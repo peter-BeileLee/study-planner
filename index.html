@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学业冲刺规划与进度管理看板</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            night: {
+              950: '#0B0F17', // 背景极致深冷色
+              900: '#111827', // 卡片主色
+              850: '#151E2E',
+              800: '#1F2937', // 边框与分界线
+              700: '#374151',
+            },
+            accent: {
+              blue: '#38BDF8',
+              cyan: '#22D3EE',
+              indigo: '#818CF8',
+              slate: '#94A3B8'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* 自定义冷色调护眼滚动条 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0B0F17;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1F2937;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #374151;
+    }
+  </style>
+</head>
+<body class="bg-night-950 text-slate-200 font-sans min-h-screen flex flex-col selection:bg-cyan-900 selection:text-cyan-200 antialiased">
+
+  <header class="border-b border-night-800 bg-night-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-2.5 h-6 bg-cyan-500 rounded-sm"></div>
+        <h1 class="text-lg font-bold tracking-wider text-slate-100 uppercase font-mono">ACADEMIC ROADMAP</h1>
+        <span class="text-xs px-2 py-0.5 rounded bg-night-800 text-slate-400 border border-night-700">READ-ONLY</span>
+      </div>
+      
+      <nav class="flex space-x-1 bg-night-950 p-1 rounded-lg border border-night-800">
+        <button id="tabWeekly" onclick="switchView('weekly')" class="px-4 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+          周度计划表 (Weekly)
+        </button>
+        <button id="tabMonthly" onclick="switchView('monthly')" class="px-4 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 text-slate-400 hover:text-slate-200">
+          月度计划表 (Monthly)
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+    <section id="viewWeekly" class="transition-opacity duration-300">
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-xl font-bold text-slate-100">高强度周期作息与课程表 (06:00 - 22:30)</h2>
+          <p class="text-xs text-slate-400 mt-1">按 30 分钟粒度进行时间块切分，强化深度认知负荷与阶段复盘。</p>
+        </div>
+        <div class="flex items-center space-x-2 text-xs text-slate-400">
+          <span class="inline-block w-2.5 h-2.5 rounded-sm bg-indigo-500/30 border border-indigo-400/40"></span> 深度学业
+          <span class="inline-block w-2.5 h-2.5 rounded-sm bg-cyan-500/30 border border-cyan-400/40 ml-2"></span> 练习与测试
+          <span class="inline-block w-2.5 h-2.5 rounded-sm bg-emerald-500/30 border border-emerald-400/40 ml-2"></span> 运动与作息
+          <span class="inline-block w-2.5 h-2.5 rounded-sm bg-amber-500/30 border border-amber-400/40 ml-2"></span> 自由复盘缓冲
+        </div>
+      </div>
+
+      <div class="overflow-x-auto rounded-lg border border-night-800 bg-night-900 shadow-2xl">
+        <div class="min-w-[950px]">
+          <div class="grid grid-cols-8 border-b border-night-800 bg-night-850 text-center text-xs font-mono font-medium text-slate-300">
+            <div class="py-3 border-r border-night-800 text-slate-500">TIME</div>
+            <div class="py-3 border-r border-night-800">周一 (MON)</div>
+            <div class="py-3 border-r border-night-800">周二 (TUE)</div>
+            <div class="py-3 border-r border-night-800">周三 (WED)</div>
+            <div class="py-3 border-r border-night-800">周四 (THU)</div>
+            <div class="py-3 border-r border-night-800">周五 (FRI)</div>
+            <div class="py-3 border-r border-night-800">周六 (SAT)</div>
+            <div class="py-3 text-cyan-400">周日 (SUN)</div>
+          </div>
+
+          <div id="weeklyGridContainer" class="divide-y divide-night-800"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="viewMonthly" class="hidden transition-opacity duration-300">
+      <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-100">里程碑与每日重点推进表</h2>
+          <p class="text-xs text-slate-400 mt-1">细化至每日的核心任务推进与考点攻坚。</p>
+        </div>
+
+        <div class="flex items-center space-x-3 bg-night-900 border border-night-800 px-3 py-1.5 rounded-lg shadow-sm">
+          <button onclick="prevMonth()" class="p-1 text-slate-400 hover:text-cyan-400 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <span id="currentMonthLabel" class="text-sm font-mono font-bold text-slate-200 tracking-wide px-2"></span>
+          <button onclick="nextMonth()" class="p-1 text-slate-400 hover:text-cyan-400 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="rounded-lg border border-night-800 bg-night-900 shadow-2xl overflow-hidden">
+        <div class="grid grid-cols-7 border-b border-night-800 bg-night-850 text-center text-xs font-mono font-medium text-slate-400">
+          <div class="py-2.5 border-r border-night-800">MON</div>
+          <div class="py-2.5 border-r border-night-800">TUE</div>
+          <div class="py-2.5 border-r border-night-800">WED</div>
+          <div class="py-2.5 border-r border-night-800">THU</div>
+          <div class="py-2.5 border-r border-night-800">FRI</div>
+          <div class="py-2.5 border-r border-night-800">SAT</div>
+          <div class="py-2.5 text-cyan-400">SUN</div>
+        </div>
+
+        <div id="monthlyCalendarGrid" class="grid grid-cols-7 divide-x divide-y divide-night-800"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="border-t border-night-800 bg-night-950 py-3 text-center text-xs font-mono text-slate-500">
+    SYSTEM STATUS: OPTIMAL &bull; DEEP WORK PROTOCOL ACTIVE
+  </footer>
+
+  <script>
+    /**
+     * 【数据配置中心】
+     * 你后续只需在此处直接增加、删除或修改你的计划内容。
+     */
+
+    // 1. 周度计划表数据
+    // 键名为 "时:分"，从 06:00 到 22:30，每 30 分钟一个槽位
+    // 数组索引 0-6 分别对应 周一至周日
+    // tag 类别可选：focus(深色学业/深蓝), test(刷题演练/青色), rest(生活作息/绿色), review(自由复盘/琥珀色), default(普通/暗灰)
+    const WEEKLY_SCHEDULE_DATA = {
+      "06:00": [
+        { text: "晨起/晨跑唤醒", tag: "rest" },
+        { text: "晨起/拉伸唤醒", tag: "rest" },
+        { text: "晨起/晨跑唤醒", tag: "rest" },
+        { text: "晨起/拉伸唤醒", tag: "rest" },
+        { text: "晨起/晨跑唤醒", tag: "rest" },
+        { text: "晨起/自主调息", tag: "rest" },
+        { text: "晨起/自主调息", tag: "rest" }
+      ],
+      "06:30": [
+        { text: "早餐 & 资讯晨读", tag: "default" },
+        { text: "早餐 & 资讯晨读", tag: "default" },
+        { text: "早餐 & 资讯晨读", tag: "default" },
+        { text: "早餐 & 资讯晨读", tag: "default" },
+        { text: "早餐 & 资讯晨读", tag: "default" },
+        { text: "高能营养早餐", tag: "default" },
+        { text: "高能营养早餐", tag: "default" }
+      ],
+      "07:00": [
+        { text: "词汇与核心公式背诵", tag: "focus" },
+        { text: "概念梳理/推导巩固", tag: "focus" },
+        { text: "词汇与核心公式背诵", tag: "focus" },
+        { text: "概念梳理/推导巩固", tag: "focus" },
+        { text: "错题集要点过筛", tag: "focus" },
+        { text: "周度知识树梳理", tag: "focus" },
+        { text: "全周错题集中再刷", tag: "test" }
+      ],
+      "08:00": [
+        { text: "高难度模块攻坚 (Block A)", tag: "focus" },
+        { text: "高难度模块攻坚 (Block A)", tag: "focus" },
+        { text: "高难度模块攻坚 (Block A)", tag: "focus" },
+        { text: "高难度模块攻坚 (Block A)", tag: "focus" },
+        { text: "全真模拟套题演练", tag: "test" },
+        { text: "全真模拟套题 (Paper 1)", tag: "test" },
+        { text: "专项弱项深度推导", tag: "focus" }
+      ],
+      "10:00": [
+        { text: "课间放松 / 远眺", tag: "rest" },
+        { text: "课间放松 / 远眺", tag: "rest" },
+        { text: "课间放松 / 远眺", tag: "rest" },
+        { text: "课间放松 / 远眺", tag: "rest" },
+        { text: "模考批改与得分分析", tag: "review" },
+        { text: "试卷分析与归因", tag: "review" },
+        { text: "知识漏洞补充补漏", tag: "review" }
+      ],
+      "10:30": [
+        { text: "例题深度剖析 (Block B)", tag: "focus" },
+        { text: "例题深度剖析 (Block B)", tag: "focus" },
+        { text: "例题深度剖析 (Block B)", tag: "focus" },
+        { text: "例题深度剖析 (Block B)", tag: "focus" },
+        { text: "难点专题强化训练", tag: "test" },
+        { text: "真题变式训练", tag: "test" },
+        { text: "思维导图整理与封装", tag: "focus" }
+      ],
+      "12:00": [
+        { text: "午餐 & 自由散步", tag: "rest" },
+        { text: "午餐 & 自由散步", tag: "rest" },
+        { text: "午餐 & 自由散步", tag: "rest" },
+        { text: "午餐 & 自由散步", tag: "rest" },
+        { text: "午餐 & 自由散步", tag: "rest" },
+        { text: "午餐 & 自由调整", tag: "rest" },
+        { text: "午餐 & 自由调整", tag: "rest" }
+      ],
+      "13:00": [
+        { text: "午间深睡眠 (20-30m)", tag: "rest" },
+        { text: "午间深睡眠 (20-30m)", tag: "rest" },
+        { text: "午间深睡眠 (20-30m)", tag: "rest" },
+        { text: "午间深睡眠 (20-30m)", tag: "rest" },
+        { text: "午间深睡眠 (20-30m)", tag: "rest" },
+        { text: "午休精力管理", tag: "rest" },
+        { text: "午休精力管理", tag: "rest" }
+      ],
+      "14:00": [
+        { text: "计算与逻辑强化 (Block C)", tag: "focus" },
+        { text: "跨学科综合演练", tag: "focus" },
+        { text: "计算与逻辑强化 (Block C)", tag: "focus" },
+        { text: "跨学科综合演练", tag: "focus" },
+        { text: "真题计时冲刺演练", tag: "test" },
+        { text: "学术拓展与阅读", tag: "focus" },
+        { text: "下周学习路径预设", tag: "review" }
+      ],
+      "16:30": [
+        { text: "体能训练 / 有氧耐力", tag: "rest" },
+        { text: "体能训练 / 核心训练", tag: "rest" },
+        { text: "体能训练 / 有氧耐力", tag: "rest" },
+        { text: "体能训练 / 核心训练", tag: "rest" },
+        { text: "户外运动与减压", tag: "rest" },
+        { text: "户外运动与减压", tag: "rest" },
+        { text: "机动缓冲时间 (Buffer)", tag: "review" }
+      ],
+      "18:00": [
+        { text: "晚餐 & 放空休息", tag: "rest" },
+        { text: "晚餐 & 放空休息", tag: "rest" },
+        { text: "晚餐 & 放空休息", tag: "rest" },
+        { text: "晚餐 & 放空休息", tag: "rest" },
+        { text: "晚餐 & 放空休息", tag: "rest" },
+        { text: "周末家庭晚餐", tag: "rest" },
+        { text: "复盘前精力储备", tag: "rest" }
+      ],
+      "19:00": [
+        { text: "当日错题闭环订正", tag: "test" },
+        { text: "当日错题闭环订正", tag: "test" },
+        { text: "当日错题闭环订正", tag: "test" },
+        { text: "当日错题闭环订正", tag: "test" },
+        { text: "全周错题二次重写", tag: "test" },
+        { text: "文献/拓展资料深研", tag: "focus" },
+        { text: "周度目标达成盘点", tag: "review" }
+      ],
+      "21:00": [
+        { text: "每日反思 & 知识归档", tag: "review" },
+        { text: "每日反思 & 知识归档", tag: "review" },
+        { text: "每日反思 & 知识归档", tag: "review" },
+        { text: "每日反思 & 知识归档", tag: "review" },
+        { text: "下一周宏观计划校验", tag: "review" },
+        { text: "学业成长手记总结", tag: "review" },
+        { text: "整顿桌面与装备", tag: "default" }
+      ],
+      "22:00": [
+        { text: "洗漱 & 彻底远离屏幕", tag: "rest" },
+        { text: "洗漱 & 彻底远离屏幕", tag: "rest" },
+        { text: "洗漱 & 彻底远离屏幕", tag: "rest" },
+        { text: "洗漱 & 彻底远离屏幕", tag: "rest" },
+        { text: "洗漱 & 彻底远离屏幕", tag: "rest" },
+        { text: "拉伸助眠 / 听书", tag: "rest" },
+        { text: "睡前深呼吸调息", tag: "rest" }
+      ],
+      "22:30": [
+        { text: "熄灯就寝 (Deep Sleep)", tag: "rest" },
+        { text: "熄灯就寝 (Deep Sleep)", tag: "rest" },
+        { text: "熄灯就寝 (Deep Sleep)", tag: "rest" },
+        { text: "熄灯就寝 (Deep Sleep)", tag: "rest" },
+        { text: "熄灯就寝 (Deep Sleep)", tag: "rest" },
+        { text: "熄灯就寝 (Deep Sleep)", tag: "rest" },
+        { text: "熄灯就寝 (Deep Sleep)", tag: "rest" }
+      ]
+    };
+
+    // 2. 月度计划表数据
+    // 格式: 'YYYY-MM-DD': [ { task: '任务描述', status: 'done' | 'urgent' | 'normal' } ]
+    const MONTHLY_SCHEDULE_DATA = {
+      "2026-09-01": [
+        { task: "学期目标拆解与 Milestone 设定", status: "urgent" },
+        { task: "核心教辅与历年真题分类入档", status: "normal" }
+      ],
+      "2026-09-05": [
+        { task: "纯数重点板块第 1 轮公式闭卷推演", status: "done" }
+      ],
+      "2026-09-12": [
+        { task: "全真模拟考试 1 (计时代入)", status: "urgent" }
+      ],
+      "2026-09-19": [
+        { task: "跨学科计算机基础模块专题攻坚", status: "normal" }
+      ],
+      "2026-09-26": [
+        { task: "月度学业进度大复盘与试卷归档", status: "urgent" }
+      ]
+    };
+
+    // 当前月历游标（默认显示当前年月）
+    let currentYear = 2026;
+    let currentMonth = 8; // 0 代表 1月，8 代表 9月
+
+    // 标签样式映射
+    const TAG_STYLES = {
+      focus: "bg-indigo-950/40 text-indigo-300 border-indigo-800/60 hover:bg-indigo-900/40",
+      test: "bg-cyan-950/40 text-cyan-300 border-cyan-800/60 hover:bg-cyan-900/40",
+      rest: "bg-emerald-950/30 text-emerald-300 border-emerald-900/50 hover:bg-emerald-900/30",
+      review: "bg-amber-950/30 text-amber-300 border-amber-900/50 hover:bg-amber-900/30",
+      default: "bg-night-850 text-slate-300 border-night-800 hover:bg-night-800"
+    };
+
+    // 视图切换
+    function switchView(view) {
+      const tabW = document.getElementById('tabWeekly');
+      const tabM = document.getElementById('tabMonthly');
+      const viewW = document.getElementById('viewWeekly');
+      const viewM = document.getElementById('viewMonthly');
+
+      if (view === 'weekly') {
+        viewW.classList.remove('hidden');
+        viewM.classList.add('hidden');
+        tabW.className = "px-4 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30";
+        tabM.className = "px-4 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 text-slate-400 hover:text-slate-200";
+      } else {
+        viewW.classList.add('hidden');
+        viewM.classList.remove('hidden');
+        tabM.className = "px-4 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30";
+        tabW.className = "px-4 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 text-slate-400 hover:text-slate-200";
+        renderMonthlyCalendar();
+      }
+    }
+
+    // 渲染周计划表
+    function renderWeeklyGrid() {
+      const container = document.getElementById('weeklyGridContainer');
+      let html = '';
+
+      for (const [timeSlot, days] of Object.entries(WEEKLY_SCHEDULE_DATA)) {
+        html += `
+          <div class="grid grid-cols-8 text-xs font-mono min-h-[46px] items-stretch">
+            <div class="p-2.5 border-r border-night-800 bg-night-850/50 flex items-center justify-center font-bold text-slate-400">
+              ${timeSlot}
+            </div>
+        `;
+
+        days.forEach((item, index) => {
+          const style = TAG_STYLES[item.tag] || TAG_STYLES.default;
+          html += `
+            <div class="p-1.5 border-r border-night-800 last:border-r-0 flex flex-col justify-center">
+              <div class="h-full w-full rounded border px-2 py-1.5 text-[11px] leading-tight flex items-center transition-colors duration-150 ${style}">
+                ${item.text}
+              </div>
+            </div>
+          `;
+        });
+
+        html += `</div>`;
+      }
+      container.innerHTML = html;
+    }
+
+    // 月历左右切换
+    function prevMonth() {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      renderMonthlyCalendar();
+    }
+
+    function nextMonth() {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      renderMonthlyCalendar();
+    }
+
+    // 渲染月度计划表
+    function renderMonthlyCalendar() {
+      const label = document.getElementById('currentMonthLabel');
+      const grid = document.getElementById('monthlyCalendarGrid');
+      
+      const monthNames = ["01 月 (JAN)", "02 月 (FEB)", "03 月 (MAR)", "04 月 (APR)", "05 月 (MAY)", "06 月 (JUN)", "07 月 (JUL)", "08 月 (AUG)", "09 月 (SEP)", "10 月 (OCT)", "11 月 (NOV)", "12 月 (DEC)"];
+      label.innerText = `${currentYear} 年 ${monthNames[currentMonth]}`;
+
+      // 获取当月天数与当月 1 号是周几
+      const firstDay = new Date(currentYear, currentMonth, 1);
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      
+      // 0 是周日，需要转换为周一作为起始 (周一为 0, 周日为 6)
+      let startingDay = firstDay.getDay() - 1;
+      if (startingDay === -1) startingDay = 6;
+
+      let html = '';
+
+      // 填充上月占位空白格
+      for (let i = 0; i < startingDay; i++) {
+        html += `<div class="min-h-[110px] bg-night-950/40 p-2 text-slate-700 font-mono text-xs select-none"></div>`;
+      }
+
+      // 渲染当月每日格子
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayTasks = MONTHLY_SCHEDULE_DATA[dateKey] || [];
+        const isToday = (new Date().toDateString() === new Date(currentYear, currentMonth, day).toDateString());
+
+        html += `
+          <div class="min-h-[110px] p-2 bg-night-900/60 hover:bg-night-850/50 transition-colors flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="font-mono text-xs font-semibold ${isToday ? 'bg-cyan-500 text-night-950 px-1.5 py-0.5 rounded-full font-bold' : 'text-slate-400'}">
+                  ${String(day).padStart(2, '0')}
+                </span>
+                ${dayTasks.length > 0 ? `<span class="text-[10px] text-cyan-400 font-mono">${dayTasks.length} 任务</span>` : ''}
+              </div>
+              <div class="space-y-1">
+                ${dayTasks.map(t => {
+                  let badge = 'border-slate-700 bg-night-800 text-slate-300';
+                  if (t.status === 'urgent') badge = 'border-rose-800/60 bg-rose-950/30 text-rose-300';
+                  if (t.status === 'done') badge = 'border-emerald-800/60 bg-emerald-950/30 text-emerald-400 line-through opacity-70';
+                  return `<div class="text-[11px] p-1 rounded border leading-tight ${badge}">${t.task}</div>`;
+                }).join('')}
+              </div>
+            </div>
+            <div class="text-right text-[10px] text-slate-700 font-mono select-none">${dateKey.substring(5)}</div>
+          </div>
+        `;
+      }
+
+      // 补齐末尾单元格
+      const totalCells = startingDay + daysInMonth;
+      const trailingCells = (7 - (totalCells % 7)) % 7;
+      for (let i = 0; i < trailingCells; i++) {
+        html += `<div class="min-h-[110px] bg-night-950/40 p-2 text-slate-700 font-mono text-xs select-none"></div>`;
+      }
+
+      grid.innerHTML = html;
+    }
+
+    // 页面加载完成后初始化
+    window.addEventListener('DOMContentLoaded', () => {
+      renderWeeklyGrid();
+    });
+  </script>
+</body>
+</html>
