@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>学业冲刺规划与进度管理看板</title>
+  <title>ACADEMIC ROADMAP OS</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,12 +24,6 @@
               850: '#151E2E',
               800: '#1F2937',
               700: '#374151',
-            },
-            accent: {
-              blue: '#38BDF8',
-              cyan: '#22D3EE',
-              indigo: '#818CF8',
-              slate: '#94A3B8'
             }
           }
         }
@@ -41,261 +35,407 @@
     ::-webkit-scrollbar-track { background: #0B0F17; }
     ::-webkit-scrollbar-thumb { background: #1F2937; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #374151; }
-    
-    /* 隐藏滑动容器的滚动条，实现丝滑纯净视觉 */
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="bg-night-950 text-slate-200 font-sans min-h-screen flex flex-col selection:bg-cyan-900 selection:text-cyan-200 antialiased">
 
-  <header class="border-b border-night-800 bg-night-900/80 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
+  <div id="loginOverlay" class="fixed inset-0 z-50 bg-night-950/95 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-night-900 border border-night-800 rounded-xl p-8 shadow-2xl">
+      <div class="flex items-center space-x-3 mb-6">
         <div class="w-2.5 h-6 bg-cyan-500 rounded-sm"></div>
-        <h1 class="text-lg font-bold tracking-wider text-slate-100 uppercase font-mono">ACADEMIC ROADMAP</h1>
-        <span class="text-xs px-2 py-0.5 rounded bg-night-800 text-slate-400 border border-night-700">READ-ONLY</span>
+        <div>
+          <h2 class="text-lg font-bold tracking-wider text-slate-100 font-mono uppercase">AUTHENTICATION</h2>
+          <p class="text-xs text-slate-500 font-mono">ACADEMIC ROADMAP KERNEL ACCESS</p>
+        </div>
       </div>
-      
-      <nav class="flex space-x-1 bg-night-950 p-1 rounded-lg border border-night-800">
-        <button id="tabWeekly" onclick="switchView('weekly')" class="px-4 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
-          周度计划表 (Weekly)
+
+      <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-mono text-slate-400 mb-1">ACCOUNT IDENTIFIER</label>
+          <input type="text" id="loginUser" required placeholder="BeileLee"
+                 class="w-full bg-night-950 border border-night-800 rounded-lg px-3.5 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-colors">
+        </div>
+        <div>
+          <label class="block text-xs font-mono text-slate-400 mb-1">SECURITY ACCESS KEY</label>
+          <input type="password" id="loginPass" required placeholder="••••••••"
+                 class="w-full bg-night-950 border border-night-800 rounded-lg px-3.5 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-colors">
+        </div>
+        <div id="loginError" class="text-xs text-rose-400 font-mono hidden"></div>
+        <button type="submit"
+                class="w-full mt-2 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 font-mono text-xs font-bold py-2.5 rounded-lg transition-all">
+          AUTHORIZE & ENTER
         </button>
-        <button id="tabMonthly" onclick="switchView('monthly')" class="px-4 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 text-slate-400 hover:text-slate-200">
-          月度计划表 (Monthly)
-        </button>
-      </nav>
+      </form>
     </div>
-  </header>
+  </div>
 
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
-
-    <section id="viewWeekly" class="transition-opacity duration-300">
-      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 class="text-xl font-bold text-slate-100">核心学业与作息时间表</h2>
-          <p class="text-xs text-slate-400 mt-1">融合校内排期 (Period 1-14) 与个人周末冲刺时段。</p>
+  <div id="appContainer" class="hidden min-h-screen flex flex-col">
+    <header class="border-b border-night-800 bg-night-900/80 backdrop-blur sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-2.5 h-6 bg-cyan-500 rounded-sm"></div>
+          <h1 class="text-base sm:text-lg font-bold tracking-wider text-slate-100 uppercase font-mono">ACADEMIC ROADMAP</h1>
+          <span id="roleBadge" class="text-[10px] px-2 py-0.5 rounded bg-night-800 text-cyan-400 border border-cyan-900 font-mono"></span>
         </div>
-        <div class="flex items-center space-x-2 text-xs text-slate-400">
-          <span class="inline-block w-2.5 h-2.5 rounded-sm bg-indigo-500/30 border border-indigo-400/40"></span> 核心理科
-          <span class="inline-block w-2.5 h-2.5 rounded-sm bg-cyan-500/30 border border-cyan-400/40 ml-2"></span> 文科/综合
-          <span class="inline-block w-2.5 h-2.5 rounded-sm bg-emerald-500/30 border border-emerald-400/40 ml-2"></span> 休息/体能
-          <span class="inline-block w-2.5 h-2.5 rounded-sm bg-amber-500/30 border border-amber-400/40 ml-2"></span> 自由/自习
-        </div>
-      </div>
-
-      <div class="overflow-x-auto rounded-lg border border-night-800 bg-night-900 shadow-2xl">
-        <div class="min-w-[1000px]">
-          <div class="grid grid-cols-8 border-b border-night-800 bg-night-850 text-center text-xs font-mono font-medium text-slate-300">
-            <div class="py-3 border-r border-night-800 text-slate-500">PERIOD / TIME</div>
-            <div class="py-3 border-r border-night-800">周一 (MON)</div>
-            <div class="py-3 border-r border-night-800">周二 (TUE)</div>
-            <div class="py-3 border-r border-night-800">周三 (WED)</div>
-            <div class="py-3 border-r border-night-800">周四 (THU)</div>
-            <div class="py-3 border-r border-night-800">周五 (FRI)</div>
-            <div class="py-3 border-r border-night-800">周六 (SAT)</div>
-            <div class="py-3 text-cyan-400">周日 (SUN)</div>
-          </div>
-          <div id="weeklyGridContainer" class="divide-y divide-night-800"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="viewMonthly" class="hidden transition-opacity duration-300">
-      <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h2 class="text-xl font-bold text-slate-100">里程碑与每日重点推进表</h2>
-          <p class="text-xs text-slate-400 mt-1">支持触控板双指左右滑动，或鼠标拖动、下方按钮控制。</p>
-        </div>
-
-        <div class="flex items-center space-x-3 bg-night-900 border border-night-800 px-3 py-1.5 rounded-lg shadow-sm">
-          <button onclick="slidePrev()" class="p-1 text-slate-400 hover:text-cyan-400 transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-          </button>
-          <span id="currentMonthLabel" class="text-sm font-mono font-bold text-cyan-400 tracking-wide px-2 min-w-[120px] text-center">读取中...</span>
-          <button onclick="slideNext()" class="p-1 text-slate-400 hover:text-cyan-400 transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        
+        <div class="flex items-center space-x-3">
+          <nav class="flex space-x-1 bg-night-950 p-1 rounded-lg border border-night-800">
+            <button id="tabWeekly" onclick="switchView('weekly')" class="px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all duration-200">
+              周度计划 (Weekly)
+            </button>
+            <button id="tabMonthly" onclick="switchView('monthly')" class="px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all duration-200">
+              月度计划 (Monthly)
+            </button>
+          </nav>
+          <button onclick="handleLogout()" title="安全注销" class="p-2 text-slate-500 hover:text-rose-400 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
           </button>
         </div>
       </div>
+    </header>
 
-      <div class="rounded-lg border border-night-800 bg-night-900 shadow-2xl overflow-hidden">
-        <div class="grid grid-cols-7 border-b border-night-800 bg-night-850 text-center text-xs font-mono font-medium text-slate-400 relative z-10">
-          <div class="py-2.5 border-r border-night-800">MON</div>
-          <div class="py-2.5 border-r border-night-800">TUE</div>
-          <div class="py-2.5 border-r border-night-800">WED</div>
-          <div class="py-2.5 border-r border-night-800">THU</div>
-          <div class="py-2.5 border-r border-night-800">FRI</div>
-          <div class="py-2.5 border-r border-night-800">SAT</div>
-          <div class="py-2.5 text-cyan-400">SUN</div>
-        </div>
-        <div id="calendar-carousel" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar w-full">
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+      <section id="viewWeekly" class="transition-opacity duration-300">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg sm:text-xl font-bold text-slate-100 font-mono">HIGH-INTENSITY WEEKLY REGIMEN</h2>
+            <p class="text-xs text-slate-400 mt-0.5">06:00起 | 无早晚餐 | 11:00午餐20m | 放学即复盘 | 竞赛/高数/雅思/项目/体能闭环</p>
           </div>
-      </div>
-    </section>
+          <div class="flex items-center space-x-2 text-[11px] text-slate-400 font-mono">
+            <span class="inline-block w-2 h-2 rounded-sm bg-indigo-500/30 border border-indigo-400/40"></span> 校内理科
+            <span class="inline-block w-2 h-2 rounded-sm bg-sky-500/30 border border-sky-400/40 ml-2"></span> 竞赛与高数
+            <span class="inline-block w-2 h-2 rounded-sm bg-purple-500/30 border border-purple-400/40 ml-2"></span> 实习与阅读
+            <span class="inline-block w-2 h-2 rounded-sm bg-emerald-500/30 border border-emerald-400/40 ml-2"></span> 体能训练
+            <span class="inline-block w-2 h-2 rounded-sm bg-amber-500/30 border border-amber-400/40 ml-2"></span> 课后复习
+          </div>
+        </div>
 
-  </main>
+        <div class="overflow-x-auto rounded-lg border border-night-800 bg-night-900 shadow-2xl">
+          <div class="min-w-[1050px]">
+            <div class="grid grid-cols-8 border-b border-night-800 bg-night-850 text-center text-xs font-mono font-medium text-slate-300">
+              <div class="py-3 border-r border-night-800 text-slate-500">PERIOD / TIME</div>
+              <div class="py-3 border-r border-night-800">周一 (MON)</div>
+              <div class="py-3 border-r border-night-800">周二 (TUE)</div>
+              <div class="py-3 border-r border-night-800">周三 (WED)</div>
+              <div class="py-3 border-r border-night-800">周四 (THU)</div>
+              <div class="py-3 border-r border-night-800">周五 (FRI)</div>
+              <div class="py-3 border-r border-night-800">周六 (SAT)</div>
+              <div class="py-3 text-cyan-400">周日 (SUN)</div>
+            </div>
+            <div id="weeklyGridContainer" class="divide-y divide-night-800"></div>
+          </div>
+        </div>
+      </section>
 
-  <footer class="border-t border-night-800 bg-night-950 py-3 text-center text-xs font-mono text-slate-500">
-    SYSTEM STATUS: OPTIMAL &bull; DEEP WORK PROTOCOL ACTIVE
-  </footer>
+      <section id="viewMonthly" class="hidden transition-opacity duration-300">
+        <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 class="text-lg sm:text-xl font-bold text-slate-100 font-mono">MONTHLY STRATEGIC ROADMAP</h2>
+            <p class="text-xs text-slate-400 mt-0.5">支持触控屏/双指横向滑动连续切换月份。</p>
+          </div>
+
+          <div class="flex items-center space-x-3 bg-night-900 border border-night-800 px-3 py-1.5 rounded-lg shadow-sm">
+            <button onclick="slidePrev()" class="p-1 text-slate-400 hover:text-cyan-400 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <span id="currentMonthLabel" class="text-sm font-mono font-bold text-cyan-400 tracking-wide px-2 min-w-[130px] text-center">读取中...</span>
+            <button onclick="slideNext()" class="p-1 text-slate-400 hover:text-cyan-400 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="rounded-lg border border-night-800 bg-night-900 shadow-2xl overflow-hidden">
+          <div class="grid grid-cols-7 border-b border-night-800 bg-night-850 text-center text-xs font-mono font-medium text-slate-400 relative z-10">
+            <div class="py-2.5 border-r border-night-800">MON</div>
+            <div class="py-2.5 border-r border-night-800">TUE</div>
+            <div class="py-2.5 border-r border-night-800">WED</div>
+            <div class="py-2.5 border-r border-night-800">THU</div>
+            <div class="py-2.5 border-r border-night-800">FRI</div>
+            <div class="py-2.5 border-r border-night-800">SAT</div>
+            <div class="py-2.5 text-cyan-400">SUN</div>
+          </div>
+          <div id="calendar-carousel" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar w-full"></div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="border-t border-night-800 bg-night-950 py-3 text-center text-xs font-mono text-slate-500">
+      SYSTEM STATUS: OPTIMAL &bull; FOCUS PROTOCOL ENFORCED &bull; READ-ONLY
+    </footer>
+  </div>
 
   <script>
-    // 标签样式映射
+    /* ==================== 身份验证与权限控制 ==================== */
+    let currentUserRole = null; // 'all' (全局) | 'monthly_only' (仅月度)
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('loginUser').value.trim();
+      const p = document.getElementById('loginPass').value.trim();
+      const err = document.getElementById('loginError');
+
+      if (u === 'BeileLee' && p === '081130Peter') {
+        setSession('all');
+      } else if (u === 'BeileLee' && p === 'peterli') {
+        setSession('monthly_only');
+      } else {
+        err.innerText = "ACCESS DENIED: 无效的账号凭据";
+        err.classList.remove('hidden');
+      }
+    }
+
+    function setSession(role) {
+      currentUserRole = role;
+      sessionStorage.setItem('academic_auth_role', role);
+      document.getElementById('loginOverlay').classList.add('hidden');
+      document.getElementById('appContainer').classList.remove('hidden');
+      
+      const badge = document.getElementById('roleBadge');
+      const tabW = document.getElementById('tabWeekly');
+
+      if (role === 'all') {
+        badge.innerText = "ROOT: FULL ACCESS";
+        tabW.classList.remove('hidden');
+        switchView('weekly');
+      } else {
+        badge.innerText = "GUEST: MONTHLY ONLY";
+        tabW.classList.add('hidden'); // 彻底隐藏周度视图按钮
+        switchView('monthly');
+      }
+      renderWeeklyGrid();
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem('academic_auth_role');
+      currentUserRole = null;
+      document.getElementById('appContainer').classList.add('hidden');
+      document.getElementById('loginOverlay').classList.remove('hidden');
+      document.getElementById('loginPass').value = '';
+      document.getElementById('loginError').classList.add('hidden');
+    }
+
+    // 检查本地已有登录状态
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedRole = sessionStorage.getItem('academic_auth_role');
+      if (savedRole === 'all' || savedRole === 'monthly_only') {
+        setSession(savedRole);
+      }
+    });
+
+    /* ==================== 样式配色与调度标签 ==================== */
     const TAG_STYLES = {
-      focus: "bg-indigo-950/40 text-indigo-200 border-indigo-800/60 hover:bg-indigo-900/40", // 数/理/化/机核心
-      default: "bg-night-850 text-slate-300 border-night-700 hover:bg-night-800", // 英语/PSHE/Form Time
-      rest: "bg-emerald-950/30 text-emerald-300 border-emerald-900/50 hover:bg-emerald-900/30", // 体育/吃饭/睡觉
-      review: "bg-amber-950/30 text-amber-300 border-amber-900/50 hover:bg-amber-900/30" // 自习/空闲/周末安排
+      school_stem: "bg-indigo-950/40 text-indigo-200 border-indigo-800/60 hover:bg-indigo-900/40",  // 校内理科 (Chem, CS, Phys, Math)
+      school_gen:  "bg-night-850 text-slate-300 border-night-700 hover:bg-night-800",             // 校内常规 (Form, Eng, PSHE)
+      comp_stem:   "bg-sky-950/50 text-sky-200 border-sky-800/70 hover:bg-sky-900/40",           // 核心竞赛与高数 (BMO, AMC12, HiMCM, AL FM)
+      project_read:"bg-purple-950/40 text-purple-200 border-purple-800/60 hover:bg-purple-900/40",// 实习项目推进 & 双语学术阅读
+      review_task: "bg-amber-950/30 text-amber-300 border-amber-900/50 hover:bg-amber-900/30",   // 放学课后复习闭环 & 雅思
+      physical:    "bg-emerald-950/30 text-emerald-300 border-emerald-900/50 hover:bg-emerald-900/30", // 运动体能/洗漱
+      dining:      "bg-slate-900 text-slate-400 border-slate-800"                               // 极速午餐 (20m)
     };
 
-    // 构建符合校历的周数据
+    /* ==================== 周度计划数据 (06:00 - 22:30) ==================== */
     const WEEKLY_SCHEDULE_DATA = [
       {
-        timeLabel: "Morning<br><span class='text-[10px] text-slate-500'>06:00-07:50</span>",
+        timeLabel: "晨起洗漱<br><span class='text-[10px] text-slate-500'>06:00-06:05</span>",
         days: [
-          { text: "晨起唤醒 / 自习", tag: "review" }, { text: "晨起唤醒 / 自习", tag: "review" }, { text: "晨起唤醒 / 自习", tag: "review" },
-          { text: "晨起唤醒 / 自习", tag: "review" }, { text: "晨起唤醒 / 自习", tag: "review" }, { text: "周末充沛睡眠", tag: "rest" }, { text: "周末充沛睡眠", tag: "rest" }
+          { text: "洗漱 (5m)", tag: "physical" }, { text: "洗漱 (5m)", tag: "physical" }, { text: "洗漱 (5m)", tag: "physical" },
+          { text: "洗漱 (5m)", tag: "physical" }, { text: "洗漱 (5m)", tag: "physical" }, { text: "洗漱 (5m)", tag: "physical" }, { text: "洗漱 (5m)", tag: "physical" }
+        ]
+      },
+      {
+        timeLabel: "晨间冲刺<br><span class='text-[10px] text-slate-500'>06:05-07:45</span>",
+        days: [
+          { text: "雅思听说精练 (100m)", tag: "review_task" },
+          { text: "BMO 几何与数论专项 (100m)", tag: "comp_stem" },
+          { text: "雅思读写逻辑攻坚 (100m)", tag: "review_task" },
+          { text: "AMC 12 组合与代数突破 (100m)", tag: "comp_stem" },
+          { text: "AL 高数核心定理推导 (100m)", tag: "comp_stem" },
+          { text: "BMO/AMC12 计时全真模考", tag: "comp_stem" },
+          { text: "HiMCM 算法框架构建与演练", tag: "comp_stem" }
         ]
       },
       {
         timeLabel: "Form Time<br><span class='text-[10px] text-slate-500'>07:50-08:00</span>",
         days: [
-          { text: "Form Time-A1<br>(A611)", tag: "default" }, { text: "Form Time-A1<br>(CR)", tag: "default" }, { text: "Form Time-A1<br>(A611)", tag: "default" },
-          { text: "Form Time-A1<br>(CR)", tag: "default" }, { text: "Form Time-A1<br>(A611)", tag: "default" }, { text: "晨起洗漱", tag: "rest" }, { text: "晨起洗漱", tag: "rest" }
+          { text: "Form Time-A1<br>(A611)", tag: "school_gen" }, { text: "Form Time-A1<br>(CR)", tag: "school_gen" }, { text: "Form Time-A1<br>(A611)", tag: "school_gen" },
+          { text: "Form Time-A1<br>(CR)", tag: "school_gen" }, { text: "Form Time-A1<br>(A611)", tag: "school_gen" }, { text: "雅思高频词根归纳", tag: "review_task" }, { text: "数学原著阅读", tag: "project_read" }
         ]
       },
       {
-        timeLabel: "Period 1<br><span class='text-[10px] text-slate-500'>08:10-08:50</span>",
+        timeLabel: "Period 1-2<br><span class='text-[10px] text-slate-500'>08:10-09:30</span>",
         days: [
-          { text: "Chemistry-AS<br>(MAS)", tag: "focus" }, { text: "Computer Science<br>(ANT)", tag: "focus" }, { text: "Physics-AS<br>(CAF)", tag: "focus" },
-          { text: "自主查漏补缺", tag: "review" }, { text: "Mathematics-AL<br>(YVL)", tag: "focus" }, { text: "模拟套题演练", tag: "review" }, { text: "高难度错题攻坚", tag: "review" }
+          { text: "Chemistry-AS<br>(MAS)", tag: "school_stem" },
+          { text: "Computer Science<br>(ANT)", tag: "school_stem" },
+          { text: "Physics-AS<br>(CAF)", tag: "school_stem" },
+          { text: "AL 高数：矩阵与微积分深入", tag: "comp_stem" },
+          { text: "Mathematics-AL<br>(YVL)", tag: "school_stem" },
+          { text: "实习项目：核心架构设计/代码", tag: "project_read" },
+          { text: "实习项目：数据流与算法验证", tag: "project_read" }
         ]
       },
       {
-        timeLabel: "Period 2<br><span class='text-[10px] text-slate-500'>08:50-09:30</span>",
+        timeLabel: "Period 3-4<br><span class='text-[10px] text-slate-500'>09:40-11:00</span>",
         days: [
-          { text: "Chemistry-AS<br>(MAS)", tag: "focus" }, { text: "Computer Science<br>(ANT)", tag: "focus" }, { text: "Physics-AS<br>(CAF)", tag: "focus" },
-          { text: "自主查漏补缺", tag: "review" }, { text: "Mathematics-AL<br>(YVL)", tag: "focus" }, { text: "模拟套题演练", tag: "review" }, { text: "高难度错题攻坚", tag: "review" }
+          { text: "English-A1.Lit<br>(JAS)", tag: "school_gen" },
+          { text: "BMO 历年真题推演", tag: "comp_stem" },
+          { text: "Mathematics-AL<br>(XIY)", tag: "school_stem" },
+          { text: "Chemistry-AS<br>(MAS)", tag: "school_stem" },
+          { text: "Computer Science<br>(ANT)", tag: "school_stem" },
+          { text: "AMC 12 核心套题冲刺", tag: "comp_stem" },
+          { text: "AL 高数题集专项突破", tag: "comp_stem" }
         ]
       },
       {
-        timeLabel: "Period 3<br><span class='text-[10px] text-slate-500'>09:40-10:20</span>",
+        timeLabel: "极速午餐<br><span class='text-[10px] text-slate-500'>11:00-11:20</span>",
         days: [
-          { text: "English-A1<br>(JAS)", tag: "default" }, { text: "自主查漏补缺", tag: "review" }, { text: "Mathematics-AL<br>(XIY)", tag: "focus" },
-          { text: "Chemistry-AS<br>(MAS)", tag: "focus" }, { text: "Computer Science<br>(ANT)", tag: "focus" }, { text: "试卷深度分析", tag: "review" }, { text: "弱项推导/背诵", tag: "review" }
+          { text: "午餐 (20m)", tag: "dining" }, { text: "午餐 (20m)", tag: "dining" }, { text: "PSHE前午餐(20m)", tag: "dining" },
+          { text: "午餐 (20m)", tag: "dining" }, { text: "午餐 (20m)", tag: "dining" }, { text: "午餐 (20m)", tag: "dining" }, { text: "午餐 (20m)", tag: "dining" }
         ]
       },
       {
-        timeLabel: "Period 4<br><span class='text-[10px] text-slate-500'>10:20-11:00</span>",
+        timeLabel: "Period 5-6<br><span class='text-[10px] text-slate-500'>11:20-12:40</span>",
         days: [
-          { text: "English-A1<br>(JAS)", tag: "default" }, { text: "自主查漏补缺", tag: "review" }, { text: "Mathematics-AL<br>(XIY)", tag: "focus" },
-          { text: "Chemistry-AS<br>(MAS)", tag: "focus" }, { text: "Computer Science<br>(ANT)", tag: "focus" }, { text: "试卷深度分析", tag: "review" }, { text: "弱项推导/背诵", tag: "review" }
+          { text: "HiMCM 建模：论文精读与复现", tag: "comp_stem" },
+          { text: "数学原著阅读 (Math Texts)", tag: "project_read" },
+          { text: "11:20-12:00 PSHE-A1<br>12:00-12:40 雅思阅读", tag: "school_gen" },
+          { text: "校内理科难点回溯预习", tag: "review_task" },
+          { text: "英语校内必读书目精读", tag: "project_read" },
+          { text: "数学原著深度推导研读", tag: "project_read" },
+          { text: "英语校内书目阅读与笔记", tag: "project_read" }
         ]
       },
       {
-        timeLabel: "Period 5<br><span class='text-[10px] text-slate-500'>11:20-12:00</span>",
+        timeLabel: "Midday Slot<br><span class='text-[10px] text-slate-500'>12:40-13:30</span>",
         days: [
-          { text: "自主查漏补缺", tag: "review" }, { text: "自主查漏补缺", tag: "review" }, { text: "PSHE-A1<br>(ADW)", tag: "default" },
-          { text: "自主查漏补缺", tag: "review" }, { text: "自主查漏补缺", tag: "review" }, { text: "知识漏洞修补", tag: "review" }, { text: "知识漏洞修补", tag: "review" }
+          { text: "英语必读书目快速阅读", tag: "project_read" },
+          { text: "雅思听力真题速刷", tag: "review_task" },
+          { text: "Pastoral / 竞赛定理速记", tag: "school_gen" },
+          { text: "英语必读书目快速阅读", tag: "project_read" },
+          { text: "雅思长难句精析", tag: "review_task" },
+          { text: "实习项目：方案与文档输出", tag: "project_read" },
+          { text: "HiMCM 团队分工与模型调试", tag: "comp_stem" }
         ]
       },
       {
-        timeLabel: "Period 6<br><span class='text-[10px] text-slate-500'>12:00-12:40</span>",
+        timeLabel: "Period 7-8<br><span class='text-[10px] text-slate-500'>13:40-15:00</span>",
         days: [
-          { text: "自主查漏补缺", tag: "review" }, { text: "自主查漏补缺", tag: "review" }, { text: "自主查漏补缺", tag: "review" },
-          { text: "自主查漏补缺", tag: "review" }, { text: "自主查漏补缺", tag: "review" }, { text: "课外拓展阅读", tag: "review" }, { text: "课外拓展阅读", tag: "review" }
+          { text: "Physics-AS<br>(CAF)", tag: "school_stem" },
+          { text: "Chemistry-AS<br>(MAS)", tag: "school_stem" },
+          { text: "Computer Science<br>(ANT)", tag: "school_stem" },
+          { text: "English-A1.Lit<br>(JAS)", tag: "school_gen" },
+          { text: "实习项目推进 (工程开发)", tag: "project_read" },
+          { text: "AL 高数：微分方程强化", tag: "comp_stem" },
+          { text: "雅思完整写作 Task 2 演练", tag: "review_task" }
         ]
       },
       {
-        timeLabel: "Lunch<br><span class='text-[10px] text-slate-500'>12:40-13:10</span>",
+        timeLabel: "Period 9-10<br><span class='text-[10px] text-slate-500'>15:10-16:30</span>",
         days: [
-          { text: "Lunch 午餐", tag: "rest" }, { text: "Lunch 午餐", tag: "rest" }, { text: "Lunch 午餐", tag: "rest" },
-          { text: "Lunch 午餐", tag: "rest" }, { text: "Lunch 午餐", tag: "rest" }, { text: "午餐 & 休息", tag: "rest" }, { text: "午餐 & 休息", tag: "rest" }
+          { text: "Mathematics-AL<br>(YVL)", tag: "school_stem" },
+          { text: "HiMCM 建模算法与仿真", tag: "comp_stem" },
+          { text: "PE-A1<br>(HYM 体能)", tag: "physical" },
+          { text: "Physics-AS<br>(CAF)", tag: "school_stem" },
+          { text: "AMC 12 易错点专题集训", tag: "comp_stem" },
+          { text: "BMO 综合大题攻坚演练", tag: "comp_stem" },
+          { text: "全周错题全量二次重演", tag: "comp_stem" }
         ]
       },
       {
-        timeLabel: "Pastoral<br><span class='text-[10px] text-slate-500'>13:20-13:30</span>",
+        timeLabel: "课后黄金期<br><span class='text-[10px] text-slate-500'>16:40-17:40</span>",
         days: [
-          { text: "Pastoral", tag: "default" }, { text: "Pastoral", tag: "default" }, { text: "Pastoral", tag: "default" },
-          { text: "Pastoral", tag: "default" }, { text: "Pastoral", tag: "default" }, { text: "午间深休", tag: "rest" }, { text: "午间深休", tag: "rest" }
+          { text: "校内各科复习：当日物理/数/化", tag: "review_task" },
+          { text: "校内各科复习：CS/化学笔记订正", tag: "review_task" },
+          { text: "校内各科复习：数学/物理作业", tag: "review_task" },
+          { text: "校内各科复习：化学/英语整理", tag: "review_task" },
+          { text: "SCIE Swimming Team (SIL)", tag: "physical" }, // 校内游泳队
+          { text: "雅思听力/口语打卡突破", tag: "review_task" },
+          { text: "校内各科全周错题归档封装", tag: "review_task" }
         ]
       },
       {
-        timeLabel: "Period 7<br><span class='text-[10px] text-slate-500'>13:40-14:20</span>",
+        timeLabel: "每日运动<br><span class='text-[10px] text-slate-500'>17:40-18:40</span>",
         days: [
-          { text: "Physics-AS<br>(CAF)", tag: "focus" }, { text: "Chemistry-AS<br>(MAS)", tag: "focus" }, { text: "Computer Science<br>(ANT)", tag: "focus" },
-          { text: "English-A1<br>(JAS)", tag: "default" }, { text: "自主查漏补缺", tag: "review" }, { text: "专业文献深读", tag: "focus" }, { text: "下周学业预演", tag: "review" }
+          { text: "游泳训练 (1h 游泳专项)", tag: "physical" },
+          { text: "陆上体能训练 (核心与耐力)", tag: "physical" },
+          { text: "Baking Club / 自由拉伸", tag: "school_gen" },
+          { text: "游泳训练 (1h 泳姿速度)", tag: "physical" }, // 原数模社已取缔，排入游泳
+          { text: "陆上体能拉伸与放松", tag: "physical" },
+          { text: "高强度游泳耐力突破 (1h)", tag: "physical" },
+          { text: "陆上体能恢复性训练 (1h)", tag: "physical" }
         ]
       },
       {
-        timeLabel: "Period 8<br><span class='text-[10px] text-slate-500'>14:20-15:00</span>",
+        timeLabel: "大块攻坚 I<br><span class='text-[10px] text-slate-500'>18:40-20:00</span>",
         days: [
-          { text: "Physics-AS<br>(CAF)", tag: "focus" }, { text: "Chemistry-AS<br>(MAS)", tag: "focus" }, { text: "Computer Science<br>(ANT)", tag: "focus" },
-          { text: "English-A1<br>(JAS)", tag: "default" }, { text: "自主查漏补缺", tag: "review" }, { text: "专业文献深读", tag: "focus" }, { text: "下周学业预演", tag: "review" }
+          { text: "AL 高数：深度刷题与难点攻坚", tag: "comp_stem" },
+          { text: "BMO 备赛：代数/函数方程大题", tag: "comp_stem" },
+          { text: "AMC 12 压轴第21-25题专题", tag: "comp_stem" },
+          { text: "AL 高数：进阶力学与统计解析", tag: "comp_stem" },
+          { text: "HiMCM 建模：团队协同与论文编撰", tag: "comp_stem" },
+          { text: "实习项目：系统模块测试联调", tag: "project_read" },
+          { text: "下周校内课程高阶深度预习", tag: "review_task" }
         ]
       },
       {
-        timeLabel: "Period 9<br><span class='text-[10px] text-slate-500'>15:10-15:50</span>",
+        timeLabel: "大块攻坚 II<br><span class='text-[10px] text-slate-500'>20:00-21:15</span>",
         days: [
-          { text: "Mathematics-AL<br>(YVL)", tag: "focus" }, { text: "自主查漏补缺", tag: "review" }, { text: "PE-A1<br>(HYM)", tag: "rest" },
-          { text: "Physics-AS<br>(CAF)", tag: "focus" }, { text: "自主查漏补缺", tag: "review" }, { text: "有氧体能训练", tag: "rest" }, { text: "户外散步放松", tag: "rest" }
+          { text: "实习项目推进：功能实现与优化", tag: "project_read" },
+          { text: "实习项目推进：功能实现与优化", tag: "project_read" },
+          { text: "HiMCM 建模：Python数据分析拟合", tag: "comp_stem" },
+          { text: "实习项目推进：模块性能调优", tag: "project_read" },
+          { text: "AL 高数 / 竞赛弱项深度复盘", tag: "comp_stem" },
+          { text: "数学经典原著精读笔记 (75m)", tag: "project_read" },
+          { text: "校内英语书籍深度分析写作", tag: "project_read" }
         ]
       },
       {
-        timeLabel: "Period 10<br><span class='text-[10px] text-slate-500'>15:50-16:30</span>",
+        timeLabel: "学术阅读/闭环<br><span class='text-[10px] text-slate-500'>21:15-22:00</span>",
         days: [
-          { text: "Mathematics-AL<br>(YVL)", tag: "focus" }, { text: "自主查漏补缺", tag: "review" }, { text: "PE-A1<br>(HYM)", tag: "rest" },
-          { text: "Physics-AS<br>(CAF)", tag: "focus" }, { text: "自主查漏补缺", tag: "review" }, { text: "有氧体能训练", tag: "rest" }, { text: "户外散步放松", tag: "rest" }
+          { text: "数学原著阅读 / 英语校内书目", tag: "project_read" },
+          { text: "英语校内必读书籍深度阅读", tag: "project_read" },
+          { text: "数学原著阅读 / 逻辑思维整理", tag: "project_read" },
+          { text: "雅思写作素材整理与反思", tag: "review_task" },
+          { text: "全周各项学习完成度指标复盘", tag: "review_task" },
+          { text: "双语学术书籍自由阅读拓展", tag: "project_read" },
+          { text: "整理桌面装备/下周全局推演", tag: "school_gen" }
         ]
       },
       {
-        timeLabel: "Period 11<br><span class='text-[10px] text-slate-500'>16:40-17:30</span>",
+        timeLabel: "休整就寝<br><span class='text-[10px] text-slate-500'>22:00-22:30</span>",
         days: [
-          { text: "晚课前整理复习", tag: "review" }, { text: "晚课前整理复习", tag: "review" }, { text: "晚课前整理复习", tag: "review" },
-          { text: "晚课前整理复习", tag: "review" }, { text: "SCIE Swimming<br>(SIL)", tag: "rest" }, { text: "个人休闲时间", tag: "rest" }, { text: "机动缓冲期", tag: "review" }
-        ]
-      },
-      {
-        timeLabel: "Period 12<br><span class='text-[10px] text-slate-500'>17:30-18:30</span>",
-        days: [
-          { text: "晚餐 / 闭目养神", tag: "rest" }, { text: "晚餐 / 闭目养神", tag: "rest" }, { text: "Baking Club<br>(LIB)", tag: "rest" },
-          { text: "晚餐 / 闭目养神", tag: "rest" }, /* 取消了数模社 */
-          { text: "晚餐 / 闭目养神", tag: "rest" }, { text: "家庭晚餐", tag: "rest" }, { text: "家庭晚餐", tag: "rest" }
-        ]
-      },
-      {
-        timeLabel: "Period 13<br><span class='text-[10px] text-slate-500'>19:00-20:00</span>",
-        days: [
-          { text: "晚自习 / 弱项攻坚", tag: "review" }, { text: "晚自习 / 弱项攻坚", tag: "review" }, { text: "晚自习 / 弱项攻坚", tag: "review" },
-          { text: "晚自习 / 弱项攻坚", tag: "review" }, { text: "晚自习 / 弱项攻坚", tag: "review" }, { text: "电影/爱好放松", tag: "rest" }, { text: "大盘点与下周排期", tag: "review" }
-        ]
-      },
-      {
-        timeLabel: "Period 14<br><span class='text-[10px] text-slate-500'>20:00-21:00</span>",
-        days: [
-          { text: "深度复盘与知识归档", tag: "review" }, { text: "深度复盘与知识归档", tag: "review" }, { text: "深度复盘与知识归档", tag: "review" },
-          { text: "深度复盘与知识归档", tag: "review" }, { text: "深度复盘与知识归档", tag: "review" }, { text: "电影/爱好放松", tag: "rest" }, { text: "大盘点与下周排期", tag: "review" }
-        ]
-      },
-      {
-        timeLabel: "Evening<br><span class='text-[10px] text-slate-500'>21:00-22:30</span>",
-        days: [
-          { text: "洗漱 / 远离屏幕 / 熄灯", tag: "rest" }, { text: "洗漱 / 远离屏幕 / 熄灯", tag: "rest" }, { text: "洗漱 / 远离屏幕 / 熄灯", tag: "rest" },
-          { text: "洗漱 / 远离屏幕 / 熄灯", tag: "rest" }, { text: "洗漱 / 远离屏幕 / 熄灯", tag: "rest" }, { text: "洗漱助眠", tag: "rest" }, { text: "洗漱助眠", tag: "rest" }
+          { text: "洗澡/准备 -> 22:30熄灯", tag: "physical" },
+          { text: "洗澡/准备 -> 22:30熄灯", tag: "physical" },
+          { text: "洗澡/准备 -> 22:30熄灯", tag: "physical" },
+          { text: "洗澡/准备 -> 22:30熄灯", tag: "physical" },
+          { text: "洗澡/准备 -> 22:30熄灯", tag: "physical" },
+          { text: "洗澡/准备 -> 22:30熄灯", tag: "physical" },
+          { text: "洗澡/准备 -> 22:30熄灯", tag: "physical" }
         ]
       }
     ];
 
-    // 月度计划表特定任务数据
+    /* ==================== 月度计划数据 ==================== */
     const MONTHLY_SCHEDULE_DATA = {
-      "2026-09-06": [{ task: "全面切换新版学校课表运行", status: "urgent" }],
-      "2026-09-12": [{ task: "计算机科学 9618 专题梳理", status: "normal" }],
-      "2026-09-26": [{ task: "月度学习曲线与进度大复盘", status: "urgent" }]
+      "2026-09-07": [{ task: "新学期第4周：执行无早晚餐极限作息", status: "urgent" }],
+      "2026-09-12": [{ task: "AMC 12 阶段模考 (目标 120+)", status: "urgent" }],
+      "2026-09-19": [{ task: "BMO Round 1 历年真题阶段验收", status: "urgent" }],
+      "2026-09-26": [{ task: "HiMCM 组队论文模板与算法库封版", status: "normal" }],
+      "2026-10-10": [{ task: "AL 高数阶段测试复习与模拟", status: "urgent" }],
+      "2026-10-24": [{ task: "雅思全真计时代入模考", status: "urgent" }]
     };
 
-    // 视图切换
+    /* ==================== 视图与渲染 ==================== */
     function switchView(view) {
+      if (view === 'weekly' && currentUserRole === 'monthly_only') {
+        alert("权限受限：该账号仅被授权访问月度战略规划表。");
+        return;
+      }
+
       const tabW = document.getElementById('tabWeekly');
       const tabM = document.getElementById('tabMonthly');
       const viewW = document.getElementById('viewWeekly');
@@ -304,26 +444,22 @@
       if (view === 'weekly') {
         viewW.classList.remove('hidden');
         viewM.classList.add('hidden');
-        tabW.className = "px-4 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30";
-        tabM.className = "px-4 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 text-slate-400 hover:text-slate-200";
+        tabW.className = "px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30";
+        tabM.className = "px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 text-slate-400 hover:text-slate-200";
       } else {
         viewW.classList.add('hidden');
         viewM.classList.remove('hidden');
-        tabM.className = "px-4 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30";
-        tabW.className = "px-4 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 text-slate-400 hover:text-slate-200";
+        tabM.className = "px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30";
+        tabW.className = "px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 text-slate-400 hover:text-slate-200";
         
-        // 第一次切换到月历时定位到当前月
-        if(!window.monthlyRendered) {
+        if (!window.monthlyRendered) {
           generateMonthlySlider();
-          setTimeout(() => {
-            slideToMonth(2026, 8, 'auto'); // 直接跳到 2026-09
-          }, 50);
+          setTimeout(() => slideToMonth(2026, 8, 'auto'), 50); // 定位到 2026-09
           window.monthlyRendered = true;
         }
       }
     }
 
-    // 渲染周计划表
     function renderWeeklyGrid() {
       const container = document.getElementById('weeklyGridContainer');
       let html = '';
@@ -331,16 +467,16 @@
       WEEKLY_SCHEDULE_DATA.forEach(row => {
         html += `
           <div class="grid grid-cols-8 text-xs font-mono items-stretch">
-            <div class="p-2 border-r border-night-800 bg-night-850/50 flex flex-col items-center justify-center font-bold text-slate-400 text-center">
+            <div class="p-2 border-r border-night-800 bg-night-850/50 flex flex-col items-center justify-center font-bold text-slate-400 text-center select-none">
               ${row.timeLabel}
             </div>
         `;
 
         row.days.forEach(item => {
-          const style = TAG_STYLES[item.tag] || TAG_STYLES.default;
+          const style = TAG_STYLES[item.tag] || TAG_STYLES.school_gen;
           html += `
-            <div class="p-1.5 border-r border-night-800 last:border-r-0 flex flex-col justify-center">
-              <div class="h-full w-full rounded border px-1.5 py-1.5 text-[11px] leading-tight flex flex-col justify-center items-center text-center transition-colors duration-150 ${style}">
+            <div class="p-1 border-r border-night-800 last:border-r-0 flex flex-col justify-center">
+              <div class="h-full w-full rounded border px-1.5 py-1 text-[11px] leading-snug flex flex-col justify-center items-center text-center transition-colors duration-150 ${style}">
                 ${item.text}
               </div>
             </div>
@@ -351,11 +487,11 @@
       container.innerHTML = html;
     }
 
-    /* ==================== 原生丝滑滚动月历逻辑 ==================== */
+    /* ==================== 原生连续滚动月历 ==================== */
     const START_YEAR = 2025;
     const END_YEAR = 2027;
     let currentFocusYear = 2026;
-    let currentFocusMonth = 8; // 8代表9月
+    let currentFocusMonth = 8;
 
     function generateMonthlySlider() {
       const carousel = document.getElementById('calendar-carousel');
@@ -372,10 +508,9 @@
       }
       carousel.innerHTML = html;
 
-      // 使用 IntersectionObserver 监听当前滑到了哪个月，实现滚动不刷新，自动改标题
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-          if(entry.isIntersecting) {
+          if (entry.isIntersecting) {
             const parts = entry.target.id.split('-');
             currentFocusYear = parseInt(parts[2]);
             currentFocusMonth = parseInt(parts[3]);
@@ -439,9 +574,7 @@
 
     function slideToMonth(y, m, behavior = 'smooth') {
       const target = document.getElementById(`month-grid-${y}-${m}`);
-      if (target) {
-        target.scrollIntoView({ behavior: behavior, block: 'nearest', inline: 'start' });
-      }
+      if (target) target.scrollIntoView({ behavior: behavior, block: 'nearest', inline: 'start' });
     }
 
     function slidePrev() {
@@ -457,10 +590,6 @@
       if (m > 11) { m = 0; y++; }
       slideToMonth(y, m);
     }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      renderWeeklyGrid();
-    });
   </script>
 </body>
 </html>
