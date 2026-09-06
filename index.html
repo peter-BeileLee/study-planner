@@ -47,7 +47,7 @@
         <div class="w-2.5 h-6 bg-cyan-500 rounded-sm"></div>
         <div>
           <h2 class="text-lg font-bold tracking-wider text-slate-100 font-mono uppercase">AUTHENTICATION</h2>
-          <p class="text-xs text-slate-500 font-mono">ACADEMIC ROADMAP KERNEL ACCESS</p>
+          <p class="text-xs text-slate-500 font-mono">ACADEMIC ROADMAP OS</p>
         </div>
       </div>
 
@@ -76,12 +76,12 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div class="flex items-center space-x-3">
           <div class="w-2.5 h-6 bg-cyan-500 rounded-sm"></div>
-          <h1 class="text-base sm:text-lg font-bold tracking-wider text-slate-100 uppercase font-mono">ACADEMIC ROADMAP</h1>
+          <h1 id="headerTitle" class="text-base sm:text-lg font-bold tracking-wider text-slate-100 uppercase font-mono">ACADEMIC ROADMAP</h1>
           <span id="roleBadge" class="text-[10px] px-2 py-0.5 rounded bg-night-800 text-cyan-400 border border-cyan-900 font-mono"></span>
         </div>
         
         <div class="flex items-center space-x-3">
-          <nav class="flex space-x-1 bg-night-950 p-1 rounded-lg border border-night-800">
+          <nav id="navBarContainer" class="flex space-x-1 bg-night-950 p-1 rounded-lg border border-night-800">
             <button id="tabWeekly" onclick="switchView('weekly')" class="px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all duration-200">
               周度计划 (Weekly)
             </button>
@@ -101,20 +101,19 @@
       <section id="viewWeekly" class="transition-opacity duration-300">
         <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 class="text-lg sm:text-xl font-bold text-slate-100 font-mono">HIGH-INTENSITY WEEKLY REGIMEN</h2>
-            <p class="text-xs text-slate-400 mt-0.5">06:00起 | 无早晚餐 | 11:00午餐20m | 放学即复盘 | 竞赛/高数/雅思/项目/体能闭环</p>
+            <h2 class="text-lg sm:text-xl font-bold text-slate-100 font-mono">WEEKLY TIME-BLOCK MASTER</h2>
+            <p class="text-xs text-slate-400 mt-0.5">校内课表精准保留 | 课外大时间块化管理 | 放学即复习 | 1h 运动 | 极简作息</p>
           </div>
           <div class="flex items-center space-x-2 text-[11px] text-slate-400 font-mono">
             <span class="inline-block w-2 h-2 rounded-sm bg-indigo-500/30 border border-indigo-400/40"></span> 校内理科
-            <span class="inline-block w-2 h-2 rounded-sm bg-sky-500/30 border border-sky-400/40 ml-2"></span> 竞赛与高数
-            <span class="inline-block w-2 h-2 rounded-sm bg-purple-500/30 border border-purple-400/40 ml-2"></span> 实习与阅读
-            <span class="inline-block w-2 h-2 rounded-sm bg-emerald-500/30 border border-emerald-400/40 ml-2"></span> 体能训练
-            <span class="inline-block w-2 h-2 rounded-sm bg-amber-500/30 border border-amber-400/40 ml-2"></span> 课后复习
+            <span class="inline-block w-2 h-2 rounded-sm bg-sky-500/30 border border-sky-400/40 ml-2"></span> 自主攻坚大时间块
+            <span class="inline-block w-2 h-2 rounded-sm bg-amber-500/30 border border-amber-400/40 ml-2"></span> 课后复习/作业
+            <span class="inline-block w-2 h-2 rounded-sm bg-emerald-500/30 border border-emerald-400/40 ml-2"></span> 每日运动训练
           </div>
         </div>
 
         <div class="overflow-x-auto rounded-lg border border-night-800 bg-night-900 shadow-2xl">
-          <div class="min-w-[1050px]">
+          <div class="min-w-[1000px]">
             <div class="grid grid-cols-8 border-b border-night-800 bg-night-850 text-center text-xs font-mono font-medium text-slate-300">
               <div class="py-3 border-r border-night-800 text-slate-500">PERIOD / TIME</div>
               <div class="py-3 border-r border-night-800">周一 (MON)</div>
@@ -134,7 +133,7 @@
         <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 class="text-lg sm:text-xl font-bold text-slate-100 font-mono">MONTHLY STRATEGIC ROADMAP</h2>
-            <p class="text-xs text-slate-400 mt-0.5">支持触控屏/双指横向滑动连续切换月份。</p>
+            <p class="text-xs text-slate-400 mt-0.5">支持触控板/屏幕双指左右连续顺滑切换月份。</p>
           </div>
 
           <div class="flex items-center space-x-3 bg-night-900 border border-night-800 px-3 py-1.5 rounded-lg shadow-sm">
@@ -165,7 +164,7 @@
     </main>
 
     <footer class="border-t border-night-800 bg-night-950 py-3 text-center text-xs font-mono text-slate-500">
-      SYSTEM STATUS: OPTIMAL &bull; FOCUS PROTOCOL ENFORCED &bull; READ-ONLY
+      SYSTEM STATUS: OPTIMAL &bull; DEEP WORK PROTOCOL &bull; READ-ONLY
     </footer>
   </div>
 
@@ -184,7 +183,7 @@
       } else if (u === 'BeileLee' && p === 'peterli') {
         setSession('monthly_only');
       } else {
-        err.innerText = "ACCESS DENIED: 无效的账号凭据";
+        err.innerText = "ACCESS DENIED: 无效的身份凭据";
         err.classList.remove('hidden');
       }
     }
@@ -197,17 +196,24 @@
       
       const badge = document.getElementById('roleBadge');
       const tabW = document.getElementById('tabWeekly');
+      const navContainer = document.getElementById('navBarContainer');
+      const headerTitle = document.getElementById('headerTitle');
 
       if (role === 'all') {
-        badge.innerText = "ROOT: FULL ACCESS";
-        tabW.classList.remove('hidden');
+        badge.innerText = "ROOT";
+        headerTitle.innerText = "ACADEMIC ROADMAP";
+        tabW.style.display = 'inline-block'; // 展现周度按钮
+        navContainer.style.display = 'flex';
         switchView('weekly');
+        renderWeeklyGrid();
       } else {
-        badge.innerText = "GUEST: MONTHLY ONLY";
-        tabW.classList.add('hidden'); // 彻底隐藏周度视图按钮
+        // 无权限账号：从 UI 物理抹去周计划的一切痕迹
+        badge.innerText = "VIEWER";
+        headerTitle.innerText = "MONTHLY PLANNER";
+        tabW.style.display = 'none'; // 彻底隐藏周度按钮
+        navContainer.style.display = 'none'; // 只有一个月度表，直接隐藏整个切换栏
         switchView('monthly');
       }
-      renderWeeklyGrid();
     }
 
     function handleLogout() {
@@ -219,7 +225,6 @@
       document.getElementById('loginError').classList.add('hidden');
     }
 
-    // 检查本地已有登录状态
     window.addEventListener('DOMContentLoaded', () => {
       const savedRole = sessionStorage.getItem('academic_auth_role');
       if (savedRole === 'all' || savedRole === 'monthly_only') {
@@ -227,18 +232,17 @@
       }
     });
 
-    /* ==================== 样式配色与调度标签 ==================== */
+    /* ==================== 样式配色与标签 ==================== */
     const TAG_STYLES = {
-      school_stem: "bg-indigo-950/40 text-indigo-200 border-indigo-800/60 hover:bg-indigo-900/40",  // 校内理科 (Chem, CS, Phys, Math)
-      school_gen:  "bg-night-850 text-slate-300 border-night-700 hover:bg-night-800",             // 校内常规 (Form, Eng, PSHE)
-      comp_stem:   "bg-sky-950/50 text-sky-200 border-sky-800/70 hover:bg-sky-900/40",           // 核心竞赛与高数 (BMO, AMC12, HiMCM, AL FM)
-      project_read:"bg-purple-950/40 text-purple-200 border-purple-800/60 hover:bg-purple-900/40",// 实习项目推进 & 双语学术阅读
-      review_task: "bg-amber-950/30 text-amber-300 border-amber-900/50 hover:bg-amber-900/30",   // 放学课后复习闭环 & 雅思
-      physical:    "bg-emerald-950/30 text-emerald-300 border-emerald-900/50 hover:bg-emerald-900/30", // 运动体能/洗漱
-      dining:      "bg-slate-900 text-slate-400 border-slate-800"                               // 极速午餐 (20m)
+      school_stem: "bg-indigo-950/40 text-indigo-200 border-indigo-800/60 hover:bg-indigo-900/40", // 校内核心理科
+      school_gen:  "bg-night-850 text-slate-300 border-night-700 hover:bg-night-800",             // Form, English, PSHE
+      focus_block: "bg-sky-950/45 text-sky-200 border-sky-800/60 hover:bg-sky-900/40",           // 课外大时间块自主攻坚
+      review_block:"bg-amber-950/30 text-amber-300 border-amber-900/50 hover:bg-amber-900/30",   // 放学校内各科复习与作业
+      physical:    "bg-emerald-950/30 text-emerald-300 border-emerald-900/50 hover:bg-emerald-900/30", // 每日运动/洗漱
+      dining:      "bg-slate-900 text-slate-400 border-slate-800"                               // 11:00 极速午餐 (20m)
     };
 
-    /* ==================== 周度计划数据 (06:00 - 22:30) ==================== */
+    /* ==================== 周度计划数据 (大时间块化排期) ==================== */
     const WEEKLY_SCHEDULE_DATA = [
       {
         timeLabel: "晨起洗漱<br><span class='text-[10px] text-slate-500'>06:00-06:05</span>",
@@ -248,22 +252,22 @@
         ]
       },
       {
-        timeLabel: "晨间冲刺<br><span class='text-[10px] text-slate-500'>06:05-07:45</span>",
+        timeLabel: "晨间学习块<br><span class='text-[10px] text-slate-500'>06:05-07:45</span>",
         days: [
-          { text: "雅思听说精练 (100m)", tag: "review_task" },
-          { text: "BMO 几何与数论专项 (100m)", tag: "comp_stem" },
-          { text: "雅思读写逻辑攻坚 (100m)", tag: "review_task" },
-          { text: "AMC 12 组合与代数突破 (100m)", tag: "comp_stem" },
-          { text: "AL 高数核心定理推导 (100m)", tag: "comp_stem" },
-          { text: "BMO/AMC12 计时全真模考", tag: "comp_stem" },
-          { text: "HiMCM 算法框架构建与演练", tag: "comp_stem" }
+          { text: "自主深度学习块 (100m)", tag: "focus_block" },
+          { text: "自主深度学习块 (100m)", tag: "focus_block" },
+          { text: "自主深度学习块 (100m)", tag: "focus_block" },
+          { text: "自主深度学习块 (100m)", tag: "focus_block" },
+          { text: "自主深度学习块 (100m)", tag: "focus_block" },
+          { text: "周末自主大时间块 (100m)", tag: "focus_block" },
+          { text: "周末自主大时间块 (100m)", tag: "focus_block" }
         ]
       },
       {
         timeLabel: "Form Time<br><span class='text-[10px] text-slate-500'>07:50-08:00</span>",
         days: [
           { text: "Form Time-A1<br>(A611)", tag: "school_gen" }, { text: "Form Time-A1<br>(CR)", tag: "school_gen" }, { text: "Form Time-A1<br>(A611)", tag: "school_gen" },
-          { text: "Form Time-A1<br>(CR)", tag: "school_gen" }, { text: "Form Time-A1<br>(A611)", tag: "school_gen" }, { text: "雅思高频词根归纳", tag: "review_task" }, { text: "数学原著阅读", tag: "project_read" }
+          { text: "Form Time-A1<br>(CR)", tag: "school_gen" }, { text: "Form Time-A1<br>(A611)", tag: "school_gen" }, { text: "机动缓冲块", tag: "focus_block" }, { text: "机动缓冲块", tag: "focus_block" }
         ]
       },
       {
@@ -272,53 +276,53 @@
           { text: "Chemistry-AS<br>(MAS)", tag: "school_stem" },
           { text: "Computer Science<br>(ANT)", tag: "school_stem" },
           { text: "Physics-AS<br>(CAF)", tag: "school_stem" },
-          { text: "AL 高数：矩阵与微积分深入", tag: "comp_stem" },
+          { text: "自主学习大时间块", tag: "focus_block" },
           { text: "Mathematics-AL<br>(YVL)", tag: "school_stem" },
-          { text: "实习项目：核心架构设计/代码", tag: "project_read" },
-          { text: "实习项目：数据流与算法验证", tag: "project_read" }
+          { text: "周末上午攻坚大时间块 I", tag: "focus_block" },
+          { text: "周末上午攻坚大时间块 I", tag: "focus_block" }
         ]
       },
       {
         timeLabel: "Period 3-4<br><span class='text-[10px] text-slate-500'>09:40-11:00</span>",
         days: [
           { text: "English-A1.Lit<br>(JAS)", tag: "school_gen" },
-          { text: "BMO 历年真题推演", tag: "comp_stem" },
+          { text: "自主学习大时间块", tag: "focus_block" },
           { text: "Mathematics-AL<br>(XIY)", tag: "school_stem" },
           { text: "Chemistry-AS<br>(MAS)", tag: "school_stem" },
           { text: "Computer Science<br>(ANT)", tag: "school_stem" },
-          { text: "AMC 12 核心套题冲刺", tag: "comp_stem" },
-          { text: "AL 高数题集专项突破", tag: "comp_stem" }
+          { text: "周末上午攻坚大时间块 II", tag: "focus_block" },
+          { text: "周末上午攻坚大时间块 II", tag: "focus_block" }
         ]
       },
       {
         timeLabel: "极速午餐<br><span class='text-[10px] text-slate-500'>11:00-11:20</span>",
         days: [
-          { text: "午餐 (20m)", tag: "dining" }, { text: "午餐 (20m)", tag: "dining" }, { text: "PSHE前午餐(20m)", tag: "dining" },
+          { text: "午餐 (20m)", tag: "dining" }, { text: "午餐 (20m)", tag: "dining" }, { text: "午餐 (20m)", tag: "dining" },
           { text: "午餐 (20m)", tag: "dining" }, { text: "午餐 (20m)", tag: "dining" }, { text: "午餐 (20m)", tag: "dining" }, { text: "午餐 (20m)", tag: "dining" }
         ]
       },
       {
         timeLabel: "Period 5-6<br><span class='text-[10px] text-slate-500'>11:20-12:40</span>",
         days: [
-          { text: "HiMCM 建模：论文精读与复现", tag: "comp_stem" },
-          { text: "数学原著阅读 (Math Texts)", tag: "project_read" },
-          { text: "11:20-12:00 PSHE-A1<br>12:00-12:40 雅思阅读", tag: "school_gen" },
-          { text: "校内理科难点回溯预习", tag: "review_task" },
-          { text: "英语校内必读书目精读", tag: "project_read" },
-          { text: "数学原著深度推导研读", tag: "project_read" },
-          { text: "英语校内书目阅读与笔记", tag: "project_read" }
+          { text: "午间自主学习块", tag: "focus_block" },
+          { text: "午间自主学习块", tag: "focus_block" },
+          { text: "11:20-12:00 PSHE-A1<br>12:00-12:40 自习块", tag: "school_gen" },
+          { text: "午间自主学习块", tag: "focus_block" },
+          { text: "午间自主学习块", tag: "focus_block" },
+          { text: "午后自主大时间块", tag: "focus_block" },
+          { text: "午后自主大时间块", tag: "focus_block" }
         ]
       },
       {
         timeLabel: "Midday Slot<br><span class='text-[10px] text-slate-500'>12:40-13:30</span>",
         days: [
-          { text: "英语必读书目快速阅读", tag: "project_read" },
-          { text: "雅思听力真题速刷", tag: "review_task" },
-          { text: "Pastoral / 竞赛定理速记", tag: "school_gen" },
-          { text: "英语必读书目快速阅读", tag: "project_read" },
-          { text: "雅思长难句精析", tag: "review_task" },
-          { text: "实习项目：方案与文档输出", tag: "project_read" },
-          { text: "HiMCM 团队分工与模型调试", tag: "comp_stem" }
+          { text: "自主阅读 / 自习块", tag: "focus_block" },
+          { text: "自主阅读 / 自习块", tag: "focus_block" },
+          { text: "Pastoral / 自习块", tag: "school_gen" },
+          { text: "自主阅读 / 自习块", tag: "focus_block" },
+          { text: "自主阅读 / 自习块", tag: "focus_block" },
+          { text: "自主阅读与调息块", tag: "focus_block" },
+          { text: "自主阅读与调息块", tag: "focus_block" }
         ]
       },
       {
@@ -328,81 +332,81 @@
           { text: "Chemistry-AS<br>(MAS)", tag: "school_stem" },
           { text: "Computer Science<br>(ANT)", tag: "school_stem" },
           { text: "English-A1.Lit<br>(JAS)", tag: "school_gen" },
-          { text: "实习项目推进 (工程开发)", tag: "project_read" },
-          { text: "AL 高数：微分方程强化", tag: "comp_stem" },
-          { text: "雅思完整写作 Task 2 演练", tag: "review_task" }
+          { text: "自主学习大时间块", tag: "focus_block" },
+          { text: "下午攻坚大时间块 I", tag: "focus_block" },
+          { text: "下午攻坚大时间块 I", tag: "focus_block" }
         ]
       },
       {
         timeLabel: "Period 9-10<br><span class='text-[10px] text-slate-500'>15:10-16:30</span>",
         days: [
           { text: "Mathematics-AL<br>(YVL)", tag: "school_stem" },
-          { text: "HiMCM 建模算法与仿真", tag: "comp_stem" },
+          { text: "自主学习大时间块", tag: "focus_block" },
           { text: "PE-A1<br>(HYM 体能)", tag: "physical" },
           { text: "Physics-AS<br>(CAF)", tag: "school_stem" },
-          { text: "AMC 12 易错点专题集训", tag: "comp_stem" },
-          { text: "BMO 综合大题攻坚演练", tag: "comp_stem" },
-          { text: "全周错题全量二次重演", tag: "comp_stem" }
+          { text: "自主学习大时间块", tag: "focus_block" },
+          { text: "下午攻坚大时间块 II", tag: "focus_block" },
+          { text: "下午攻坚大时间块 II", tag: "focus_block" }
         ]
       },
       {
         timeLabel: "课后黄金期<br><span class='text-[10px] text-slate-500'>16:40-17:40</span>",
         days: [
-          { text: "校内各科复习：当日物理/数/化", tag: "review_task" },
-          { text: "校内各科复习：CS/化学笔记订正", tag: "review_task" },
-          { text: "校内各科复习：数学/物理作业", tag: "review_task" },
-          { text: "校内各科复习：化学/英语整理", tag: "review_task" },
-          { text: "SCIE Swimming Team (SIL)", tag: "physical" }, // 校内游泳队
-          { text: "雅思听力/口语打卡突破", tag: "review_task" },
-          { text: "校内各科全周错题归档封装", tag: "review_task" }
+          { text: "校内各科复习与作业", tag: "review_block" },
+          { text: "校内各科复习与作业", tag: "review_block" },
+          { text: "校内各科复习与作业", tag: "review_block" },
+          { text: "校内各科复习与作业", tag: "review_block" },
+          { text: "SCIE Swimming Team<br>(SIL)", tag: "physical" },
+          { text: "周末自主大时间块", tag: "focus_block" },
+          { text: "全周错题大盘点与归档", tag: "review_block" }
         ]
       },
       {
         timeLabel: "每日运动<br><span class='text-[10px] text-slate-500'>17:40-18:40</span>",
         days: [
-          { text: "游泳训练 (1h 游泳专项)", tag: "physical" },
-          { text: "陆上体能训练 (核心与耐力)", tag: "physical" },
+          { text: "运动训练 (1h 游泳/陆上)", tag: "physical" },
+          { text: "运动训练 (1h 游泳/陆上)", tag: "physical" },
           { text: "Baking Club / 自由拉伸", tag: "school_gen" },
-          { text: "游泳训练 (1h 泳姿速度)", tag: "physical" }, // 原数模社已取缔，排入游泳
-          { text: "陆上体能拉伸与放松", tag: "physical" },
-          { text: "高强度游泳耐力突破 (1h)", tag: "physical" },
-          { text: "陆上体能恢复性训练 (1h)", tag: "physical" }
+          { text: "运动训练 (1h 游泳/陆上)", tag: "physical" },
+          { text: "运动训练 (1h 游泳/陆上)", tag: "physical" },
+          { text: "运动训练 (1h 游泳专项)", tag: "physical" },
+          { text: "运动训练 (1h 陆上体能)", tag: "physical" }
         ]
       },
       {
-        timeLabel: "大块攻坚 I<br><span class='text-[10px] text-slate-500'>18:40-20:00</span>",
+        timeLabel: "晚间攻坚 I<br><span class='text-[10px] text-slate-500'>18:40-20:00</span>",
         days: [
-          { text: "AL 高数：深度刷题与难点攻坚", tag: "comp_stem" },
-          { text: "BMO 备赛：代数/函数方程大题", tag: "comp_stem" },
-          { text: "AMC 12 压轴第21-25题专题", tag: "comp_stem" },
-          { text: "AL 高数：进阶力学与统计解析", tag: "comp_stem" },
-          { text: "HiMCM 建模：团队协同与论文编撰", tag: "comp_stem" },
-          { text: "实习项目：系统模块测试联调", tag: "project_read" },
-          { text: "下周校内课程高阶深度预习", tag: "review_task" }
+          { text: "晚间核心攻坚大时间块 I", tag: "focus_block" },
+          { text: "晚间核心攻坚大时间块 I", tag: "focus_block" },
+          { text: "晚间核心攻坚大时间块 I", tag: "focus_block" },
+          { text: "晚间核心攻坚大时间块 I", tag: "focus_block" },
+          { text: "晚间核心攻坚大时间块 I", tag: "focus_block" },
+          { text: "晚间核心攻坚大时间块 I", tag: "focus_block" },
+          { text: "晚间核心攻坚大时间块 I", tag: "focus_block" }
         ]
       },
       {
-        timeLabel: "大块攻坚 II<br><span class='text-[10px] text-slate-500'>20:00-21:15</span>",
+        timeLabel: "晚间攻坚 II<br><span class='text-[10px] text-slate-500'>20:00-21:15</span>",
         days: [
-          { text: "实习项目推进：功能实现与优化", tag: "project_read" },
-          { text: "实习项目推进：功能实现与优化", tag: "project_read" },
-          { text: "HiMCM 建模：Python数据分析拟合", tag: "comp_stem" },
-          { text: "实习项目推进：模块性能调优", tag: "project_read" },
-          { text: "AL 高数 / 竞赛弱项深度复盘", tag: "comp_stem" },
-          { text: "数学经典原著精读笔记 (75m)", tag: "project_read" },
-          { text: "校内英语书籍深度分析写作", tag: "project_read" }
+          { text: "晚间核心攻坚大时间块 II", tag: "focus_block" },
+          { text: "晚间核心攻坚大时间块 II", tag: "focus_block" },
+          { text: "晚间核心攻坚大时间块 II", tag: "focus_block" },
+          { text: "晚间核心攻坚大时间块 II", tag: "focus_block" },
+          { text: "晚间核心攻坚大时间块 II", tag: "focus_block" },
+          { text: "晚间核心攻坚大时间块 II", tag: "focus_block" },
+          { text: "晚间核心攻坚大时间块 II", tag: "focus_block" }
         ]
       },
       {
-        timeLabel: "学术阅读/闭环<br><span class='text-[10px] text-slate-500'>21:15-22:00</span>",
+        timeLabel: "拓展与总结<br><span class='text-[10px] text-slate-500'>21:15-22:00</span>",
         days: [
-          { text: "数学原著阅读 / 英语校内书目", tag: "project_read" },
-          { text: "英语校内必读书籍深度阅读", tag: "project_read" },
-          { text: "数学原著阅读 / 逻辑思维整理", tag: "project_read" },
-          { text: "雅思写作素材整理与反思", tag: "review_task" },
-          { text: "全周各项学习完成度指标复盘", tag: "review_task" },
-          { text: "双语学术书籍自由阅读拓展", tag: "project_read" },
-          { text: "整理桌面装备/下周全局推演", tag: "school_gen" }
+          { text: "学术阅读与知识封装块", tag: "focus_block" },
+          { text: "学术阅读与知识封装块", tag: "focus_block" },
+          { text: "学术阅读与知识封装块", tag: "focus_block" },
+          { text: "学术阅读与知识封装块", tag: "focus_block" },
+          { text: "学术阅读与知识封装块", tag: "focus_block" },
+          { text: "自由阅读与总结块", tag: "focus_block" },
+          { text: "桌面归档/下周战略推演", tag: "review_block" }
         ]
       },
       {
@@ -419,21 +423,17 @@
       }
     ];
 
-    /* ==================== 月度计划数据 ==================== */
+    /* ==================== 月度计划数据 (后续精细化排期中心) ==================== */
     const MONTHLY_SCHEDULE_DATA = {
-      "2026-09-07": [{ task: "新学期第4周：执行无早晚餐极限作息", status: "urgent" }],
-      "2026-09-12": [{ task: "AMC 12 阶段模考 (目标 120+)", status: "urgent" }],
-      "2026-09-19": [{ task: "BMO Round 1 历年真题阶段验收", status: "urgent" }],
-      "2026-09-26": [{ task: "HiMCM 组队论文模板与算法库封版", status: "normal" }],
-      "2026-10-10": [{ task: "AL 高数阶段测试复习与模拟", status: "urgent" }],
-      "2026-10-24": [{ task: "雅思全真计时代入模考", status: "urgent" }]
+      "2026-09-07": [{ task: "新周期：执行大时间块与紧凑作息", status: "urgent" }],
+      "2026-09-12": [{ task: "阶段模考与大时间块验收", status: "urgent" }],
+      "2026-09-26": [{ task: "月度战略大盘点", status: "normal" }]
     };
 
-    /* ==================== 视图与渲染 ==================== */
+    /* ==================== 视图切换与渲染逻辑 ==================== */
     function switchView(view) {
       if (view === 'weekly' && currentUserRole === 'monthly_only') {
-        alert("权限受限：该账号仅被授权访问月度战略规划表。");
-        return;
+        return; // 拦截阻止
       }
 
       const tabW = document.getElementById('tabWeekly');
@@ -454,7 +454,7 @@
         
         if (!window.monthlyRendered) {
           generateMonthlySlider();
-          setTimeout(() => slideToMonth(2026, 8, 'auto'), 50); // 定位到 2026-09
+          setTimeout(() => slideToMonth(2026, 8, 'auto'), 50); // 默认定位至 2026 年 9 月
           window.monthlyRendered = true;
         }
       }
@@ -476,7 +476,7 @@
           const style = TAG_STYLES[item.tag] || TAG_STYLES.school_gen;
           html += `
             <div class="p-1 border-r border-night-800 last:border-r-0 flex flex-col justify-center">
-              <div class="h-full w-full rounded border px-1.5 py-1 text-[11px] leading-snug flex flex-col justify-center items-center text-center transition-colors duration-150 ${style}">
+              <div class="h-full w-full rounded border px-1.5 py-1.5 text-[11px] leading-snug flex flex-col justify-center items-center text-center transition-colors duration-150 ${style}">
                 ${item.text}
               </div>
             </div>
