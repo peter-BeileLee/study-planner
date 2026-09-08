@@ -87,8 +87,9 @@
               月度计划 (Monthly)
             </button>
           </nav>
-          <button onclick="handleLogout()" title="安全注销" class="p-2 text-slate-500 hover:text-rose-400 transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          <!-- 替换为 Home (回家/退出) 图标 -->
+          <button onclick="handleLogout()" title="退出系统" class="p-2 text-slate-500 hover:text-cyan-400 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
           </button>
         </div>
       </div>
@@ -97,25 +98,26 @@
     <!-- 内容区 -->
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
 
-      <!-- 视图一：周度计划表 (动态比例高度) -->
+      <!-- 视图一：周度计划表 (动态比例高度 + 通勤解耦) -->
       <section id="viewWeekly" class="transition-opacity duration-300">
         <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 class="text-lg sm:text-xl font-bold text-slate-100 font-mono">PROPORTIONAL TIME-BLOCK MASTER</h2>
-            <p class="text-xs text-slate-400 mt-0.5">具象化排期 | 块高度映射真实时间 | 确保AMC12/BMO包含 1.5卷测试与复盘</p>
+            <p class="text-xs text-slate-400 mt-0.5">净时间管理 | 空间转场与通勤损耗已独立隔离核算</p>
           </div>
           <div class="flex items-center space-x-2 text-[11px] text-slate-400 font-mono flex-wrap gap-y-2">
             <span class="inline-block w-2 h-2 bg-indigo-500/30 border border-indigo-400/40 ml-2 mr-1"></span>校内理科
             <span class="inline-block w-2 h-2 bg-sky-500/30 border border-sky-400/40 ml-2 mr-1"></span>高数与竞赛
             <span class="inline-block w-2 h-2 bg-purple-500/30 border border-purple-400/40 ml-2 mr-1"></span>项目建模
             <span class="inline-block w-2 h-2 bg-amber-500/30 border border-amber-400/40 ml-2 mr-1"></span>语言与阅读
-            <span class="inline-block w-2 h-2 bg-orange-500/30 border border-orange-400/40 ml-2 mr-1"></span>课后复习
+            <span class="inline-block w-2 h-2 bg-orange-500/30 border border-orange-400/40 ml-2 mr-1"></span>校内复习
             <span class="inline-block w-2 h-2 bg-emerald-500/30 border border-emerald-400/40 ml-2 mr-1"></span>运动洗漱
           </div>
         </div>
 
         <div class="overflow-x-auto rounded-lg border border-night-800 bg-night-900 shadow-2xl">
           <div class="min-w-[1100px]">
+            <!-- 统一表头颜色 -->
             <div class="grid grid-cols-8 border-b border-night-800 bg-night-850 text-center text-xs font-mono font-medium text-slate-300">
               <div class="py-3 border-r border-night-800 text-slate-500">TIME (Duration)</div>
               <div class="py-3 border-r border-night-800">周一 (MON)</div>
@@ -124,7 +126,7 @@
               <div class="py-3 border-r border-night-800">周四 (THU)</div>
               <div class="py-3 border-r border-night-800">周五 (FRI)</div>
               <div class="py-3 border-r border-night-800">周六 (SAT)</div>
-              <div class="py-3 text-cyan-400">周日 (SUN)</div>
+              <div class="py-3 border-r border-night-800">周日 (SUN)</div>
             </div>
             <div id="weeklyGridContainer" class="flex flex-col border-b border-night-800"></div>
           </div>
@@ -236,13 +238,15 @@
       lang_read:   "bg-amber-950/30 text-amber-300 border-amber-900/50 hover:bg-amber-900/30",   
       review:      "bg-orange-950/30 text-orange-300 border-orange-900/50 hover:bg-orange-900/30",
       physical:    "bg-emerald-950/30 text-emerald-300 border-emerald-900/50 hover:bg-emerald-900/30", 
-      dining:      "bg-slate-900 text-slate-500 border-slate-800/50"                               
+      dining:      "bg-slate-900 text-slate-500 border-slate-800/50",
+      transit:     "bg-night-950 text-slate-600 border-night-800 border-dashed" // 极简通勤槽位
     };
 
-    /* ==================== 周度计划数据 (具象化排期 + 时长) ==================== */
+    /* ==================== 周度计划数据 (净时间管理 + 通勤扣除) ==================== */
+    // 注：所有跨空间的转场，已从原持续时间中剥离出 5 分钟分配给 Transit。
     const WEEKLY_SCHEDULE_DATA = [
       {
-        timeLabel: "洗漱<br><span class='text-[10px] text-slate-500'>06:00-06:05</span>",
+        timeLabel: "极速洗漱<br><span class='text-[10px] text-slate-500'>06:00-06:05</span>",
         duration: 5,
         days: [
           { text: "洗漱", tag: "physical" }, { text: "洗漱", tag: "physical" }, { text: "洗漱", tag: "physical" },
@@ -250,12 +254,15 @@
         ]
       },
       {
-        timeLabel: "晨间高能块<br><span class='text-[10px] text-slate-500'>06:05-07:50</span>",
-        duration: 105,
+        timeLabel: "晨间高能块<br><span class='text-[10px] text-slate-500'>06:05-07:45</span>",
+        duration: 100, // 剥离5分钟通勤
         days: [
-          { text: "雅思听说精练", tag: "lang_read" }, { text: "AL高数推导与刷题", tag: "math_comp" }, { text: "AMC12核心考点突破", tag: "math_comp" },
-          { text: "BMO历年真题研习", tag: "math_comp" }, { text: "雅思读写攻坚", tag: "lang_read" }, { text: "BMO专项深度爆破", tag: "math_comp" }, { text: "AMC12难题挑战", tag: "math_comp" }
+          { text: "雅思学习", tag: "lang_read" }, { text: "AL高数学习", tag: "math_comp" }, { text: "AMC12备赛", tag: "math_comp" },
+          { text: "BMO备赛", tag: "math_comp" }, { text: "雅思学习", tag: "lang_read" }, { text: "BMO备赛", tag: "math_comp" }, { text: "AMC12备赛", tag: "math_comp" }
         ]
+      },
+      {
+        timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit" })
       },
       {
         timeLabel: "Form Time<br><span class='text-[10px] text-slate-500'>07:50-08:00</span>",
@@ -266,112 +273,139 @@
         ]
       },
       {
+        timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "课间转场", tag: "transit" })
+      },
+      {
         timeLabel: "Period 1-2<br><span class='text-[10px] text-slate-500'>08:10-09:30</span>",
         duration: 80,
         days: [
           { text: "Chemistry-AS<br>(MAS)", tag: "school_stem" }, { text: "Computer Science<br>(ANT)", tag: "school_stem" }, { text: "Physics-AS<br>(CAF)", tag: "school_stem" },
-          { text: "实习项目优化", tag: "project" }, { text: "Mathematics-AL<br>(YVL)", tag: "school_stem" }, 
-          { text: "AMC12 套题演练 (上)", tag: "math_comp" }, { text: "BMO 套题演练 (上)", tag: "math_comp" }
+          { text: "实习项目推进", tag: "project" }, { text: "Mathematics-AL<br>(YVL)", tag: "school_stem" }, 
+          { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }
         ]
       },
       {
-        timeLabel: "Period 3-4<br><span class='text-[10px] text-slate-500'>09:40-11:00</span>",
-        duration: 80,
+        timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "课间转场", tag: "transit" })
+      },
+      {
+        timeLabel: "Period 3-4<br><span class='text-[10px] text-slate-500'>09:40-10:55</span>",
+        duration: 75, // 剥离5分钟前往午餐
         days: [
-          { text: "English-A1.Lit<br>(JAS)", tag: "school_gen" }, { text: "雅思听力真题", tag: "lang_read" }, { text: "Mathematics-AL<br>(XIY)", tag: "school_stem" },
+          { text: "English-A1.Lit<br>(JAS)", tag: "school_gen" }, { text: "雅思学习", tag: "lang_read" }, { text: "Mathematics-AL<br>(XIY)", tag: "school_stem" },
           { text: "Chemistry-AS<br>(MAS)", tag: "school_stem" }, { text: "Computer Science<br>(ANT)", tag: "school_stem" }, 
-          { text: "AMC12 错题剖析与总结<br>(与上节凑齐160m)", tag: "math_comp" }, { text: "BMO 错题剖析与总结<br>(与上节凑齐160m)", tag: "math_comp" }
+          { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }
         ]
       },
       {
-        timeLabel: "极速午餐<br><span class='text-[10px] text-slate-500'>11:00-11:20</span>",
-        duration: 20,
+        timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "就餐通勤", tag: "transit" })
+      },
+      {
+        timeLabel: "极速午餐<br><span class='text-[10px] text-slate-500'>11:00-11:15</span>",
+        duration: 15, // 剥离5分钟返回教室
         days: [
-          { text: "午餐 (20m)", tag: "dining" }, { text: "午餐 (20m)", tag: "dining" }, { text: "午餐 (20m)", tag: "dining" },
-          { text: "午餐 (20m)", tag: "dining" }, { text: "午餐 (20m)", tag: "dining" }, { text: "午餐 (20m)", tag: "dining" }, { text: "午餐 (20m)", tag: "dining" }
+          { text: "午餐", tag: "dining" }, { text: "午餐", tag: "dining" }, { text: "午餐", tag: "dining" },
+          { text: "午餐", tag: "dining" }, { text: "午餐", tag: "dining" }, { text: "午餐", tag: "dining" }, { text: "午餐", tag: "dining" }
         ]
+      },
+      {
+        timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "就餐通勤", tag: "transit" })
       },
       {
         timeLabel: "Period 5-6<br><span class='text-[10px] text-slate-500'>11:20-12:40</span>",
         duration: 80,
         days: [
-          { text: "英语简要阅读与笔记", tag: "lang_read" }, { text: "AL高数专项演练", tag: "math_comp" }, { text: "PSHE / 英语简读", tag: "school_gen" },
-          { text: "AL高数专项演练", tag: "math_comp" }, { text: "英语简要阅读与笔记", tag: "lang_read" }, 
-          { text: "数学原著详读<br>(大学要求)", tag: "lang_read" }, { text: "数学原著详读<br>(大学要求)", tag: "lang_read" }
+          { text: "英语简要阅读", tag: "lang_read" }, { text: "AL高数学习", tag: "math_comp" }, { text: "PSHE / 英语简读", tag: "school_gen" },
+          { text: "AL高数学习", tag: "math_comp" }, { text: "英语简要阅读", tag: "lang_read" }, 
+          { text: "数学原著阅读", tag: "lang_read" }, { text: "数学原著阅读", tag: "lang_read" }
         ]
       },
       {
         timeLabel: "Midday<br><span class='text-[10px] text-slate-500'>12:40-13:30</span>",
         duration: 50,
         days: [
-          { text: "英语简要阅读", tag: "lang_read" }, { text: "实习代码梳理", tag: "project" }, { text: "Pastoral/雅思单词", tag: "lang_read" },
-          { text: "雅思单词与短文", tag: "lang_read" }, { text: "实习代码梳理", tag: "project" }, { text: "雅思听力/口语", tag: "lang_read" }, { text: "雅思听力/口语", tag: "lang_read" }
+          { text: "英语简要阅读", tag: "lang_read" }, { text: "实习项目推进", tag: "project" }, { text: "Pastoral/雅思", tag: "lang_read" },
+          { text: "雅思学习", tag: "lang_read" }, { text: "实习项目推进", tag: "project" }, { text: "雅思学习", tag: "lang_read" }, { text: "雅思学习", tag: "lang_read" }
         ]
+      },
+      {
+        timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "课间转场", tag: "transit" })
       },
       {
         timeLabel: "Period 7-8<br><span class='text-[10px] text-slate-500'>13:40-15:00</span>",
         duration: 80,
         days: [
           { text: "Physics-AS<br>(CAF)", tag: "school_stem" }, { text: "Chemistry-AS<br>(MAS)", tag: "school_stem" }, { text: "Computer Science<br>(ANT)", tag: "school_stem" },
-          { text: "English-A1.Lit<br>(JAS)", tag: "school_gen" }, { text: "AL高数进阶", tag: "math_comp" }, 
-          { text: "HiMCM 建模框架构思", tag: "project" }, { text: "AL高数题库冲刺", tag: "math_comp" }
+          { text: "English-A1.Lit<br>(JAS)", tag: "school_gen" }, { text: "AL高数学习", tag: "math_comp" }, 
+          { text: "HiMCM备赛", tag: "project" }, { text: "AL高数学习", tag: "math_comp" }
         ]
+      },
+      {
+        timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "课间转场", tag: "transit" })
       },
       {
         timeLabel: "Period 9-10<br><span class='text-[10px] text-slate-500'>15:10-16:30</span>",
         duration: 80,
         days: [
-          { text: "Mathematics-AL<br>(YVL)", tag: "school_stem" }, { text: "AL高数进阶", tag: "math_comp" }, { text: "PE-A1<br>(HYM 体能)", tag: "physical" },
-          { text: "Physics-AS<br>(CAF)", tag: "school_stem" }, { text: "AMC12 考点扫盲", tag: "math_comp" }, 
-          { text: "HiMCM 建模论文撰写", tag: "project" }, { text: "BMO 几何/代数突击", tag: "math_comp" }
+          { text: "Mathematics-AL<br>(YVL)", tag: "school_stem" }, { text: "AL高数学习", tag: "math_comp" }, { text: "PE-A1<br>(HYM 体能)", tag: "physical" },
+          { text: "Physics-AS<br>(CAF)", tag: "school_stem" }, { text: "AMC12备赛", tag: "math_comp" }, 
+          { text: "HiMCM备赛", tag: "project" }, { text: "BMO备赛", tag: "math_comp" }
         ]
       },
       {
-        timeLabel: "课后闭环<br><span class='text-[10px] text-slate-500'>16:40-17:40</span>",
-        duration: 60,
+        timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "放学通勤", tag: "transit" })
+      },
+      {
+        timeLabel: "课后闭环<br><span class='text-[10px] text-slate-500'>16:40-17:35</span>",
+        duration: 55, // 剥离5分钟前往运动场
         days: [
-          { text: "校内各科复习与作业", tag: "review" }, { text: "校内各科复习与作业", tag: "review" }, { text: "校内各科复习与作业", tag: "review" },
-          { text: "校内各科复习与作业", tag: "review" }, { text: "校内各科复习与作业", tag: "review" }, { text: "校内各科回顾与整理", tag: "review" }, { text: "全周理科错题大盘点", tag: "review" }
+          { text: "校内复习与作业", tag: "review" }, { text: "校内复习与作业", tag: "review" }, { text: "校内复习与作业", tag: "review" },
+          { text: "校内复习与作业", tag: "review" }, { text: "校内复习与作业", tag: "review" }, { text: "校内复习", tag: "review" }, { text: "错题盘点", tag: "review" }
         ]
       },
       {
-        timeLabel: "每日运动<br><span class='text-[10px] text-slate-500'>17:40-18:40</span>",
-        duration: 60,
+        timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "运动通勤", tag: "transit" })
+      },
+      {
+        timeLabel: "每日运动<br><span class='text-[10px] text-slate-500'>17:40-18:35</span>",
+        duration: 55, // 剥离5分钟返回
         days: [
-          { text: "游泳/陆上训练 (1h)", tag: "physical" }, { text: "游泳/陆上训练 (1h)", tag: "physical" }, { text: "Baking Club / 运动", tag: "school_gen" },
-          { text: "游泳/陆上训练 (1h)", tag: "physical" }, { text: "游泳/陆上训练 (1h)", tag: "physical" }, { text: "游泳/陆上训练 (1h)", tag: "physical" }, { text: "游泳/陆上训练 (1h)", tag: "physical" }
+          { text: "运动", tag: "physical" }, { text: "运动", tag: "physical" }, { text: "Baking Club / 运动", tag: "school_gen" },
+          { text: "运动", tag: "physical" }, { text: "运动", tag: "physical" }, { text: "运动", tag: "physical" }, { text: "运动", tag: "physical" }
         ]
+      },
+      {
+        timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "运动通勤", tag: "transit" })
       },
       {
         timeLabel: "晚间攻坚 I<br><span class='text-[10px] text-slate-500'>18:40-20:00</span>",
         duration: 80,
         days: [
-          { text: "AMC12 计时套题 (上)", tag: "math_comp" }, { text: "BMO 计时套题 (上)", tag: "math_comp" }, { text: "AL高数综合演练", tag: "math_comp" },
-          { text: "AMC12 计时套题 (上)", tag: "math_comp" }, { text: "BMO 计时套题 (上)", tag: "math_comp" }, { text: "实习项目核心推进", tag: "project" }, { text: "HiMCM 数据处理与仿真", tag: "project" }
+          { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "AL高数学习", tag: "math_comp" },
+          { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "实习项目推进", tag: "project" }, { text: "HiMCM备赛", tag: "project" }
         ]
       },
       {
         timeLabel: "晚间攻坚 II<br><span class='text-[10px] text-slate-500'>20:00-21:15</span>",
         duration: 75,
         days: [
-          { text: "AMC12 错题总结复盘<br>(凑齐155m)", tag: "math_comp" }, { text: "BMO 错题总结复盘<br>(凑齐155m)", tag: "math_comp" }, { text: "AL高数难点清灰", tag: "math_comp" },
-          { text: "AMC12 错题总结复盘", tag: "math_comp" }, { text: "BMO 错题总结复盘", tag: "math_comp" }, { text: "数学原著详读 (75m)", tag: "lang_read" }, { text: "数学原著详读 (75m)", tag: "lang_read" }
+          { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "AL高数学习", tag: "math_comp" },
+          { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "数学原著阅读", tag: "lang_read" }, { text: "数学原著阅读", tag: "lang_read" }
         ]
       },
       {
         timeLabel: "总结与阅读<br><span class='text-[10px] text-slate-500'>21:15-22:00</span>",
         duration: 45,
         days: [
-          { text: "雅思阅读精析", tag: "lang_read" }, { text: "英语简要阅读与笔记", tag: "lang_read" }, { text: "雅思写作练习", tag: "lang_read" },
-          { text: "英语简要阅读与笔记", tag: "lang_read" }, { text: "雅思口语素材准备", tag: "lang_read" }, { text: "实习项目收尾与提交", tag: "project" }, { text: "下周规划与排期预演", tag: "review" }
+          { text: "雅思学习", tag: "lang_read" }, { text: "英语简要阅读", tag: "lang_read" }, { text: "雅思学习", tag: "lang_read" },
+          { text: "英语简要阅读", tag: "lang_read" }, { text: "雅思学习", tag: "lang_read" }, { text: "实习项目推进", tag: "project" }, { text: "排期预演", tag: "review" }
         ]
       },
       {
         timeLabel: "休整就寝<br><span class='text-[10px] text-slate-500'>22:00-22:30</span>",
         duration: 30,
         days: [
-          { text: "洗澡准备 -> 22:30熄灯", tag: "physical" }, { text: "洗澡准备 -> 22:30熄灯", tag: "physical" }, { text: "洗澡准备 -> 22:30熄灯", tag: "physical" },
-          { text: "洗澡准备 -> 22:30熄灯", tag: "physical" }, { text: "洗澡准备 -> 22:30熄灯", tag: "physical" }, { text: "洗澡准备 -> 22:30熄灯", tag: "physical" }, { text: "洗澡准备 -> 22:30熄灯", tag: "physical" }
+          { text: "洗澡 -> 熄灯", tag: "physical" }, { text: "洗澡 -> 熄灯", tag: "physical" }, { text: "洗澡 -> 熄灯", tag: "physical" },
+          { text: "洗澡 -> 熄灯", tag: "physical" }, { text: "洗澡 -> 熄灯", tag: "physical" }, { text: "洗澡 -> 熄灯", tag: "physical" }, { text: "洗澡 -> 熄灯", tag: "physical" }
         ]
       }
     ];
@@ -379,8 +413,8 @@
     /* ==================== 月度计划数据 ==================== */
     const MONTHLY_SCHEDULE_DATA = {
       "2026-09-07": [{ task: "新周期：动态可视化时间流排期", status: "urgent" }],
-      "2026-09-12": [{ task: "AMC12/BMO 阶段模考", status: "urgent" }],
-      "2026-09-26": [{ task: "月度战略大盘点", status: "normal" }]
+      "2026-09-12": [{ task: "AMC12/BMO 阶段验收", status: "urgent" }],
+      "2026-09-26": [{ task: "月度战略盘点", status: "normal" }]
     };
 
     /* ==================== 视图切换与动态比例渲染 ==================== */
@@ -416,31 +450,48 @@
       let html = '';
 
       WEEKLY_SCHEDULE_DATA.forEach(row => {
-        // UI 核心算法：每 1 分钟等价于 1.5 px 的高度。针对小时间（洗漱）给予保底高度以防字看不见。
-        const calculatedHeight = Math.max(row.duration * 1.5, row.duration < 15 ? 24 : 36);
-
-        html += `
-          <div class="grid grid-cols-8 text-xs font-mono items-stretch border-t border-night-800" style="min-height: ${calculatedHeight}px;">
-            <div class="p-1.5 border-r border-night-800 bg-night-850/50 flex flex-col items-center justify-center font-bold text-slate-400 text-center select-none">
-              ${row.timeLabel}
-              <span class="text-[9px] font-normal text-slate-600 mt-1">${row.duration}m</span>
-            </div>
-        `;
-
-        row.days.forEach(item => {
-          const style = TAG_STYLES[item.tag] || TAG_STYLES.school_gen;
-          // 根据持续时间动态调整文字间距和内边距，让小块紧凑，大块舒适
-          const padding = row.duration <= 10 ? 'p-0.5 text-[10px]' : 'px-1 py-1.5 text-[11px] leading-snug';
+        if(row.type === 'transit') {
+          // 通勤极简槽位渲染 (固定极小高度)
+          html += `
+            <div class="grid grid-cols-8 text-[9px] font-mono items-stretch border-t border-night-800" style="min-height: 16px; opacity: 0.6;">
+              <div class="border-r border-night-800 bg-night-950 flex flex-col items-center justify-center text-slate-600 select-none">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+              </div>
+          `;
+          row.days.forEach(item => {
+            html += `
+              <div class="border-r border-night-800 last:border-r-0 flex flex-col justify-center p-px">
+                <div class="h-full w-full rounded flex items-center justify-center text-slate-600 bg-night-950 border border-night-800 border-dashed tracking-widest">${item.text}</div>
+              </div>
+            `;
+          });
+          html += `</div>`;
+        } else {
+          // 常规任务槽位渲染
+          const calculatedHeight = Math.max(row.duration * 1.5, row.duration < 15 ? 24 : 36);
 
           html += `
-            <div class="p-[3px] border-r border-night-800 last:border-r-0 flex flex-col justify-center">
-              <div class="h-full w-full rounded border flex flex-col justify-center items-center text-center transition-colors duration-150 ${style} ${padding}">
-                ${item.text}
+            <div class="grid grid-cols-8 text-xs font-mono items-stretch border-t border-night-800" style="min-height: ${calculatedHeight}px;">
+              <div class="p-1.5 border-r border-night-800 bg-night-850/50 flex flex-col items-center justify-center font-bold text-slate-400 text-center select-none">
+                ${row.timeLabel}
+                <span class="text-[9px] font-normal text-slate-600 mt-1">${row.duration}m</span>
               </div>
-            </div>
           `;
-        });
-        html += `</div>`;
+
+          row.days.forEach(item => {
+            const style = TAG_STYLES[item.tag] || TAG_STYLES.school_gen;
+            const padding = row.duration <= 15 ? 'p-0 text-[10px]' : 'px-1 py-1.5 text-[11px] leading-snug';
+
+            html += `
+              <div class="p-[3px] border-r border-night-800 last:border-r-0 flex flex-col justify-center">
+                <div class="h-full w-full rounded border flex flex-col justify-center items-center text-center transition-colors duration-150 ${style} ${padding}">
+                  ${item.text}
+                </div>
+              </div>
+            `;
+          });
+          html += `</div>`;
+        }
       });
       container.innerHTML = html;
     }
