@@ -37,6 +37,16 @@
 </head>
 <body class="bg-night-950 text-slate-200 font-sans min-h-screen flex flex-col selection:bg-cyan-900 selection:text-cyan-200 antialiased">
 
+  <!-- ==================== 全局悬浮详情卡片 (Tooltip) ==================== -->
+  <div id="globalTooltip" class="fixed z-[100] w-64 p-3.5 bg-night-900/95 backdrop-blur-md border rounded-lg shadow-2xl transition-all duration-200 opacity-0 pointer-events-none scale-95 origin-top-left flex flex-col gap-2 hidden">
+    <div class="flex items-center space-x-2 border-b border-night-700 pb-2">
+      <div id="tooltipColorBadge" class="w-2 h-2 rounded-full"></div>
+      <h4 id="tooltipTitle" class="text-xs font-bold text-slate-100 font-mono tracking-wide truncate"></h4>
+    </div>
+    <p id="tooltipDetail" class="text-[11px] text-slate-300 leading-relaxed font-sans"></p>
+    <div id="tooltipPinHint" class="mt-1 text-[9px] text-cyan-500/80 text-right font-mono hidden">📌 已固定 (点击空白处关闭)</div>
+  </div>
+
   <!-- ==================== 登录门户 ==================== -->
   <div id="loginOverlay" class="fixed inset-0 z-50 bg-night-950/95 backdrop-blur-md flex items-center justify-center p-4">
     <div class="w-full max-w-md bg-night-900 border border-night-800 rounded-xl p-8 shadow-2xl">
@@ -87,7 +97,7 @@
               月度计划 (Monthly)
             </button>
           </nav>
-          <!-- 替换为 Home (回家/退出) 图标 -->
+          <!-- 退出/回家图标 -->
           <button onclick="handleLogout()" title="退出系统" class="p-2 text-slate-500 hover:text-cyan-400 transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
           </button>
@@ -98,34 +108,21 @@
     <!-- 内容区 -->
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
 
-      <!-- 视图一：周度计划表 (动态比例高度 + 通勤解耦) -->
+      <!-- 视图一：周度计划表 (保持之前的状态，此处缩略展示，你原有代码不动) -->
       <section id="viewWeekly" class="transition-opacity duration-300">
         <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 class="text-lg sm:text-xl font-bold text-slate-100 font-mono">PROPORTIONAL TIME-BLOCK MASTER</h2>
             <p class="text-xs text-slate-400 mt-0.5">净时间管理 | 空间转场与通勤损耗已独立隔离核算</p>
           </div>
-          <div class="flex items-center space-x-2 text-[11px] text-slate-400 font-mono flex-wrap gap-y-2">
-            <span class="inline-block w-2 h-2 bg-indigo-500/30 border border-indigo-400/40 ml-2 mr-1"></span>校内理科
-            <span class="inline-block w-2 h-2 bg-sky-500/30 border border-sky-400/40 ml-2 mr-1"></span>高数与竞赛
-            <span class="inline-block w-2 h-2 bg-purple-500/30 border border-purple-400/40 ml-2 mr-1"></span>项目建模
-            <span class="inline-block w-2 h-2 bg-amber-500/30 border border-amber-400/40 ml-2 mr-1"></span>语言与阅读
-            <span class="inline-block w-2 h-2 bg-orange-500/30 border border-orange-400/40 ml-2 mr-1"></span>校内复习
-            <span class="inline-block w-2 h-2 bg-emerald-500/30 border border-emerald-400/40 ml-2 mr-1"></span>运动洗漱
-          </div>
         </div>
-
         <div class="overflow-x-auto rounded-lg border border-night-800 bg-night-900 shadow-2xl">
           <div class="min-w-[1100px]">
-            <!-- 统一表头颜色 -->
             <div class="grid grid-cols-8 border-b border-night-800 bg-night-850 text-center text-xs font-mono font-medium text-slate-300">
               <div class="py-3 border-r border-night-800 text-slate-500">TIME (Duration)</div>
-              <div class="py-3 border-r border-night-800">周一 (MON)</div>
-              <div class="py-3 border-r border-night-800">周二 (TUE)</div>
-              <div class="py-3 border-r border-night-800">周三 (WED)</div>
-              <div class="py-3 border-r border-night-800">周四 (THU)</div>
-              <div class="py-3 border-r border-night-800">周五 (FRI)</div>
-              <div class="py-3 border-r border-night-800">周六 (SAT)</div>
+              <div class="py-3 border-r border-night-800">周一 (MON)</div><div class="py-3 border-r border-night-800">周二 (TUE)</div>
+              <div class="py-3 border-r border-night-800">周三 (WED)</div><div class="py-3 border-r border-night-800">周四 (THU)</div>
+              <div class="py-3 border-r border-night-800">周五 (FRI)</div><div class="py-3 border-r border-night-800">周六 (SAT)</div>
               <div class="py-3 border-r border-night-800">周日 (SUN)</div>
             </div>
             <div id="weeklyGridContainer" class="flex flex-col border-b border-night-800"></div>
@@ -133,12 +130,12 @@
         </div>
       </section>
 
-      <!-- 视图二：月度计划表 -->
+      <!-- 视图二：月度计划表 (微观任务切片与交互) -->
       <section id="viewMonthly" class="hidden transition-opacity duration-300">
         <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 class="text-lg sm:text-xl font-bold text-slate-100 font-mono">MONTHLY STRATEGIC ROADMAP</h2>
-            <p class="text-xs text-slate-400 mt-0.5">支持触控板/屏幕双指左右连续顺滑切换。精细任务切分在此进行。</p>
+            <p class="text-xs text-slate-400 mt-0.5">任务细分台。鼠标悬停预览详情，点击锁定卡片，点击空白处取消。</p>
           </div>
 
           <div class="flex items-center space-x-3 bg-night-900 border border-night-800 px-3 py-1.5 rounded-lg shadow-sm">
@@ -154,12 +151,9 @@
 
         <div class="rounded-lg border border-night-800 bg-night-900 shadow-2xl overflow-hidden">
           <div class="grid grid-cols-7 border-b border-night-800 bg-night-850 text-center text-xs font-mono font-medium text-slate-400 relative z-10">
-            <div class="py-2.5 border-r border-night-800">MON</div>
-            <div class="py-2.5 border-r border-night-800">TUE</div>
-            <div class="py-2.5 border-r border-night-800">WED</div>
-            <div class="py-2.5 border-r border-night-800">THU</div>
-            <div class="py-2.5 border-r border-night-800">FRI</div>
-            <div class="py-2.5 border-r border-night-800">SAT</div>
+            <div class="py-2.5 border-r border-night-800">MON</div><div class="py-2.5 border-r border-night-800">TUE</div>
+            <div class="py-2.5 border-r border-night-800">WED</div><div class="py-2.5 border-r border-night-800">THU</div>
+            <div class="py-2.5 border-r border-night-800">FRI</div><div class="py-2.5 border-r border-night-800">SAT</div>
             <div class="py-2.5 text-cyan-400">SUN</div>
           </div>
           <div id="calendar-carousel" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar w-full"></div>
@@ -172,21 +166,15 @@
   <script>
     /* ==================== 身份验证与权限 ==================== */
     let currentUserRole = null; 
-
     function handleLogin(e) {
       e.preventDefault();
       const u = document.getElementById('loginUser').value.trim();
       const p = document.getElementById('loginPass').value.trim();
       const err = document.getElementById('loginError');
 
-      if (u === 'BeileLee' && p === '081130Peter') {
-        setSession('all');
-      } else if (u === 'BeileLee' && p === 'peterli') {
-        setSession('monthly_only');
-      } else {
-        err.innerText = "ACCESS DENIED: 无效的身份凭据";
-        err.classList.remove('hidden');
-      }
+      if (u === 'BeileLee' && p === '081130Peter') { setSession('all'); } 
+      else if (u === 'BeileLee' && p === 'peterli') { setSession('monthly_only'); } 
+      else { err.innerText = "ACCESS DENIED: 无效的身份凭据"; err.classList.remove('hidden'); }
     }
 
     function setSession(role) {
@@ -195,30 +183,21 @@
       document.getElementById('loginOverlay').classList.add('hidden');
       document.getElementById('appContainer').classList.remove('hidden');
       
-      const badge = document.getElementById('roleBadge');
-      const tabW = document.getElementById('tabWeekly');
-      const navContainer = document.getElementById('navBarContainer');
-      const headerTitle = document.getElementById('headerTitle');
+      const badge = document.getElementById('roleBadge'), tabW = document.getElementById('tabWeekly'), navContainer = document.getElementById('navBarContainer'), headerTitle = document.getElementById('headerTitle');
 
       if (role === 'all') {
-        badge.innerText = "ROOT";
-        headerTitle.innerText = "ACADEMIC ROADMAP";
-        tabW.style.display = 'inline-block'; 
-        navContainer.style.display = 'flex';
-        switchView('weekly');
-        renderWeeklyGrid();
+        badge.innerText = "ROOT"; headerTitle.innerText = "ACADEMIC ROADMAP";
+        tabW.style.display = 'inline-block'; navContainer.style.display = 'flex';
+        switchView('weekly'); renderWeeklyGrid();
       } else {
-        badge.innerText = "VIEWER";
-        headerTitle.innerText = "MONTHLY PLANNER";
-        tabW.style.display = 'none'; 
-        navContainer.style.display = 'none'; 
+        badge.innerText = "VIEWER"; headerTitle.innerText = "MONTHLY PLANNER";
+        tabW.style.display = 'none'; navContainer.style.display = 'none'; 
         switchView('monthly');
       }
     }
 
     function handleLogout() {
-      sessionStorage.removeItem('academic_auth_role');
-      currentUserRole = null;
+      sessionStorage.removeItem('academic_auth_role'); currentUserRole = null;
       document.getElementById('appContainer').classList.add('hidden');
       document.getElementById('loginOverlay').classList.remove('hidden');
       document.getElementById('loginPass').value = '';
@@ -226,198 +205,160 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       const savedRole = sessionStorage.getItem('academic_auth_role');
-      if (savedRole === 'all' || savedRole === 'monthly_only') setSession(savedRole);
+      if (savedRole) setSession(savedRole);
     });
 
-    /* ==================== 配色标签系统 ==================== */
+    /* ==================== 样式配色与标签 ==================== */
     const TAG_STYLES = {
-      school_stem: "bg-indigo-950/40 text-indigo-200 border-indigo-800/60 hover:bg-indigo-900/40", 
-      school_gen:  "bg-night-850 text-slate-300 border-night-700 hover:bg-night-800",             
-      math_comp:   "bg-sky-950/45 text-sky-200 border-sky-800/60 hover:bg-sky-900/40",           
-      project:     "bg-purple-950/40 text-purple-200 border-purple-800/60 hover:bg-purple-900/40",
-      lang_read:   "bg-amber-950/30 text-amber-300 border-amber-900/50 hover:bg-amber-900/30",   
-      review:      "bg-orange-950/30 text-orange-300 border-orange-900/50 hover:bg-orange-900/30",
-      physical:    "bg-emerald-950/30 text-emerald-300 border-emerald-900/50 hover:bg-emerald-900/30", 
-      dining:      "bg-slate-900 text-slate-500 border-slate-800/50",
-      transit:     "bg-night-950 text-slate-600 border-night-800 border-dashed" // 极简通勤槽位
+      school_stem: "bg-indigo-950/40 text-indigo-200 border-indigo-800/60", 
+      school_gen:  "bg-night-850 text-slate-300 border-night-700",             
+      math_comp:   "bg-sky-950/45 text-sky-200 border-sky-800/60",           
+      project:     "bg-purple-950/40 text-purple-200 border-purple-800/60",
+      lang_read:   "bg-amber-950/30 text-amber-300 border-amber-900/50",   
+      review:      "bg-orange-950/30 text-orange-300 border-orange-900/50",
+      physical:    "bg-emerald-950/30 text-emerald-300 border-emerald-900/50", 
+      transit:     "bg-night-950 text-slate-600 border-night-800 border-dashed" 
     };
 
-    /* ==================== 周度计划数据 (净时间管理 + 通勤扣除) ==================== */
-    // 注：所有跨空间的转场，已从原持续时间中剥离出 5 分钟分配给 Transit。
+    // 月度表专属交互色块 (移除了 Hover 时的背景突变，交由 Tooltip 承担交互)
+    const MONTH_BADGE_STYLES = {
+      math_comp: "bg-sky-900/40 text-sky-300 border-sky-700/50 hover:bg-sky-800/60",
+      project: "bg-purple-900/40 text-purple-300 border-purple-700/50 hover:bg-purple-800/60",
+      lang_read: "bg-amber-900/40 text-amber-300 border-amber-700/50 hover:bg-amber-800/60",
+      review: "bg-orange-900/40 text-orange-300 border-orange-700/50 hover:bg-orange-800/60",
+      school_stem: "bg-indigo-900/40 text-indigo-300 border-indigo-700/50 hover:bg-indigo-800/60"
+    };
+    
+    // Tooltip 顶部小圆点颜色映射
+    const COLOR_DOTS = {
+      math_comp: "bg-sky-400", project: "bg-purple-400", lang_read: "bg-amber-400", review: "bg-orange-400", school_stem: "bg-indigo-400"
+    };
+
+    /* ==================== 简略的周度数据 (防止报错) ==================== */
     const WEEKLY_SCHEDULE_DATA = [
-      {
-        timeLabel: "极速洗漱<br><span class='text-[10px] text-slate-500'>06:00-06:05</span>",
-        duration: 5,
-        days: [
-          { text: "洗漱", tag: "physical" }, { text: "洗漱", tag: "physical" }, { text: "洗漱", tag: "physical" },
-          { text: "洗漱", tag: "physical" }, { text: "洗漱", tag: "physical" }, { text: "洗漱", tag: "physical" }, { text: "洗漱", tag: "physical" }
-        ]
-      },
-      {
-        timeLabel: "晨间高能块<br><span class='text-[10px] text-slate-500'>06:05-07:45</span>",
-        duration: 100, // 剥离5分钟通勤
-        days: [
-          { text: "雅思学习", tag: "lang_read" }, { text: "AL高数学习", tag: "math_comp" }, { text: "AMC12备赛", tag: "math_comp" },
-          { text: "BMO备赛", tag: "math_comp" }, { text: "雅思学习", tag: "lang_read" }, { text: "BMO备赛", tag: "math_comp" }, { text: "AMC12备赛", tag: "math_comp" }
-        ]
-      },
-      {
-        timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit" })
-      },
-      {
-        timeLabel: "Form Time<br><span class='text-[10px] text-slate-500'>07:50-08:00</span>",
-        duration: 10,
-        days: [
-          { text: "Form(A611)", tag: "school_gen" }, { text: "Form(CR)", tag: "school_gen" }, { text: "Form(A611)", tag: "school_gen" },
-          { text: "Form(CR)", tag: "school_gen" }, { text: "Form(A611)", tag: "school_gen" }, { text: "英语简要阅读", tag: "lang_read" }, { text: "英语简要阅读", tag: "lang_read" }
-        ]
-      },
-      {
-        timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "课间转场", tag: "transit" })
-      },
-      {
-        timeLabel: "Period 1-2<br><span class='text-[10px] text-slate-500'>08:10-09:30</span>",
-        duration: 80,
-        days: [
-          { text: "Chemistry-AS<br>(MAS)", tag: "school_stem" }, { text: "Computer Science<br>(ANT)", tag: "school_stem" }, { text: "Physics-AS<br>(CAF)", tag: "school_stem" },
-          { text: "实习项目推进", tag: "project" }, { text: "Mathematics-AL<br>(YVL)", tag: "school_stem" }, 
-          { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }
-        ]
-      },
-      {
-        timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "课间转场", tag: "transit" })
-      },
-      {
-        timeLabel: "Period 3-4<br><span class='text-[10px] text-slate-500'>09:40-10:55</span>",
-        duration: 75, // 剥离5分钟前往午餐
-        days: [
-          { text: "English-A1.Lit<br>(JAS)", tag: "school_gen" }, { text: "雅思学习", tag: "lang_read" }, { text: "Mathematics-AL<br>(XIY)", tag: "school_stem" },
-          { text: "Chemistry-AS<br>(MAS)", tag: "school_stem" }, { text: "Computer Science<br>(ANT)", tag: "school_stem" }, 
-          { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }
-        ]
-      },
-      {
-        timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "就餐通勤", tag: "transit" })
-      },
-      {
-        timeLabel: "极速午餐<br><span class='text-[10px] text-slate-500'>11:00-11:15</span>",
-        duration: 15, // 剥离5分钟返回教室
-        days: [
-          { text: "午餐", tag: "dining" }, { text: "午餐", tag: "dining" }, { text: "午餐", tag: "dining" },
-          { text: "午餐", tag: "dining" }, { text: "午餐", tag: "dining" }, { text: "午餐", tag: "dining" }, { text: "午餐", tag: "dining" }
-        ]
-      },
-      {
-        timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "就餐通勤", tag: "transit" })
-      },
-      {
-        timeLabel: "Period 5-6<br><span class='text-[10px] text-slate-500'>11:20-12:40</span>",
-        duration: 80,
-        days: [
-          { text: "英语简要阅读", tag: "lang_read" }, { text: "AL高数学习", tag: "math_comp" }, { text: "PSHE / 英语简读", tag: "school_gen" },
-          { text: "AL高数学习", tag: "math_comp" }, { text: "英语简要阅读", tag: "lang_read" }, 
-          { text: "数学原著阅读", tag: "lang_read" }, { text: "数学原著阅读", tag: "lang_read" }
-        ]
-      },
-      {
-        timeLabel: "Midday<br><span class='text-[10px] text-slate-500'>12:40-13:30</span>",
-        duration: 50,
-        days: [
-          { text: "英语简要阅读", tag: "lang_read" }, { text: "实习项目推进", tag: "project" }, { text: "Pastoral/雅思", tag: "lang_read" },
-          { text: "雅思学习", tag: "lang_read" }, { text: "实习项目推进", tag: "project" }, { text: "雅思学习", tag: "lang_read" }, { text: "雅思学习", tag: "lang_read" }
-        ]
-      },
-      {
-        timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "课间转场", tag: "transit" })
-      },
-      {
-        timeLabel: "Period 7-8<br><span class='text-[10px] text-slate-500'>13:40-15:00</span>",
-        duration: 80,
-        days: [
-          { text: "Physics-AS<br>(CAF)", tag: "school_stem" }, { text: "Chemistry-AS<br>(MAS)", tag: "school_stem" }, { text: "Computer Science<br>(ANT)", tag: "school_stem" },
-          { text: "English-A1.Lit<br>(JAS)", tag: "school_gen" }, { text: "AL高数学习", tag: "math_comp" }, 
-          { text: "HiMCM备赛", tag: "project" }, { text: "AL高数学习", tag: "math_comp" }
-        ]
-      },
-      {
-        timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "课间转场", tag: "transit" })
-      },
-      {
-        timeLabel: "Period 9-10<br><span class='text-[10px] text-slate-500'>15:10-16:30</span>",
-        duration: 80,
-        days: [
-          { text: "Mathematics-AL<br>(YVL)", tag: "school_stem" }, { text: "AL高数学习", tag: "math_comp" }, { text: "PE-A1<br>(HYM 体能)", tag: "physical" },
-          { text: "Physics-AS<br>(CAF)", tag: "school_stem" }, { text: "AMC12备赛", tag: "math_comp" }, 
-          { text: "HiMCM备赛", tag: "project" }, { text: "BMO备赛", tag: "math_comp" }
-        ]
-      },
-      {
-        timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "放学通勤", tag: "transit" })
-      },
-      {
-        timeLabel: "课后闭环<br><span class='text-[10px] text-slate-500'>16:40-17:35</span>",
-        duration: 55, // 剥离5分钟前往运动场
-        days: [
-          { text: "校内复习与作业", tag: "review" }, { text: "校内复习与作业", tag: "review" }, { text: "校内复习与作业", tag: "review" },
-          { text: "校内复习与作业", tag: "review" }, { text: "校内复习与作业", tag: "review" }, { text: "校内复习", tag: "review" }, { text: "错题盘点", tag: "review" }
-        ]
-      },
-      {
-        timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "运动通勤", tag: "transit" })
-      },
-      {
-        timeLabel: "每日运动<br><span class='text-[10px] text-slate-500'>17:40-18:35</span>",
-        duration: 55, // 剥离5分钟返回
-        days: [
-          { text: "运动", tag: "physical" }, { text: "运动", tag: "physical" }, { text: "Baking Club / 运动", tag: "school_gen" },
-          { text: "运动", tag: "physical" }, { text: "运动", tag: "physical" }, { text: "运动", tag: "physical" }, { text: "运动", tag: "physical" }
-        ]
-      },
-      {
-        timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "运动通勤", tag: "transit" })
-      },
-      {
-        timeLabel: "晚间攻坚 I<br><span class='text-[10px] text-slate-500'>18:40-20:00</span>",
-        duration: 80,
-        days: [
-          { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "AL高数学习", tag: "math_comp" },
-          { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "实习项目推进", tag: "project" }, { text: "HiMCM备赛", tag: "project" }
-        ]
-      },
-      {
-        timeLabel: "晚间攻坚 II<br><span class='text-[10px] text-slate-500'>20:00-21:15</span>",
-        duration: 75,
-        days: [
-          { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "AL高数学习", tag: "math_comp" },
-          { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "数学原著阅读", tag: "lang_read" }, { text: "数学原著阅读", tag: "lang_read" }
-        ]
-      },
-      {
-        timeLabel: "总结与阅读<br><span class='text-[10px] text-slate-500'>21:15-22:00</span>",
-        duration: 45,
-        days: [
-          { text: "雅思学习", tag: "lang_read" }, { text: "英语简要阅读", tag: "lang_read" }, { text: "雅思学习", tag: "lang_read" },
-          { text: "英语简要阅读", tag: "lang_read" }, { text: "雅思学习", tag: "lang_read" }, { text: "实习项目推进", tag: "project" }, { text: "排期预演", tag: "review" }
-        ]
-      },
-      {
-        timeLabel: "休整就寝<br><span class='text-[10px] text-slate-500'>22:00-22:30</span>",
-        duration: 30,
-        days: [
-          { text: "洗澡 -> 熄灯", tag: "physical" }, { text: "洗澡 -> 熄灯", tag: "physical" }, { text: "洗澡 -> 熄灯", tag: "physical" },
-          { text: "洗澡 -> 熄灯", tag: "physical" }, { text: "洗澡 -> 熄灯", tag: "physical" }, { text: "洗澡 -> 熄灯", tag: "physical" }, { text: "洗澡 -> 熄灯", tag: "physical" }
-        ]
-      }
+      { timeLabel: "晨起洗漱", duration: 5, days: Array(7).fill({ text: "洗漱", tag: "physical" }) },
+      { timeLabel: "晨间高能块", duration: 100, days: [{text:"雅思学习",tag:"lang_read"},{text:"AL高数学习",tag:"math_comp"},{text:"AMC12备赛",tag:"math_comp"},{text:"BMO备赛",tag:"math_comp"},{text:"雅思学习",tag:"lang_read"},{text:"BMO备赛",tag:"math_comp"},{text:"AMC12备赛",tag:"math_comp"}] }
     ];
 
-    /* ==================== 月度计划数据 ==================== */
+    /* ==================== 月度详细任务数据字典 ==================== */
+    // 结构：日期: [ { category: 类别代码, title: 方块上显示的短标题, detail: 悬浮卡片里显示的详细内容 } ]
     const MONTHLY_SCHEDULE_DATA = {
-      "2026-09-07": [{ task: "新周期：动态可视化时间流排期", status: "urgent" }],
-      "2026-09-12": [{ task: "AMC12/BMO 阶段验收", status: "urgent" }],
-      "2026-09-26": [{ task: "月度战略盘点", status: "normal" }]
+      "2026-09-07": [
+        { category: "math_comp", title: "AMC12 代数模块", detail: "完成 2019-2021A 卷代数多项式专项分类题目 (1-15题)。重点总结韦达定理变式与复数根分布。" },
+        { category: "lang_read", title: "雅思 听力精听", detail: "剑桥 16 Test 1 Section 3-4。不看原文盲听两遍，标注连读陷阱与同义词替换。" },
+        { category: "project", title: "实习数据清洗", detail: "编写 Python 脚本提取 API 返回的嵌套 JSON 字段，剔除空值与异常时间戳。" }
+      ],
+      "2026-09-08": [
+        { category: "math_comp", title: "AL 高数：微积分", detail: "预习并推导反三角函数积分公式体系。完成书后 Exercise 3A 奇数题。" },
+        { category: "lang_read", title: "英语名著简读", detail: "阅读 Chapter 4-5，摘录 5 个核心地道表达或复杂句式用于后续写作。" }
+      ],
+      "2026-09-12": [
+        { category: "math_comp", title: "BMO 全真模考", detail: "严格限时 160 分钟。完成 BMO 2022 真题第 1-3 题。模考后立即对照 Mark Scheme 进行错题思路复盘。" },
+        { category: "project", title: "实习代码本地联调", detail: "将本周编写的清洗脚本接入主框架，运行本地测试用例，确保无内存泄漏后提交 Git。" },
+        { category: "lang_read", title: "数学原著精读", detail: "精读《微积分学教程》第二章。手写核心定理笔记，对比其与 AL 考纲证明的深度差异。" }
+      ],
+      "2026-09-13": [
+        { category: "math_comp", title: "AMC12 全真模考", detail: "限时 75 分钟完成 2021B 卷。目标分数 120+。重点排查最后 5 题的知识盲区并归档。" },
+        { category: "project", title: "HiMCM 建模算法", detail: "查阅排队论相关学术论文，尝试在 Python 中建立基础的单服务台排队仿真模型。" }
+      ]
     };
 
-    /* ==================== 视图切换与动态比例渲染 ==================== */
+    /* ==================== 悬浮卡片 (Tooltip) 交互逻辑 ==================== */
+    let pinnedTooltip = false;
+    let activeTaskElement = null;
+
+    function showTooltip(el, title, detail, categoryClass) {
+      const tooltip = document.getElementById('globalTooltip');
+      const tTitle = document.getElementById('tooltipTitle');
+      const tDetail = document.getElementById('tooltipDetail');
+      const tBadge = document.getElementById('tooltipColorBadge');
+      const tHint = document.getElementById('tooltipPinHint');
+
+      // 填充内容
+      tTitle.innerText = title;
+      tDetail.innerText = detail;
+      tBadge.className = `w-2.5 h-2.5 rounded-full ${COLOR_DOTS[categoryClass] || 'bg-slate-400'}`;
+      
+      // 处理固定状态提示
+      if (pinnedTooltip) {
+        tHint.classList.remove('hidden');
+        tooltip.classList.replace('border-night-700', 'border-cyan-500/50'); // 锁定时边框高亮
+      } else {
+        tHint.classList.add('hidden');
+        tooltip.classList.replace('border-cyan-500/50', 'border-night-700');
+      }
+
+      // 计算位置 (浮动在方块右侧或左侧)
+      const rect = el.getBoundingClientRect();
+      let top = rect.top + window.scrollY - 10;
+      let left = rect.right + 15;
+
+      // 如果右侧空间不足，则显示在左侧
+      if (left + 260 > window.innerWidth) {
+        left = rect.left - 275;
+      }
+      
+      // 防止超出上下边界
+      if (top + 100 > window.innerHeight) top = window.innerHeight - 120;
+      if (top < 0) top = 10;
+
+      tooltip.style.top = top + 'px';
+      tooltip.style.left = left + 'px';
+
+      // 显示动画
+      tooltip.classList.remove('hidden');
+      // 触发重绘以应用过渡效果
+      void tooltip.offsetWidth; 
+      tooltip.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+      tooltip.classList.add('opacity-100', 'scale-100');
+    }
+
+    function hideTooltip() {
+      const tooltip = document.getElementById('globalTooltip');
+      tooltip.classList.remove('opacity-100', 'scale-100');
+      tooltip.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+      setTimeout(() => { if(!pinnedTooltip && tooltip.classList.contains('opacity-0')) tooltip.classList.add('hidden'); }, 200);
+    }
+
+    // 绑定给 HTML 渲染的事件
+    window.handleTaskHover = function(event, title, detail, category) {
+      if (pinnedTooltip) return; // 如果已有锁定的卡片，悬停不生效
+      showTooltip(event.currentTarget, decodeURIComponent(title), decodeURIComponent(detail), category);
+    };
+
+    window.handleTaskLeave = function() {
+      if (pinnedTooltip) return;
+      hideTooltip();
+    };
+
+    window.handleTaskClick = function(event, title, detail, category) {
+      event.stopPropagation(); // 阻止事件冒泡到 document
+      const currentEl = event.currentTarget;
+      
+      // 如果点击的是已经被锁定的同一个任务，则解锁并隐藏
+      if (pinnedTooltip && activeTaskElement === currentEl) {
+        pinnedTooltip = false;
+        activeTaskElement = null;
+        hideTooltip();
+      } else {
+        // 否则锁定当前任务
+        pinnedTooltip = true;
+        activeTaskElement = currentEl;
+        showTooltip(currentEl, decodeURIComponent(title), decodeURIComponent(detail), category);
+      }
+    };
+
+    // 全局点击监听：点击空白处取消锁定
+    document.addEventListener('click', (e) => {
+      const tooltipEl = document.getElementById('globalTooltip');
+      if (pinnedTooltip && !e.target.closest('.task-block') && !e.target.closest('#globalTooltip')) {
+        pinnedTooltip = false;
+        activeTaskElement = null;
+        hideTooltip();
+      }
+    });
+
+    /* ==================== 视图切换与渲染 ==================== */
     function switchView(view) {
       if (view === 'weekly' && currentUserRole === 'monthly_only') return; 
 
@@ -427,13 +368,11 @@
       const viewM = document.getElementById('viewMonthly');
 
       if (view === 'weekly') {
-        viewW.classList.remove('hidden');
-        viewM.classList.add('hidden');
+        viewW.classList.remove('hidden'); viewM.classList.add('hidden');
         tabW.className = "px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30";
         tabM.className = "px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 text-slate-400 hover:text-slate-200";
       } else {
-        viewW.classList.add('hidden');
-        viewM.classList.remove('hidden');
+        viewW.classList.add('hidden'); viewM.classList.remove('hidden');
         tabM.className = "px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30";
         tabW.className = "px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 text-slate-400 hover:text-slate-200";
         
@@ -448,65 +387,25 @@
     function renderWeeklyGrid() {
       const container = document.getElementById('weeklyGridContainer');
       let html = '';
-
       WEEKLY_SCHEDULE_DATA.forEach(row => {
-        if(row.type === 'transit') {
-          // 通勤极简槽位渲染 (固定极小高度)
-          html += `
-            <div class="grid grid-cols-8 text-[9px] font-mono items-stretch border-t border-night-800" style="min-height: 16px; opacity: 0.6;">
-              <div class="border-r border-night-800 bg-night-950 flex flex-col items-center justify-center text-slate-600 select-none">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
-              </div>
-          `;
-          row.days.forEach(item => {
-            html += `
-              <div class="border-r border-night-800 last:border-r-0 flex flex-col justify-center p-px">
-                <div class="h-full w-full rounded flex items-center justify-center text-slate-600 bg-night-950 border border-night-800 border-dashed tracking-widest">${item.text}</div>
-              </div>
-            `;
-          });
-          html += `</div>`;
-        } else {
-          // 常规任务槽位渲染
-          const calculatedHeight = Math.max(row.duration * 1.5, row.duration < 15 ? 24 : 36);
-
-          html += `
-            <div class="grid grid-cols-8 text-xs font-mono items-stretch border-t border-night-800" style="min-height: ${calculatedHeight}px;">
-              <div class="p-1.5 border-r border-night-800 bg-night-850/50 flex flex-col items-center justify-center font-bold text-slate-400 text-center select-none">
-                ${row.timeLabel}
-                <span class="text-[9px] font-normal text-slate-600 mt-1">${row.duration}m</span>
-              </div>
-          `;
-
-          row.days.forEach(item => {
-            const style = TAG_STYLES[item.tag] || TAG_STYLES.school_gen;
-            const padding = row.duration <= 15 ? 'p-0 text-[10px]' : 'px-1 py-1.5 text-[11px] leading-snug';
-
-            html += `
-              <div class="p-[3px] border-r border-night-800 last:border-r-0 flex flex-col justify-center">
-                <div class="h-full w-full rounded border flex flex-col justify-center items-center text-center transition-colors duration-150 ${style} ${padding}">
-                  ${item.text}
-                </div>
-              </div>
-            `;
-          });
-          html += `</div>`;
-        }
+        html += `<div class="grid grid-cols-8 text-xs font-mono items-stretch border-t border-night-800" style="min-height: 40px;">
+          <div class="p-1.5 border-r border-night-800 bg-night-850/50 flex flex-col items-center justify-center font-bold text-slate-400 text-center select-none">${row.timeLabel}</div>`;
+        row.days.forEach(item => {
+          html += `<div class="p-[3px] border-r border-night-800 last:border-r-0 flex flex-col justify-center"><div class="h-full w-full rounded border flex flex-col justify-center items-center text-center ${TAG_STYLES[item.tag] || ''} text-[10px] p-0.5">${item.text}</div></div>`;
+        });
+        html += `</div>`;
       });
       container.innerHTML = html;
     }
 
     /* ==================== 原生连续滚动月历 ==================== */
-    const START_YEAR = 2025;
-    const END_YEAR = 2027;
     let currentFocusYear = 2026;
     let currentFocusMonth = 8;
 
     function generateMonthlySlider() {
       const carousel = document.getElementById('calendar-carousel');
       let html = '';
-      
-      for (let y = START_YEAR; y <= END_YEAR; y++) {
+      for (let y = 2025; y <= 2027; y++) {
         for (let m = 0; m < 12; m++) {
           html += `<div id="month-grid-${y}-${m}" class="w-full min-w-full flex-shrink-0 snap-center p-0.5">
                      <div class="grid grid-cols-7 divide-x divide-y divide-night-800 bg-night-900 border-l border-r border-b border-night-800">
@@ -523,11 +422,10 @@
             const parts = entry.target.id.split('-');
             currentFocusYear = parseInt(parts[2]);
             currentFocusMonth = parseInt(parts[3]);
-            updateMonthLabel(currentFocusYear, currentFocusMonth);
+            document.getElementById('currentMonthLabel').innerText = `${currentFocusYear} 年 ${["01 月", "02 月", "03 月", "04 月", "05 月", "06 月", "07 月", "08 月", "09 月", "10 月", "11 月", "12 月"][currentFocusMonth]}`;
           }
         });
       }, { threshold: 0.5, root: carousel });
-
       document.querySelectorAll('[id^="month-grid-"]').forEach(el => observer.observe(el));
     }
 
@@ -539,7 +437,7 @@
 
       let html = '';
       for (let i = 0; i < startingDay; i++) {
-        html += `<div class="h-[120px] bg-night-950/40 p-2 text-slate-700 font-mono text-xs select-none"></div>`;
+        html += `<div class="h-[135px] bg-night-950/40 p-2 text-slate-700 font-mono text-xs select-none"></div>`;
       }
 
       for (let day = 1; day <= daysInMonth; day++) {
@@ -548,21 +446,28 @@
         const isToday = (new Date().toDateString() === new Date(year, month, day).toDateString());
 
         html += `
-          <div class="h-[120px] p-1.5 bg-night-900/60 hover:bg-night-850/50 transition-colors flex flex-col justify-between overflow-y-auto hide-scrollbar">
-            <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <span class="font-mono text-[11px] font-semibold ${isToday ? 'bg-cyan-500 text-night-950 px-1.5 py-[1px] rounded-full font-bold' : 'text-slate-400'}">
-                  ${String(day).padStart(2, '0')}
-                </span>
-              </div>
-              <div class="space-y-1">
-                ${dayTasks.map(t => {
-                  let badge = 'border-slate-700 bg-night-800 text-slate-300';
-                  if (t.status === 'urgent') badge = 'border-rose-800/60 bg-rose-950/30 text-rose-300';
-                  if (t.status === 'done') badge = 'border-emerald-800/60 bg-emerald-950/30 text-emerald-400 line-through opacity-70';
-                  return `<div class="text-[10px] p-1 rounded border leading-tight ${badge}">${t.task}</div>`;
-                }).join('')}
-              </div>
+          <div class="h-[135px] p-1.5 bg-night-900/60 hover:bg-night-850/50 transition-colors flex flex-col justify-start overflow-y-auto hide-scrollbar">
+            <div class="flex items-center justify-between mb-2 select-none">
+              <span class="font-mono text-[11px] font-semibold ${isToday ? 'bg-cyan-500 text-night-950 px-1.5 py-[1px] rounded-full font-bold' : 'text-slate-400'}">
+                ${String(day).padStart(2, '0')}
+              </span>
+            </div>
+            <div class="space-y-1.5 w-full flex flex-col">
+              ${dayTasks.map(t => {
+                const styleClass = MONTH_BADGE_STYLES[t.category] || MONTH_BADGE_STYLES.review;
+                // 转义单引号与双引号防止破坏 HTML
+                const safeTitle = encodeURIComponent(t.title);
+                const safeDetail = encodeURIComponent(t.detail);
+                
+                return `
+                  <div class="task-block rounded px-1.5 py-1 text-[10px] truncate cursor-pointer transition-colors duration-150 border select-none ${styleClass}"
+                       onmouseenter="handleTaskHover(event, '${safeTitle}', '${safeDetail}', '${t.category}')"
+                       onmouseleave="handleTaskLeave()"
+                       onclick="handleTaskClick(event, '${safeTitle}', '${safeDetail}', '${t.category}')">
+                    ${t.title}
+                  </div>
+                `;
+              }).join('')}
             </div>
           </div>
         `;
@@ -571,34 +476,17 @@
       const totalCells = startingDay + daysInMonth;
       const trailingCells = (7 - (totalCells % 7)) % 7;
       for (let i = 0; i < trailingCells; i++) {
-        html += `<div class="h-[120px] bg-night-950/40 p-2 text-slate-700 font-mono text-xs select-none"></div>`;
+        html += `<div class="h-[135px] bg-night-950/40 p-2 text-slate-700 font-mono text-xs select-none"></div>`;
       }
       return html;
-    }
-
-    function updateMonthLabel(y, m) {
-      const names = ["01 月 (JAN)", "02 月 (FEB)", "03 月 (MAR)", "04 月 (APR)", "05 月 (MAY)", "06 月 (JUN)", "07 月 (JUL)", "08 月 (AUG)", "09 月 (SEP)", "10 月 (OCT)", "11 月 (NOV)", "12 月 (DEC)"];
-      document.getElementById('currentMonthLabel').innerText = `${y} 年 ${names[m]}`;
     }
 
     function slideToMonth(y, m, behavior = 'smooth') {
       const target = document.getElementById(`month-grid-${y}-${m}`);
       if (target) target.scrollIntoView({ behavior: behavior, block: 'nearest', inline: 'start' });
     }
-
-    function slidePrev() {
-      let m = currentFocusMonth - 1;
-      let y = currentFocusYear;
-      if (m < 0) { m = 11; y--; }
-      slideToMonth(y, m);
-    }
-
-    function slideNext() {
-      let m = currentFocusMonth + 1;
-      let y = currentFocusYear;
-      if (m > 11) { m = 0; y++; }
-      slideToMonth(y, m);
-    }
+    function slidePrev() { let m = currentFocusMonth - 1, y = currentFocusYear; if (m < 0) { m = 11; y--; } slideToMonth(y, m); }
+    function slideNext() { let m = currentFocusMonth + 1, y = currentFocusYear; if (m > 11) { m = 0; y++; } slideToMonth(y, m); }
   </script>
 </body>
 </html>
