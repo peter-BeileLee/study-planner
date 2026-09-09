@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ACADEMIC ROADMAP OS - ULTIMATE</title>
+  <title>ACADEMIC ROADMAP OS - CLOUD ENABLED</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase 云端同步 SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -14,154 +16,150 @@
       theme: {
         extend: {
           fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
-          colors: { night: { 950: '#0B0F17', 900: '#111827', 850: '#151E2E', 800: '#1F2937', 700: '#374151' } }
+          colors: { night: { 950: '#06090e', 900: '#0d131f', 850: '#131b2c', 800: '#1b263b', 700: '#2b3c5a' } }
         }
       }
     }
   </script>
   <style>
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #0B0F17; }
-    ::-webkit-scrollbar-thumb { background: #1F2937; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #374151; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #2b3c5a; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* 卷帘悬浮气泡 */
-    #global-tooltip {
-      position: absolute; z-index: 90; transform-origin: top center;
-      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.2), opacity 0.2s ease-out;
-      pointer-events: none;
+    /* 高级卡片样式 */
+    .pro-card {
+      background: linear-gradient(135deg, rgba(13, 19, 31, 0.9) 0%, rgba(6, 9, 14, 0.95) 100%);
+      border-top: 1px solid rgba(255, 255, 255, 0.05); border-left: 1px solid rgba(255, 255, 255, 0.02);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); position: relative; overflow: hidden;
     }
-    .tooltip-hidden { opacity: 0; transform: scaleY(0); }
-    .tooltip-visible { opacity: 1; transform: scaleY(1); }
-    #global-tooltip.pinned { pointer-events: auto; border: 1px solid #38BDF8; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
     
-    /* 护眼暗色调任务块 */
-    .task-bar {
-      position: relative; width: 100%; height: 16px; border-radius: 3px; margin-bottom: 4px;
-      font-size: 10px; line-height: 14px; padding: 0 4px; overflow: hidden;
-      white-space: nowrap; text-overflow: ellipsis; border: 1px solid transparent; transition: filter 0.2s;
-    }
-    .task-bar:hover { filter: brightness(1.2); }
-    
-    /* 编辑模式下任务块交互 */
-    .edit-mode .task-bar { border-style: dashed; border-color: rgba(255,255,255,0.2); cursor: default; }
-    .edit-mode .task-bar.uneditable { opacity: 0.4; filter: grayscale(1); pointer-events: none; }
-    
-    /* Hover Action Menu (编辑模式下方块内滑出的控制条) */
-    .action-overlay {
-      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(11, 15, 23, 0.9); display: flex; align-items: center; justify-content: space-around;
-      opacity: 0; transform: translateY(-100%); transition: all 0.2s ease;
-    }
+    /* 月度表与操作菜单 */
+    .task-bar { width: 100%; min-height: 22px; border-radius: 4px; margin-bottom: 6px; font-size: 11px; line-height: 14px; padding: 4px 6px; cursor: pointer; transition: all 0.2s; }
+    .task-bar:hover { filter: brightness(1.3); transform: translateX(2px); }
+    .action-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(11, 15, 23, 0.95); display: flex; align-items: center; justify-content: space-around; opacity: 0; transform: translateY(-100%); transition: all 0.2s ease; }
     .edit-mode .task-bar.editable:hover .action-overlay { opacity: 1; transform: translateY(0); }
-    .action-btn { font-size: 10px; padding: 0 4px; cursor: pointer; transition: color 0.1s; }
-    .action-btn:hover { color: #38BDF8; }
+    .action-btn { font-size: 11px; padding: 0 5px; cursor: pointer; transition: color 0.1s; }
+    .action-btn:hover { color: #38bdf8; }
+
+    /* 科技感进度水波纹 */
+    .tech-fill-bar {
+      background: linear-gradient(90deg, rgba(56,189,248,0.05) 0%, rgba(56,189,248,0.25) 100%);
+      border-right: 2px solid rgba(56,189,248,0.8);
+      box-shadow: inset -5px 0 15px rgba(56,189,248,0.2), 2px 0 8px rgba(56,189,248,0.4);
+    }
+    
+    /* 彻底完成后的状态 */
+    .task-completed { filter: grayscale(100%) opacity(0.25); pointer-events: none; }
+    .task-active-glow { box-shadow: inset 0 0 10px rgba(56, 189, 248, 0.1), 0 0 5px rgba(56, 189, 248, 0.2); border-color: rgba(56, 189, 248, 0.4) !important; }
+
+    /* 折线图动画与样式 */
+    .timeline-path { stroke-dasharray: 3000; stroke-dashoffset: 3000; animation: drawLine 1.5s ease-out forwards; }
+    @keyframes drawLine { to { stroke-dashoffset: 0; } }
+    @keyframes fillProgress { from { width: 0%; } }
+    .progress-fill { animation: fillProgress 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+    #celebration { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.5); opacity: 0; z-index: 9999; pointer-events: none; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2); }
+    #celebration.active { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   </style>
 </head>
-<body class="bg-night-950 text-slate-200 font-sans min-h-screen flex flex-col selection:bg-cyan-900 selection:text-cyan-200 antialiased" onclick="handleBodyClick(event)">
+<body class="bg-night-950 text-slate-200 font-sans min-h-screen flex flex-col selection:bg-cyan-900 selection:text-cyan-200 antialiased" onload="initApp()">
 
-  <!-- 登录门户 -->
+  <div id="celebration" class="flex flex-col items-center justify-center bg-night-900/95 border border-emerald-500/50 p-8 rounded-2xl shadow-[0_0_80px_rgba(16,185,129,0.5)] backdrop-blur-xl">
+    <div class="text-7xl mb-3">🎖️</div>
+    <div class="text-3xl font-black text-emerald-400 font-mono tracking-widest drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]">ALL CLEAR!</div>
+    <div class="text-sm text-slate-400 mt-2 font-mono">区块任务完美歼灭</div>
+  </div>
+
   <div id="loginOverlay" class="fixed inset-0 z-[100] bg-night-950/95 backdrop-blur-md flex items-center justify-center p-4">
     <div class="w-full max-w-md bg-night-900 border border-night-800 rounded-xl p-8 shadow-2xl">
-      <div class="flex items-center space-x-3 mb-6">
-        <div class="w-2.5 h-6 bg-cyan-500 rounded-sm"></div>
-        <div>
-          <h2 class="text-lg font-bold tracking-wider text-slate-100 font-mono uppercase">AUTHENTICATION</h2>
-          <p class="text-xs text-slate-500 font-mono">ACADEMIC ROADMAP OS</p>
-        </div>
-      </div>
+      <div class="flex items-center space-x-3 mb-6"><div class="w-2.5 h-6 bg-cyan-500 rounded-sm"></div><div><h2 class="text-lg font-bold tracking-wider text-slate-100 font-mono uppercase">AUTHENTICATION</h2><p class="text-xs text-slate-500 font-mono">CLOUD SYNC ENABLED</p></div></div>
       <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
-        <input type="text" id="loginUser" required placeholder="Account" class="w-full bg-night-950 border border-night-800 rounded-lg px-3.5 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-cyan-500">
-        <input type="password" id="loginPass" required placeholder="Security Key" class="w-full bg-night-950 border border-night-800 rounded-lg px-3.5 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-cyan-500">
+        <input type="text" id="loginUser" required class="w-full bg-night-950 border border-night-800 rounded-lg px-3.5 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-cyan-500" autocomplete="off">
+        <input type="password" id="loginPass" required class="w-full bg-night-950 border border-night-800 rounded-lg px-3.5 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-cyan-500" autocomplete="new-password">
         <div id="loginError" class="text-xs text-rose-400 font-mono hidden"></div>
         <button type="submit" class="w-full bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 font-mono text-xs font-bold py-2.5 rounded-lg transition-all">ENTER SYSTEM</button>
       </form>
     </div>
   </div>
 
-  <!-- 全局 Modals 容器 -->
   <div id="modalOverlay" class="fixed inset-0 z-[110] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    
-    <!-- 模态框: 替换模块 (Swap) -->
     <div id="modalSwap" class="hidden w-full max-w-md bg-night-900 border border-night-700 rounded-xl p-6 shadow-2xl">
-      <h3 class="text-sm font-bold text-cyan-400 font-mono border-b border-night-800 pb-2 mb-4">🔄 OVERRIDE BLOCK (模块替换)</h3>
+      <h3 class="text-sm font-bold text-cyan-400 font-mono border-b border-night-800 pb-2 mb-4">🔄 OVERRIDE BLOCK</h3>
       <p class="text-[10px] text-slate-400 mb-3" id="swapTargetInfo"></p>
       <div class="space-y-3">
-        <div>
-          <label class="block text-[10px] text-slate-500 mb-1">NEW THEME (新主题)</label>
-          <input type="text" id="swapTheme" class="w-full bg-night-950 border border-night-800 rounded p-2 text-xs text-slate-200" placeholder="例如: 物理考试冲刺">
-        </div>
-        <div>
-          <label class="block text-[10px] text-slate-500 mb-1">COLOR TAG (专属颜色)</label>
+        <div><label class="block text-[10px] text-slate-500 mb-1">NEW THEME</label><input type="text" id="swapTheme" class="w-full bg-night-950 border border-night-800 rounded p-2 text-xs text-slate-200"></div>
+        <div><label class="block text-[10px] text-slate-500 mb-1">COLOR TAG</label>
           <select id="swapTag" class="w-full bg-night-950 border border-night-800 rounded p-2 text-xs text-slate-200 font-mono">
-            <option value="math_comp">Cyan (高数/竞赛)</option>
-            <option value="school_stem">Indigo (校内理科)</option>
-            <option value="project">Purple (项目建模)</option>
-            <option value="lang_read">Amber (语言阅读)</option>
-            <option value="review">Orange (校内复习)</option>
+            <option value="math_comp">Cyan (高数/竞赛)</option><option value="project">Purple (项目/写作)</option>
+            <option value="lang_read">Amber (语言阅读)</option><option value="review">Orange (校内复习)</option>
             <option value="physical">Emerald (运动体能)</option>
           </select>
         </div>
-        <div class="flex justify-end space-x-2 pt-2">
-          <button onclick="closeModal()" class="px-3 py-1.5 text-xs text-slate-400 hover:text-slate-200">CANCEL</button>
-          <button onclick="executeSwap()" class="px-3 py-1.5 bg-rose-900/50 text-rose-300 border border-rose-800 rounded text-xs">CONFIRM OVERRIDE</button>
-        </div>
+        <div class="flex justify-end space-x-2 pt-2"><button onclick="closeModal()" class="px-3 py-1.5 text-xs text-slate-400">CANCEL</button><button onclick="executeSwap()" class="px-3 py-1.5 bg-rose-900/50 text-rose-300 border border-rose-800 rounded text-xs">CONFIRM</button></div>
       </div>
     </div>
-
-    <!-- 模态框: 删除列表 (Delete) -->
+    
     <div id="modalDel" class="hidden w-full max-w-md bg-night-900 border border-night-700 rounded-xl p-6 shadow-2xl">
-      <h3 class="text-sm font-bold text-rose-400 font-mono border-b border-night-800 pb-2 mb-4">🗑️ REMOVE DETAIL (删除子项)</h3>
+      <h3 class="text-sm font-bold text-rose-400 font-mono border-b border-night-800 pb-2 mb-4">🗑️ REMOVE DETAIL</h3>
       <div id="delListContainer" class="space-y-2 max-h-60 overflow-y-auto hide-scrollbar mb-4"></div>
       <div class="flex justify-end"><button onclick="closeModal()" class="px-3 py-1.5 bg-night-800 text-slate-300 rounded text-xs">CLOSE</button></div>
     </div>
+
+    <!-- 动态六边形时间轴 Modal -->
+    <div id="modalTimeline" class="hidden w-full max-w-6xl bg-night-950 border border-night-700 rounded-xl shadow-2xl overflow-hidden flex flex-col h-[75vh]">
+      <div class="bg-night-900 px-6 py-4 border-b border-night-800 flex justify-between items-center z-20 shadow-md">
+        <h3 id="timelineTitle" class="text-xl font-bold font-mono tracking-widest uppercase">TIMELINE</h3>
+        <button onclick="closeModal()" class="text-slate-500 hover:text-rose-400 text-3xl leading-none transition-colors">×</button>
+      </div>
+      <div class="flex-1 overflow-x-auto overflow-y-hidden hide-scrollbar cursor-grab active:cursor-grabbing relative" id="timelineScrollArea">
+        <div id="timelineContent" class="h-full relative w-max min-w-full flex"></div>
+      </div>
+    </div>
   </div>
 
-  <!-- 查看模式卷帘气泡 -->
-  <div id="global-tooltip" class="tooltip-hidden bg-night-900 border border-night-700 text-slate-200 p-3 rounded-lg shadow-xl text-xs font-mono w-64 flex-col gap-2">
-    <div id="tooltip-title" class="font-bold text-cyan-400 border-b border-night-700 pb-1"></div>
-    <div id="tooltip-content" class="text-slate-300 leading-relaxed break-words pt-1"></div>
-    <div id="tooltip-hint" class="text-[9px] text-slate-500 pt-1 italic hidden"></div>
-  </div>
-
-  <!-- 系统主框架 -->
   <div id="appContainer" class="hidden min-h-screen flex flex-col">
     <header class="border-b border-night-800 bg-night-900/80 backdrop-blur sticky top-0 z-40">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div class="flex items-center space-x-3">
           <div class="w-2.5 h-6 bg-cyan-500 rounded-sm"></div>
           <h1 id="headerTitle" class="text-base sm:text-lg font-bold tracking-wider text-slate-100 uppercase font-mono">ACADEMIC ROADMAP</h1>
-          <span id="roleBadge" class="text-[10px] px-2 py-0.5 rounded bg-night-800 text-cyan-400 border border-cyan-900 font-mono"></span>
+          <span id="syncStatusBadge" class="text-[10px] px-2 py-0.5 rounded bg-night-800 text-emerald-400 border border-emerald-900/50 font-mono">CLOUD SYNCED</span>
         </div>
         <div class="flex items-center space-x-3">
-          <nav id="navBarContainer" class="flex space-x-1 bg-night-950 p-1 rounded-lg border border-night-800">
-            <button id="tabWeekly" onclick="switchView('weekly')" class="px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all">周度计划 (Weekly)</button>
-            <button id="tabMonthly" onclick="switchView('monthly')" class="px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all">月度计划 (Monthly)</button>
+          <nav id="navBarContainer" class="flex space-x-1 bg-night-950 p-1 rounded-lg border border-night-800 shadow-inner">
+            <button id="tabWeekly" onclick="switchView('weekly')" class="px-4 py-1.5 text-xs font-semibold rounded-md transition-all">周计划 (Weekly)</button>
+            <button id="tabMonthly" onclick="switchView('monthly')" class="px-4 py-1.5 text-xs font-semibold rounded-md transition-all">月计划 (Monthly)</button>
+            <button id="tabProgress" onclick="switchView('progress')" class="px-4 py-1.5 text-xs font-semibold rounded-md transition-all text-emerald-400">📈 进度总览</button>
           </nav>
-          <button onclick="handleLogout()" title="返回首页 (安全登出)" class="p-2 text-slate-500 hover:text-cyan-400 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-          </button>
+          <button onclick="handleLogout()" title="安全登出" class="p-2 text-slate-500 hover:text-rose-400 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></button>
         </div>
       </div>
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+      <!-- 视图三：进度总览 -->
+      <section id="viewProgress" class="hidden transition-opacity duration-300">
+        <div class="mb-6"><h2 class="text-xl sm:text-2xl font-bold text-slate-100 font-mono">BATTLEFRONT PROGRESS 🛡️</h2><p class="text-xs text-slate-400 mt-1">秋季战役倒计时。点击卡片展开<span class="text-cyan-400">【六边形节点时间轴】</span>查看具体月度规划与边缘充能进度。</p></div>
+        <div id="progressContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      </section>
+
       <!-- 视图一：周度计划 -->
       <section id="viewWeekly" class="transition-opacity duration-300">
         <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 class="text-lg sm:text-xl font-bold text-slate-100 font-mono">PROPORTIONAL TIME-BLOCK MASTER</h2>
-            <p class="text-xs text-slate-400 mt-0.5">净时间比例渲染 | 细分数字列表与替换模块已自动在格内生效</p>
+            <h2 class="text-lg sm:text-xl font-bold text-slate-100 font-mono">DYNAMIC TIME-BLOCK MASTER</h2>
+            <p class="text-xs text-slate-400 mt-0.5">全勾选自动压暗 | 进行中方块展示科技感蓝色水位线 | 多端实时云同步</p>
           </div>
         </div>
         <div class="overflow-x-auto rounded-lg border border-night-800 bg-night-900 shadow-2xl">
-          <div class="min-w-[1200px]">
+          <div class="min-w-[1250px]">
             <div class="grid grid-cols-8 border-b border-night-800 bg-night-850 text-center text-xs font-mono font-medium text-slate-300">
-              <div class="py-3 border-r border-night-800 text-slate-500">TIME (Duration)</div>
-              <div class="py-3 border-r border-night-800">MON</div><div class="py-3 border-r border-night-800">TUE</div><div class="py-3 border-r border-night-800">WED</div>
-              <div class="py-3 border-r border-night-800">THU</div><div class="py-3 border-r border-night-800">FRI</div><div class="py-3 border-r border-night-800">SAT</div><div class="py-3 text-slate-300">SUN</div>
+              <div class="py-3 border-r border-night-800 text-slate-500 shadow-inner">TIME</div>
+              <div class="py-3 border-r border-night-800 shadow-inner">MON</div><div class="py-3 border-r border-night-800 shadow-inner">TUE</div><div class="py-3 border-r border-night-800 shadow-inner">WED</div>
+              <div class="py-3 border-r border-night-800 shadow-inner">THU</div><div class="py-3 border-r border-night-800 shadow-inner">FRI</div><div class="py-3 border-r border-night-800 shadow-inner">SAT</div><div class="py-3 text-slate-300 shadow-inner">SUN</div>
             </div>
             <div id="weeklyGridContainer" class="flex flex-col border-b border-night-800"></div>
           </div>
@@ -173,23 +171,22 @@
         <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 class="text-lg sm:text-xl font-bold text-slate-100 font-mono">MONTHLY STRATEGIC ROADMAP</h2>
-            <p class="text-xs text-slate-400 mt-0.5">进入编辑模式悬浮任务块可 [添加细分]/[删除细分]/[覆写替换该时段]</p>
+            <p class="text-xs text-slate-400 mt-0.5">点击任务条在下方内联展开详细任务 | 已屏蔽过去未完成的无效任务</p>
           </div>
           <div class="flex items-center space-x-3">
-            <button id="editModeBtn" onclick="toggleEditMode()" class="hidden px-3 py-1.5 text-xs font-semibold rounded-md border border-night-700 bg-night-800 text-slate-300 hover:text-cyan-400 transition-all">
-              ⚙️ 进入编辑模式
-            </button>
-            <div class="flex items-center space-x-3 bg-night-900 border border-night-800 px-3 py-1.5 rounded-lg shadow-sm">
-              <button onclick="slidePrev()" class="p-1 text-slate-400 hover:text-cyan-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg></button>
-              <span id="currentMonthLabel" class="text-sm font-mono font-bold text-cyan-400 px-2 min-w-[130px] text-center">...</span>
-              <button onclick="slideNext()" class="p-1 text-slate-400 hover:text-cyan-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+            <button onclick="goToToday()" class="px-4 py-2 text-xs font-bold font-mono rounded-lg border border-cyan-800 bg-cyan-900/50 text-cyan-300 hover:bg-cyan-800/80 transition-all shadow-[0_0_10px_rgba(34,211,238,0.2)]">📍 BACK TO TODAY</button>
+            <button id="editModeBtn" onclick="toggleEditMode()" class="hidden px-4 py-2 text-xs font-semibold rounded-lg border border-night-700 bg-night-800 text-slate-300 hover:text-cyan-400 transition-all shadow-sm">⚙️ EDIT MODE</button>
+            <div class="flex items-center space-x-2 bg-night-900 border border-night-800 px-3 py-1.5 rounded-lg shadow-inner">
+              <button onclick="slidePrev()" class="p-1.5 text-slate-400 hover:text-cyan-400 bg-night-800 rounded hover:bg-night-700 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg></button>
+              <span id="currentMonthLabel" class="text-sm font-mono font-bold text-cyan-400 px-3 min-w-[140px] text-center tracking-widest">...</span>
+              <button onclick="slideNext()" class="p-1.5 text-slate-400 hover:text-cyan-400 bg-night-800 rounded hover:bg-night-700 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M9 5l7 7-7 7"/></svg></button>
             </div>
           </div>
         </div>
-        <div id="monthlyWrapper" class="rounded-lg border border-night-800 bg-night-900 shadow-2xl overflow-hidden transition-all duration-300">
-          <div class="grid grid-cols-7 border-b border-night-800 bg-night-850 text-center text-xs font-mono font-medium text-slate-400 relative z-10">
-            <div class="py-2.5 border-r border-night-800">MON</div><div class="py-2.5 border-r border-night-800">TUE</div><div class="py-2.5 border-r border-night-800">WED</div>
-            <div class="py-2.5 border-r border-night-800">THU</div><div class="py-2.5 border-r border-night-800">FRI</div><div class="py-2.5 border-r border-night-800">SAT</div><div class="py-2.5 text-slate-400">SUN</div>
+        <div id="monthlyWrapper" class="rounded-xl border border-night-800 bg-night-900 shadow-2xl overflow-hidden transition-all duration-300 relative">
+          <div class="grid grid-cols-7 border-b border-night-800 bg-night-850 text-center text-xs font-mono font-medium text-slate-400 relative z-10 shadow-md">
+            <div class="py-3 border-r border-night-800">MON</div><div class="py-3 border-r border-night-800">TUE</div><div class="py-3 border-r border-night-800">WED</div>
+            <div class="py-3 border-r border-night-800">THU</div><div class="py-3 border-r border-night-800">FRI</div><div class="py-3 border-r border-night-800">SAT</div><div class="py-3 text-cyan-500">SUN</div>
           </div>
           <div id="calendar-carousel" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar w-full"></div>
         </div>
@@ -198,211 +195,343 @@
   </div>
 
   <script>
-    /* ==================== 身份与基础配置 ==================== */
+    /* ==================== SUPABASE 云端数据库配置 ==================== */
+    // 注入你提供的专属数据库地址和匿名公钥
+    const SUPABASE_URL = "https://wdndkpoajujjnpthwwjn.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkbmRrcG9hanVqam5wdHR3d2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NTIzMjMsImV4cCI6MjEwNDUyODMyM30.W6r5aHzaSqCC2n_4dP_PCN3BqGUTDrpiWvcUf7dvhXE";
+
+    let supabaseClient = null;
+    if (SUPABASE_URL !== "YOUR_SUPABASE_URL" && !SUPABASE_URL.includes("YOUR_")) {
+      supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+
+    let memoryStoreCache = null;
+
+    async function loadCloudData() {
+      const badge = document.getElementById('syncStatusBadge');
+      if (!supabaseClient) {
+        if (badge) { badge.innerText = "LOCAL MODE"; badge.className = "text-[10px] px-2 py-0.5 rounded bg-night-800 text-slate-400 border border-night-700 font-mono"; }
+        memoryStoreCache = JSON.parse(localStorage.getItem('academic_cloud_v8') || '{}');
+        return;
+      }
+
+      try {
+        if (badge) { badge.innerText = "SYNCING..."; badge.className = "text-[10px] px-2 py-0.5 rounded bg-night-800 text-amber-400 border border-amber-900/50 font-mono"; }
+        const { data, error } = await supabaseClient.from('planner_storage').select('data').eq('id', 'main_planner').single();
+        if (data && data.data) {
+          memoryStoreCache = data.data;
+          localStorage.setItem('academic_cloud_v8', JSON.stringify(data.data));
+          if (badge) { badge.innerText = "CLOUD SYNCED"; badge.className = "text-[10px] px-2 py-0.5 rounded bg-night-800 text-emerald-400 border border-emerald-900/50 font-mono"; }
+        } else {
+          memoryStoreCache = JSON.parse(localStorage.getItem('academic_cloud_v8') || '{}');
+          if (badge) { badge.innerText = "CLOUD READY"; badge.className = "text-[10px] px-2 py-0.5 rounded bg-night-800 text-emerald-400 border border-emerald-900/50 font-mono"; }
+        }
+      } catch (err) {
+        console.warn("Cloud load fallback:", err);
+        memoryStoreCache = JSON.parse(localStorage.getItem('academic_cloud_v8') || '{}');
+      }
+    }
+
+    async function saveCloudData(newData) {
+      memoryStoreCache = newData;
+      localStorage.setItem('academic_cloud_v8', JSON.stringify(newData));
+
+      if (supabaseClient) {
+        const badge = document.getElementById('syncStatusBadge');
+        try {
+          if (badge) badge.innerText = "SAVING...";
+          await supabaseClient.from('planner_storage').upsert({ id: 'main_planner', data: newData, updated_at: new Date() });
+          if (badge) badge.innerText = "CLOUD SYNCED";
+        } catch (err) {
+          console.error("Cloud save failed, saved locally:", err);
+          if (badge) badge.innerText = "LOCAL SAVED";
+        }
+      }
+    }
+
+    function getStore() {
+      if (!memoryStoreCache) {
+        memoryStoreCache = JSON.parse(localStorage.getItem('academic_cloud_v8') || '{}');
+      }
+      return memoryStoreCache;
+    }
+
+    /* ==================== 身份验证 ==================== */
     let currentUserRole = null; 
     function handleLogin(e) {
-      e.preventDefault();
-      const u = document.getElementById('loginUser').value.trim(); const p = document.getElementById('loginPass').value.trim();
+      e.preventDefault(); const u = document.getElementById('loginUser').value.trim(); const p = document.getElementById('loginPass').value.trim();
       if (u === 'BeileLee' && p === '081130Peter') setSession('all');
       else if (u === 'BeileLee' && p === 'peterli') setSession('monthly_only');
-      else { document.getElementById('loginError').innerText="无效凭据"; document.getElementById('loginError').classList.remove('hidden'); }
+      else { document.getElementById('loginError').innerText="ACCESS DENIED: Credentials mismatch."; document.getElementById('loginError').classList.remove('hidden'); }
     }
     function setSession(role) {
       currentUserRole = role; sessionStorage.setItem('academic_auth_role', role);
       document.getElementById('loginOverlay').classList.add('hidden'); document.getElementById('appContainer').classList.remove('hidden');
       if (role === 'all') {
-        document.getElementById('roleBadge').innerText="ROOT"; document.getElementById('tabWeekly').style.display='inline-block';
-        document.getElementById('navBarContainer').style.display='flex'; document.getElementById('editModeBtn').classList.remove('hidden');
+        document.getElementById('headerTitle').innerText="ACADEMIC ROADMAP";
+        document.getElementById('tabWeekly').style.display='inline-block';
+        document.getElementById('editModeBtn').classList.remove('hidden'); document.getElementById('tabProgress').classList.remove('hidden');
         switchView('weekly'); 
       } else {
-        document.getElementById('roleBadge').innerText="VIEWER"; document.getElementById('headerTitle').innerText="MONTHLY PLANNER";
-        document.getElementById('tabWeekly').style.display='none'; document.getElementById('navBarContainer').style.display='none';
+        document.getElementById('headerTitle').innerText="MONTHLY PLANNER";
+        document.getElementById('tabWeekly').style.display='none'; document.getElementById('tabProgress').style.display='none';
         switchView('monthly');
       }
     }
     function handleLogout() { sessionStorage.removeItem('academic_auth_role'); window.location.reload(); }
-    window.addEventListener('DOMContentLoaded', () => { const sr = sessionStorage.getItem('academic_auth_role'); if(sr) setSession(sr); });
 
-    /* ==================== 颜色体系 ==================== */
+    async function initApp() {
+      await loadCloudData();
+      const sr = sessionStorage.getItem('academic_auth_role');
+      if (sr) setSession(sr);
+      updateRealTimeProgress();
+    }
+
+    /* ==================== 视觉系统 ==================== */
     const TAG_STYLES = {
-      school_stem: "bg-indigo-950/40 text-indigo-200 border-indigo-800/60", school_gen: "bg-night-850 text-slate-300 border-night-700",             
-      math_comp: "bg-sky-950/45 text-sky-200 border-sky-800/60", project: "bg-purple-950/40 text-purple-200 border-purple-800/60",
-      lang_read: "bg-amber-950/30 text-amber-300 border-amber-900/50", review: "bg-orange-950/30 text-orange-300 border-orange-900/50",
-      physical: "bg-emerald-950/30 text-emerald-300 border-emerald-900/50", dining: "bg-slate-900 text-slate-500 border-slate-800/50"
+      school_stem: "pro-card border-l-[3px] border-l-indigo-500/50 text-indigo-200", 
+      school_gen:  "pro-card border-l-[3px] border-l-slate-600/50 text-slate-300",             
+      math_comp:   "pro-card border-l-[3px] border-l-cyan-500 text-cyan-100", 
+      project:     "pro-card border-l-[3px] border-l-purple-500 text-purple-100",
+      lang_read:   "pro-card border-l-[3px] border-l-amber-500 text-amber-100", 
+      review:      "pro-card border-l-[3px] border-l-orange-500 text-orange-100",
+      physical:    "pro-card border-l-[3px] border-l-emerald-500 text-emerald-100", 
+      dining:      "bg-night-900 border border-night-800 text-slate-500", 
+      transit:     "bg-transparent text-slate-600 border-none"
     };
     const TAG_COLORS_FOR_BARS = {
-      school_stem: "bg-indigo-900/30 text-indigo-300/80 border-indigo-800/30", school_gen: "bg-night-800/40 text-slate-400 border-night-700/40",
-      math_comp: "bg-sky-900/30 text-sky-300/80 border-sky-800/30", project: "bg-purple-900/30 text-purple-300/80 border-purple-800/30",
-      lang_read: "bg-amber-900/30 text-amber-300/80 border-amber-800/30", review: "bg-orange-900/30 text-orange-300/80 border-orange-800/30",
-      physical: "bg-emerald-900/30 text-emerald-300/80 border-emerald-800/30", dining: "bg-slate-800/30 text-slate-500 border-slate-700/30"
+      math_comp: "bg-cyan-900/30 border-l-[3px] border-l-cyan-500 text-cyan-200", 
+      project:   "bg-purple-900/30 border-l-[3px] border-l-purple-500 text-purple-200",
+      lang_read: "bg-amber-900/30 border-l-[3px] border-l-amber-500 text-amber-200", 
+      review:    "bg-orange-900/30 border-l-[3px] border-l-orange-500 text-orange-200",
+      physical:  "bg-emerald-900/30 border-l-[3px] border-l-emerald-500 text-emerald-200"
     };
 
-    /* ==================== 模板排期数据 (含 Row Index) ==================== */
+    /* ==================== 固定作息骨架 ==================== */
     const WEEKLY_SCHEDULE_DATA = [
-      { rowId: 0, timeLabel: "晨起洗漱<br><span class='text-[10px] text-slate-500'>06:00-06:05</span>", duration: 5, days: Array(7).fill({ text: "洗漱", tag: "physical", hide: true }) },
-      { rowId: 1, timeLabel: "晨间高能块<br><span class='text-[10px] text-slate-500'>06:05-07:45</span>", duration: 100, days: [
-          { text: "雅思学习", tag: "lang_read" }, { text: "AL高数学习", tag: "math_comp" }, { text: "AMC12备赛", tag: "math_comp" },
-          { text: "BMO备赛", tag: "math_comp" }, { text: "雅思学习", tag: "lang_read" }, { text: "BMO备赛", tag: "math_comp" }, { text: "AMC12备赛", tag: "math_comp" } ]},
-      { rowId: 2, timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
-      { rowId: 3, timeLabel: "Form Time<br><span class='text-[10px] text-slate-500'>07:50-08:00</span>", duration: 10, days: [
-          { text: "Form(A611)", tag: "school_gen" }, { text: "Form(CR)", tag: "school_gen" }, { text: "Form(A611)", tag: "school_gen" },
-          { text: "Form(CR)", tag: "school_gen" }, { text: "Form(A611)", tag: "school_gen" }, { text: "英语简要阅读", tag: "lang_read" }, { text: "英语简要阅读", tag: "lang_read" } ]},
-      { rowId: 4, timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "转场", tag: "transit", hide: true }) },
-      { rowId: 5, timeLabel: "Period 1-2<br><span class='text-[10px] text-slate-500'>08:10-09:30</span>", duration: 80, days: [
-          { text: "Chemistry-AS(MAS)", tag: "school_stem" }, { text: "Computer Science(ANT)", tag: "school_stem" }, { text: "Physics-AS(CAF)", tag: "school_stem" },
-          { text: "实习项目推进", tag: "project" }, { text: "Mathematics-AL(YVL)", tag: "school_stem" }, { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" } ]},
-      { rowId: 6, timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "转场", tag: "transit", hide: true }) },
-      { rowId: 7, timeLabel: "Period 3-4<br><span class='text-[10px] text-slate-500'>09:40-10:55</span>", duration: 75, days: [
-          { text: "English-A1.Lit(JAS)", tag: "school_gen" }, { text: "雅思学习", tag: "lang_read" }, { text: "Mathematics-AL(XIY)", tag: "school_stem" },
-          { text: "Chemistry-AS(MAS)", tag: "school_stem" }, { text: "Computer Science(ANT)", tag: "school_stem" }, { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" } ]},
-      { rowId: 8, timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
-      { rowId: 9, timeLabel: "极速午餐<br><span class='text-[10px] text-slate-500'>11:00-11:15</span>", duration: 15, days: Array(7).fill({ text: "午餐", tag: "dining", hide: true }) },
-      { rowId: 10, timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
-      { rowId: 11, timeLabel: "Period 5-6<br><span class='text-[10px] text-slate-500'>11:20-12:40</span>", duration: 80, days: [
-          { text: "英语简要阅读", tag: "lang_read" }, { text: "AL高数学习", tag: "math_comp" }, { text: "PSHE / 英语简读", tag: "school_gen" },
-          { text: "AL高数学习", tag: "math_comp" }, { text: "英语简要阅读", tag: "lang_read" }, { text: "数学原著阅读", tag: "lang_read" }, { text: "数学原著阅读", tag: "lang_read" } ]},
-      { rowId: 12, timeLabel: "Midday<br><span class='text-[10px] text-slate-500'>12:40-13:30</span>", duration: 50, days: [
-          { text: "英语简要阅读", tag: "lang_read" }, { text: "实习项目推进", tag: "project" }, { text: "Pastoral/雅思", tag: "lang_read" },
-          { text: "雅思学习", tag: "lang_read" }, { text: "实习项目推进", tag: "project" }, { text: "雅思学习", tag: "lang_read" }, { text: "雅思学习", tag: "lang_read" } ]},
-      { rowId: 13, timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "转场", tag: "transit", hide: true }) },
-      { rowId: 14, timeLabel: "Period 7-8<br><span class='text-[10px] text-slate-500'>13:40-15:00</span>", duration: 80, days: [
-          { text: "Physics-AS(CAF)", tag: "school_stem" }, { text: "Chemistry-AS(MAS)", tag: "school_stem" }, { text: "Computer Science(ANT)", tag: "school_stem" },
-          { text: "English-A1.Lit(JAS)", tag: "school_gen" }, { text: "AL高数学习", tag: "math_comp" }, { text: "HiMCM备赛", tag: "project" }, { text: "AL高数学习", tag: "math_comp" } ]},
-      { rowId: 15, timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "转场", tag: "transit", hide: true }) },
-      { rowId: 16, timeLabel: "Period 9-10<br><span class='text-[10px] text-slate-500'>15:10-16:30</span>", duration: 80, days: [
-          { text: "Mathematics-AL(YVL)", tag: "school_stem" }, { text: "AL高数学习", tag: "math_comp" }, { text: "PE-A1(HYM 体能)", tag: "physical", hide: true },
-          { text: "Physics-AS(CAF)", tag: "school_stem" }, { text: "AMC12备赛", tag: "math_comp" }, { text: "HiMCM备赛", tag: "project" }, { text: "BMO备赛", tag: "math_comp" } ]},
-      { rowId: 17, timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
-      { rowId: 18, timeLabel: "课后闭环<br><span class='text-[10px] text-slate-500'>16:40-17:35</span>", duration: 55, days: [
-          { text: "校内复习与作业", tag: "review" }, { text: "校内复习与作业", tag: "review" }, { text: "校内复习与作业", tag: "review" },
-          { text: "校内复习与作业", tag: "review" }, { text: "校内复习与作业", tag: "review" }, { text: "校内复习", tag: "review" }, { text: "错题盘点", tag: "review" } ]},
-      { rowId: 19, timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
-      { rowId: 20, timeLabel: "每日运动<br><span class='text-[10px] text-slate-500'>17:40-18:35</span>", duration: 55, days: Array(7).fill({ text: "运动", tag: "physical", hide: true }) },
-      { rowId: 21, timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
-      { rowId: 22, timeLabel: "晚间攻坚 I<br><span class='text-[10px] text-slate-500'>18:40-20:00</span>", duration: 80, days: [
-          { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "AL高数学习", tag: "math_comp" },
-          { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "实习项目推进", tag: "project" }, { text: "HiMCM备赛", tag: "project" } ]},
-      { rowId: 23, timeLabel: "晚间攻坚 II<br><span class='text-[10px] text-slate-500'>20:00-21:15</span>", duration: 75, days: [
-          { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "AL高数学习", tag: "math_comp" },
-          { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "数学原著阅读", tag: "lang_read" }, { text: "数学原著阅读", tag: "lang_read" } ]},
-      { rowId: 24, timeLabel: "总结与阅读<br><span class='text-[10px] text-slate-500'>21:15-22:00</span>", duration: 45, days: [
-          { text: "雅思学习", tag: "lang_read" }, { text: "英语简要阅读", tag: "lang_read" }, { text: "雅思学习", tag: "lang_read" },
-          { text: "英语简要阅读", tag: "lang_read" }, { text: "雅思学习", tag: "lang_read" }, { text: "实习项目推进", tag: "project" }, { text: "排期预演", tag: "review" } ]},
-      { rowId: 25, timeLabel: "休整就寝<br><span class='text-[10px] text-slate-500'>22:00-22:30</span>", duration: 30, days: Array(7).fill({ text: "洗澡 -> 熄灯", tag: "physical", hide: true }) }
+      { rowId: 0, start: '06:00', end: '06:05', timeLabel: "极速洗漱<br><span class='text-[10px] text-slate-500'>06:00-06:05</span>", duration: 5, days: Array(7).fill({ text: "洗漱", tag: "physical", hide: true }) },
+      { rowId: 1, start: '06:05', end: '07:45', timeLabel: "晨间高能块<br><span class='text-[10px] text-slate-500'>06:05-07:45</span>", duration: 100, days: [{ text: "雅思学习", tag: "lang_read" }, { text: "AL高数学习", tag: "school_stem" }, { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "雅思学习", tag: "lang_read" }, { text: "BMO备赛", tag: "math_comp" }, { text: "AMC12备赛", tag: "math_comp" } ]},
+      { rowId: 2, start: '07:45', end: '07:50', timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
+      { rowId: 3, start: '07:50', end: '08:00', timeLabel: "Form Time<br><span class='text-[10px] text-slate-500'>07:50-08:00</span>", duration: 10, days: [{ text: "Form(A611)", tag: "school_gen" }, { text: "Form(CR)", tag: "school_gen" }, { text: "Form(A611)", tag: "school_gen" }, { text: "Form(CR)", tag: "school_gen" }, { text: "Form(A611)", tag: "school_gen" }, { text: "英语书籍阅读", tag: "lang_read" }, { text: "数学书籍阅读", tag: "lang_read" } ]},
+      { rowId: 4, start: '08:00', end: '08:10', timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "转场", tag: "transit", hide: true }) },
+      { rowId: 5, start: '08:10', end: '09:30', timeLabel: "Period 1-2<br><span class='text-[10px] text-slate-500'>08:10-09:30</span>", duration: 80, days: [{ text: "Chemistry-AS(MAS)", tag: "school_stem" }, { text: "Computer Science(ANT)", tag: "school_stem" }, { text: "Physics-AS(CAF)", tag: "school_stem" }, { text: "实习项目推进", tag: "project" }, { text: "Mathematics-AL(YVL)", tag: "school_stem" }, { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" } ]},
+      { rowId: 6, start: '09:30', end: '09:40', timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "转场", tag: "transit", hide: true }) },
+      { rowId: 7, start: '09:40', end: '10:55', timeLabel: "Period 3-4<br><span class='text-[10px] text-slate-500'>09:40-10:55</span>", duration: 75, days: [{ text: "English-A1.Lit(JAS)", tag: "school_gen" }, { text: "雅思学习", tag: "lang_read" }, { text: "Mathematics-AL(XIY)", tag: "school_stem" }, { text: "Chemistry-AS(MAS)", tag: "school_stem" }, { text: "Computer Science(ANT)", tag: "school_stem" }, { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" } ]},
+      { rowId: 8, start: '10:55', end: '11:00', timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
+      { rowId: 9, start: '11:00', end: '11:15', timeLabel: "极速午餐<br><span class='text-[10px] text-slate-500'>11:00-11:15</span>", duration: 15, days: Array(7).fill({ text: "午餐", tag: "dining", hide: true }) },
+      { rowId: 10, start: '11:15', end: '11:20', timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
+      { rowId: 11, start: '11:20', end: '12:40', timeLabel: "Period 5-6<br><span class='text-[10px] text-slate-500'>11:20-12:40</span>", duration: 80, days: [{ text: "英语书籍阅读", tag: "lang_read" }, { text: "AL高数学习", tag: "school_stem" }, { text: "PSHE / 英语阅读", tag: "school_gen" }, { text: "AL高数学习", tag: "school_stem" }, { text: "英语书籍阅读", tag: "lang_read" }, { text: "HiMCM建模", tag: "project" }, { text: "HiMCM建模", tag: "project" } ]},
+      { rowId: 12, start: '12:40', end: '13:30', timeLabel: "Midday<br><span class='text-[10px] text-slate-500'>12:40-13:30</span>", duration: 50, days: [{ text: "英语书籍阅读", tag: "lang_read" }, { text: "实习项目推进", tag: "project" }, { text: "Pastoral/雅思", tag: "lang_read" }, { text: "雅思学习", tag: "lang_read" }, { text: "实习项目推进", tag: "project" }, { text: "雅思学习", tag: "lang_read" }, { text: "雅思学习", tag: "lang_read" } ]},
+      { rowId: 13, start: '13:30', end: '13:40', timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "转场", tag: "transit", hide: true }) },
+      { rowId: 14, start: '13:40', end: '15:00', timeLabel: "Period 7-8<br><span class='text-[10px] text-slate-500'>13:40-15:00</span>", duration: 80, days: [{ text: "Physics-AS(CAF)", tag: "school_stem" }, { text: "Chemistry-AS(MAS)", tag: "school_stem" }, { text: "Computer Science(ANT)", tag: "school_stem" }, { text: "English-A1.Lit(JAS)", tag: "school_gen" }, { text: "AL高数学习", tag: "school_stem" }, { text: "HiMCM建模", tag: "project" }, { text: "AL高数学习", tag: "school_stem" } ]},
+      { rowId: 15, start: '15:00', end: '15:10', timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "转场", tag: "transit", hide: true }) },
+      { rowId: 16, start: '15:10', end: '16:30', timeLabel: "Period 9-10<br><span class='text-[10px] text-slate-500'>15:10-16:30</span>", duration: 80, days: [{ text: "Mathematics-AL(YVL)", tag: "school_stem" }, { text: "AL高数学习", tag: "school_stem" }, { text: "校内复习", tag: "review" }, { text: "Physics-AS(CAF)", tag: "school_stem" }, { text: "AMC12备赛", tag: "math_comp" }, { text: "HiMCM建模", tag: "project" }, { text: "BMO备赛", tag: "math_comp" } ]},
+      { rowId: 17, start: '16:30', end: '16:40', timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
+      { rowId: 18, start: '16:40', end: '17:35', timeLabel: "课后闭环<br><span class='text-[10px] text-slate-500'>16:40-17:35</span>", duration: 55, days: [{ text: "校内各科复习", tag: "review" }, { text: "校内各科复习", tag: "review" }, { text: "校内各科复习", tag: "review" }, { text: "校内各科复习", tag: "review" }, { text: "校内各科复习", tag: "review" }, { text: "校内各科复习", tag: "review" }, { text: "校内各科复习", tag: "review" } ]},
+      { rowId: 19, start: '17:35', end: '17:40', timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
+      { rowId: 20, start: '17:40', end: '18:35', timeLabel: "伤病期居家运动<br><span class='text-[10px] text-slate-500'>17:40-18:35</span>", duration: 55, days: [{ text: "A日(背/核心)", tag: "physical" }, { text: "B日(胸/核心)", tag: "physical" }, { text: "A日(背/核心)", tag: "physical" }, { text: "B日(胸/核心)", tag: "physical" }, { text: "A日(背/核心)", tag: "physical" }, { text: "B日(胸/核心)", tag: "physical" }, { text: "静态拉伸恢复", tag: "physical" } ]},
+      { rowId: 21, start: '18:35', end: '18:40', timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
+      { rowId: 22, start: '18:40', end: '20:00', timeLabel: "晚间攻坚 I<br><span class='text-[10px] text-slate-500'>18:40-20:00</span>", duration: 80, days: [{ text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "AL高数学习", tag: "school_stem" }, { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "实习项目推进", tag: "project" }, { text: "HiMCM建模", tag: "project" } ]},
+      { rowId: 23, start: '20:00', end: '21:15', timeLabel: "晚间攻坚 II<br><span class='text-[10px] text-slate-500'>20:00-21:15</span>", duration: 75, days: [{ text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "AL高数学习", tag: "school_stem" }, { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "数学书籍阅读", tag: "lang_read" }, { text: "数学书籍阅读", tag: "lang_read" } ]},
+      { rowId: 24, start: '21:15', end: '22:00', timeLabel: "总结与阅读<br><span class='text-[10px] text-slate-500'>21:15-22:00</span>", duration: 45, days: [{ text: "雅思学习", tag: "lang_read" }, { text: "英语书籍阅读", tag: "lang_read" }, { text: "雅思学习", tag: "lang_read" }, { text: "英语书籍阅读", tag: "lang_read" }, { text: "雅思学习", tag: "lang_read" }, { text: "实习项目推进", tag: "project" }, { text: "雅思学习", tag: "lang_read" } ]},
+      { rowId: 25, start: '22:00', end: '22:30', timeLabel: "休整就寝<br><span class='text-[10px] text-slate-500'>22:00-22:30</span>", duration: 30, days: Array(7).fill({ text: "洗澡 -> 熄灯", tag: "physical", hide: true }) }
     ];
 
-    /* ==================== 高级数据对象引擎 ==================== */
-    function getStore() { return JSON.parse(localStorage.getItem('academic_v5') || '{}'); }
-    function setStore(data) { localStorage.setItem('academic_v5', JSON.stringify(data)); }
-    
+    /* ==================== 智能配速算法 (题库) ==================== */
+    function getSmartDetail(dateStr, taskName) {
+      const today = new Date('2026-09-09T00:00:00');
+      const target = new Date(dateStr + 'T00:00:00');
+      if (target < today) return []; // 屏蔽过去
+      
+      const offset = Math.floor((target - today) / 86400000); 
+      const month = target.getMonth() + 1;
+      
+      if (taskName === "AMC12备赛") {
+        const y = 2012 + Math.floor(offset / 4); 
+        const type = (offset % 4) < 2 ? 'A' : 'B';
+        if (month <= 10) return [{text: `完成 ${y} AMC12 ${type}卷 1-15题 (复数与多项式专项)`, checked: false}, {text: "核对答案，将错题录入代数/组合错题本", checked: false}];
+        else if (month === 11) return [{text: `冲刺：全真模拟 ${Math.min(y, 2023)} 压轴题集训`, checked: false}, {text: "考前易错知识点地毯式复盘", checked: false}];
+        else return [{text: "【考试已结束】切换为大学预修微积分", checked: false}];
+      } 
+      else if (taskName === "BMO备赛") {
+        const y = 2005 + Math.floor(offset / 4); 
+        if (month <= 10) return [{text: `完成 ${y} BMO1 Q1-Q3 几何综合推理`, checked: false}, {text: "比对官方解答，纠正英文书面证明逻辑断层", checked: false}];
+        else if (month === 11) return [{text: `高压模考：${Math.min(y, 2024)} BMO1 全卷演练`, checked: false}, {text: "总结几何辅助线与数论构造核心套路", checked: false}];
+        else return [{text: "准备 BMO2 进阶或放松调整", checked: false}];
+      } 
+      else if (taskName === "雅思学习") {
+        const cNum = 10 + Math.floor(offset / 10); 
+        const tNum = 1 + (Math.floor(offset/2) % 4); 
+        const pNum = 1 + (offset % 3);
+        if (month <= 11) return [{text: `精读 剑${Math.min(cNum,18)} Test ${tNum} Passage ${pNum}`, checked: false}, {text: `听力 Test ${tNum} Section 1-2 精听盲写`, checked: false}, {text: "积累 Part 2 口语素材，录音修正逻辑", checked: false}];
+        else return [{text: "【圣诞冲刺】精批写作 Task 2 大作文", checked: false}, {text: "录音并反复修改口语高频题回答", checked: false}];
+      }
+      else if (taskName === "实习项目推进") {
+        const w = 6 + Math.floor(offset / 7); 
+        if(w===6) return [{text: "调用大模型API完成 zero-shot/few-shot 测试", checked: false}, {text: "搭建本地笔记 RAG (检索增强) Demo 雏形", checked: false}];
+        else if(w===7) return [{text: "开发 Streamlit/Gradio 可交互 UI 界面", checked: false}, {text: "完成模型混淆矩阵与错误案例深度分析", checked: false}];
+        else if(w===8) return [{text: "撰写 5-8 页全英文 NLP 项目结题报告", checked: false}, {text: "准备 15 分钟 Final Presentation 幻灯片", checked: false}];
+        else return [{text: "【NLP实习已圆满结业】", checked: false}];
+      }
+      else if (taskName === "HiMCM建模") {
+        if (month <= 10) return [{text: "研究评价模型：AHP、TOPSIS、CRITIC客观赋权", checked: false}, {text: "学习机器学习分类器：逻辑回归、SVM、随机森林", checked: false}, {text: "推演线性规划(单纯形法)与微分方程(SIR/种群)", checked: false}];
+        else if (month === 11) return [{text: "【比赛月】锁定赛题，团队分工算法攻坚", checked: false}, {text: "完成全英文论文初稿排版与数学公式 LaTeX 化", checked: false}];
+        else return [{text: "【建模结束】整理代码库与参赛经验总结", checked: false}];
+      }
+      else if (taskName === "AL高数学习") {
+        if (month <= 11) return [{text: "强行推进考纲进度 (纯数 P3/P4 核心)", checked: false}, {text: "推进力学 M1 / 统计 S1 基础难点", checked: false}];
+        else return [{text: "【期末保卫战】狂刷 AL 历年综合 Past Papers", checked: false}, {text: "TMUA / STEP 基础题型初级试水", checked: false}];
+      }
+      else if (taskName === "英语书籍阅读") {
+        if (month <= 10) return [{text: "强力推进英文原版书阅读 (目标一章)", checked: false}, {text: "做读书批注，提炼高级词汇与地道从句", checked: false}];
+        else return [{text: "【已读完】转化为期末文学复习", checked: false}];
+      }
+      else if (taskName === "数学书籍阅读") {
+        return [{text: "精读《小蓝本》巩固硬核代数/组合竞赛知识漏洞", checked: false}, {text: "翻阅大学英文数学原著，演草纸推导公式定理", checked: false}];
+      }
+      else if (taskName.includes("校内各科复习")) {
+        if (month <= 11) return [{text: "闭环当天 物理/化学/CS 作业", checked: false}, {text: "整理当日课堂重点笔记与错题本", checked: false}];
+        else return [{text: "【期末保卫战】时间翻倍，狂刷 Past Papers", checked: false}, {text: "突击记忆化学实验现象与物理定义名词", checked: false}];
+      }
+      else if (taskName.includes("A日")) return [{text: "引体向上：做到力竭 × 4组", checked: false}, {text: "拉力绳(拉背/面拉)：100个 × 3组", checked: false}, {text: "腹部核心：俄罗斯转体/仰卧举腿 3组", checked: false}];
+      else if (taskName.includes("B日")) return [{text: "俯卧撑：20个 × 5组 (宽窄距交替)", checked: false}, {text: "仰卧起坐：50个 起底爆发", checked: false}, {text: "平板支撑：核心稳定力竭 × 2组", checked: false}];
+      else if (taskName.includes("拉伸")) return [{text: "足部护养与全身静态肌肉拉伸 (15m)", checked: false}, {text: "泡沫轴滚压：排解乳酸，放松背/腿筋膜", checked: false}];
+      
+      return [];
+    }
+
+    /* ==================== 统一读写引擎 ==================== */
     function getBlockData(dateStr, rowId, baseText) {
       const db = getStore(); const key = `${rowId}_${baseText}`;
-      if(db[dateStr] && db[dateStr][key]) return db[dateStr][key];
-      return { details: [], replacedBy: null };
+      if(db[dateStr] && db[dateStr][key]) {
+        let dt = db[dateStr][key];
+        if (dt.details.length === 0 && !dt.userDeletedAll && dt.replacedBy === null) dt.details = getSmartDetail(dateStr, baseText);
+        return dt;
+      }
+      return { details: getSmartDetail(dateStr, baseText), replacedBy: null, userDeletedAll: false };
     }
 
-    function saveDetail(dateStr, rowId, baseText, detailText) {
+    async function saveDetail(dateStr, rowId, baseText, detailText) {
       if(!detailText.trim()) return;
       const db = getStore(); const key = `${rowId}_${baseText}`;
-      if(!db[dateStr]) db[dateStr] = {}; if(!db[dateStr][key]) db[dateStr][key] = { details: [], replacedBy: null };
-      db[dateStr][key].details.push(detailText.trim());
-      setStore(db);
+      if(!db[dateStr]) db[dateStr] = {}; if(!db[dateStr][key]) db[dateStr][key] = { details: getSmartDetail(dateStr, baseText), replacedBy: null };
+      db[dateStr][key].details.push({text: detailText.trim(), checked: false});
+      db[dateStr][key].userDeletedAll = false; 
+      await saveCloudData(db);
     }
 
-    function deleteDetail(dateStr, rowId, baseText, index) {
+    async function deleteDetail(dateStr, rowId, baseText, index) {
       const db = getStore(); const key = `${rowId}_${baseText}`;
+      if(!db[dateStr]) db[dateStr] = {}; if(!db[dateStr][key]) db[dateStr][key] = { details: getSmartDetail(dateStr, baseText), replacedBy: null };
       db[dateStr][key].details.splice(index, 1);
-      setStore(db);
+      if (db[dateStr][key].details.length === 0) db[dateStr][key].userDeletedAll = true; 
+      await saveCloudData(db);
     }
 
-    function executeSwapOverride(dateStr, rowId, baseText, newTheme, newTag) {
+    async function toggleCheck(dateStr, rowId, baseText, index) {
+      const db = getStore(); const key = `${rowId}_${baseText}`;
+      if(!db[dateStr] || !db[dateStr][key]) return; 
+      db[dateStr][key].details[index].checked = !db[dateStr][key].details[index].checked;
+      await saveCloudData(db);
+
+      const allDone = db[dateStr][key].details.length > 0 && db[dateStr][key].details.every(d => d.checked);
+      if(allDone) playSuccessAnimation();
+      
+      renderWeeklyGrid();
+      if(currentActiveView === 'progress') renderProgress();
+      updateRealTimeProgress(); 
+    }
+
+    async function executeSwapOverride(dateStr, rowId, baseText, newTheme, newTag) {
       const db = getStore(); const key = `${rowId}_${baseText}`;
       if(!db[dateStr]) db[dateStr] = {}; if(!db[dateStr][key]) db[dateStr][key] = { details: [], replacedBy: null };
       db[dateStr][key].replacedBy = { theme: newTheme, tag: newTag };
-      db[dateStr][key].details = []; // 替换主题清空原细节
-      setStore(db);
+      db[dateStr][key].details = []; 
+      await saveCloudData(db);
     }
 
-    function getDayIndex(dateStr) {
-      let d = new Date(dateStr).getDay() - 1; return d === -1 ? 6 : d;
-    }
+    function getDayIndex(dateStr) { let d = new Date(dateStr).getDay() - 1; return d === -1 ? 6 : d; }
+    function sanitizeForHTML(str) { return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;').replace(/"/g, '&quot;'); }
 
-    // 防止单引号与特殊字符破坏HTML注入
-    function sanitizeForHTML(str) {
-      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
-    }
-
-    /* ==================== 模态框逻辑 (Add, Del, Swap) ==================== */
+    /* ==================== Modal 触发与处理 ==================== */
     let activeModalContext = null;
-
-    function openAdd(dateStr, rowId, baseText, e) {
-      e.stopPropagation();
-      const txt = prompt(`为 [${baseText}] 添加细分任务：`);
-      if(txt) { saveDetail(dateStr, rowId, baseText, txt); generateMonthlySlider(); renderWeeklyGrid(); }
+    async function openAdd(dateStr, rowId, baseText, e) {
+      e.stopPropagation(); const txt = prompt(`为 [${baseText}] 添加细分任务：`);
+      if(txt) { await saveDetail(dateStr, rowId, baseText, txt); generateMonthlySlider(); renderWeeklyGrid(); updateRealTimeProgress(); }
     }
-
     function openDel(dateStr, rowId, baseText, e) {
-      e.stopPropagation();
-      const data = getBlockData(dateStr, rowId, baseText);
-      if(data.details.length === 0) { alert("当前模块没有任何可删除的细分任务。"); return; }
-      
+      e.stopPropagation(); const data = getBlockData(dateStr, rowId, baseText);
+      if(data.details.length === 0) { alert("当前无细分任务。"); return; }
       const container = document.getElementById('delListContainer');
       container.innerHTML = data.details.map((d, i) => `
-        <div class="flex justify-between items-center p-2 bg-night-800 rounded">
-          <span class="text-[11px]">${i+1}. ${sanitizeForHTML(d)}</span>
-          <button onclick="commitDel('${dateStr}', ${rowId}, '${sanitizeForHTML(baseText)}', ${i})" class="text-rose-400 hover:text-rose-300 text-[10px] border border-rose-800/50 px-2 py-0.5 rounded">删除</button>
+        <div class="flex justify-between items-center p-2 bg-night-800 rounded mb-1 border border-night-700">
+          <span class="text-[11px] text-slate-300">${i+1}. ${sanitizeForHTML(d.text)}</span>
+          <button onclick="commitDel('${dateStr}', ${rowId}, '${sanitizeForHTML(baseText)}', ${i})" class="text-rose-400 border border-rose-800/50 px-3 py-1 rounded text-[10px] hover:bg-rose-900/30 transition-colors">删除</button>
         </div>
       `).join('');
-      
-      document.getElementById('modalOverlay').classList.remove('hidden');
-      document.getElementById('modalDel').classList.remove('hidden');
+      document.getElementById('modalOverlay').classList.remove('hidden'); document.getElementById('modalDel').classList.remove('hidden');
     }
-
-    function commitDel(dateStr, rowId, baseText, idx) {
-      deleteDetail(dateStr, rowId, baseText, idx);
-      closeModal(); generateMonthlySlider(); renderWeeklyGrid();
-    }
-
-    function openSwap(dateStr, rowId, baseText, timeLabel, e) {
-      e.stopPropagation();
-      activeModalContext = { dateStr, rowId, baseText };
+    async function commitDel(dateStr, rowId, baseText, idx) { await deleteDetail(dateStr, rowId, baseText, idx); closeModal(); generateMonthlySlider(); renderWeeklyGrid(); updateRealTimeProgress(); }
+    function openSwap(dateStr, rowId, baseText, e) {
+      e.stopPropagation(); activeModalContext = { dateStr, rowId, baseText };
       document.getElementById('swapTargetInfo').innerText = `TARGET: ${dateStr} | ${baseText}`;
       document.getElementById('swapTheme').value = '';
-      document.getElementById('modalOverlay').classList.remove('hidden');
-      document.getElementById('modalSwap').classList.remove('hidden');
+      document.getElementById('modalOverlay').classList.remove('hidden'); document.getElementById('modalSwap').classList.remove('hidden');
     }
-
-    function executeSwap() {
-      const theme = document.getElementById('swapTheme').value.trim();
-      const tag = document.getElementById('swapTag').value;
+    async function executeSwap() {
+      const theme = document.getElementById('swapTheme').value.trim(); const tag = document.getElementById('swapTag').value;
       if(!theme) { alert('新主题不能为空！'); return; }
-      executeSwapOverride(activeModalContext.dateStr, activeModalContext.rowId, activeModalContext.baseText, theme, tag);
-      closeModal(); generateMonthlySlider(); renderWeeklyGrid();
+      await executeSwapOverride(activeModalContext.dateStr, activeModalContext.rowId, activeModalContext.baseText, theme, tag);
+      closeModal(); generateMonthlySlider(); renderWeeklyGrid(); updateRealTimeProgress();
+    }
+    function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); document.getElementById('modalSwap').classList.add('hidden'); document.getElementById('modalDel').classList.add('hidden'); document.getElementById('modalTimeline').classList.add('hidden'); activeModalContext = null; }
+
+    /* ==================== 视觉动画引擎 ==================== */
+    function playSuccessAnimation() {
+      const anim = document.getElementById('celebration');
+      anim.classList.add('active'); setTimeout(() => anim.classList.remove('active'), 2500);
     }
 
-    function closeModal() {
-      document.getElementById('modalOverlay').classList.add('hidden');
-      document.getElementById('modalSwap').classList.add('hidden');
-      document.getElementById('modalDel').classList.add('hidden');
-      activeModalContext = null;
-    }
+    function updateRealTimeProgress() {
+      if(currentActiveView !== 'weekly') return;
+      const now = new Date();
+      document.querySelectorAll('.task-cell-wrap').forEach(cell => {
+        const isCompleted = cell.getAttribute('data-completed') === 'true';
+        const start = new Date(cell.getAttribute('data-start'));
+        const end = new Date(cell.getAttribute('data-end'));
+        const fillBar = cell.querySelector('.tech-fill-bar');
 
-    /* ==================== 视图双向渲染核心 ==================== */
-    
+        if (isCompleted || now > end) {
+          cell.classList.add('task-completed');
+          cell.classList.remove('task-active-glow');
+          if(fillBar) fillBar.style.width = '100%';
+        } else if (now >= start && now <= end) {
+          cell.classList.remove('task-completed');
+          cell.classList.add('task-active-glow');
+          const percent = ((now - start) / (end - start)) * 100;
+          if(fillBar) fillBar.style.width = `${percent}%`;
+        } else {
+          cell.classList.remove('task-completed', 'task-active-glow');
+          if(fillBar) fillBar.style.width = '0%';
+        }
+      });
+    }
+    setInterval(updateRealTimeProgress, 60000); 
+
+    /* ==================== 周度表渲染 ==================== */
     function renderWeeklyGrid() {
-      const container = document.getElementById('weeklyGridContainer');
-      let html = '';
+      const container = document.getElementById('weeklyGridContainer'); let html = '';
       const d = new Date(); const currentDayNum = d.getDay() === 0 ? 7 : d.getDay(); 
 
       WEEKLY_SCHEDULE_DATA.forEach(row => {
         if(row.type === 'transit') {
-          html += `<div class="grid grid-cols-8 text-[9px] font-mono border-t border-night-800" style="min-height: 14px; opacity: 0.5;"><div class="border-r border-night-800 bg-night-950 flex justify-center items-center text-slate-600"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg></div>`;
-          row.days.forEach(item => html += `<div class="border-r border-night-800 p-[1px]"><div class="h-full w-full rounded flex items-center justify-center text-slate-600 bg-night-950 border border-night-800/50 border-dashed tracking-widest">${item.text}</div></div>`);
+          html += `<div class="grid grid-cols-8 text-[9px] font-mono border-t border-night-800/50" style="min-height: 14px; opacity: 0.4;"><div class="border-r border-night-800 bg-night-950 flex justify-center items-center text-slate-700"></div>`;
+          row.days.forEach(item => html += `<div class="border-r border-night-800"><div class="h-full w-full bg-night-950 border-t border-b border-night-800/30 border-dashed"></div></div>`);
           html += `</div>`;
         } else {
-          const calculatedHeight = Math.max(row.duration * 1.5, row.duration < 15 ? 24 : 36);
-          html += `<div class="grid grid-cols-8 text-xs font-mono items-stretch border-t border-night-800" style="min-height: ${calculatedHeight}px;">
-              <div class="p-1.5 border-r border-night-800 bg-night-850/50 flex flex-col items-center justify-center font-bold text-slate-400 text-center select-none">
+          const calculatedHeight = Math.max(row.duration * 1.6, row.duration < 15 ? 26 : 40);
+          html += `<div class="grid grid-cols-8 text-xs font-mono items-stretch border-t border-night-800/80" style="min-height: ${calculatedHeight}px;">
+              <div class="p-1.5 border-r border-night-800 bg-gradient-to-b from-night-850 to-night-900 flex flex-col items-center justify-center font-bold text-slate-400 text-center select-none shadow-inner">
                 ${row.timeLabel}<span class="text-[9px] font-normal text-slate-600 mt-1">${row.duration}m</span>
               </div>`;
 
@@ -415,20 +544,28 @@
             const displayTxt = isReplaced ? blockData.replacedBy.theme : item.text;
             const displayTag = isReplaced ? blockData.replacedBy.tag : item.tag;
             const style = TAG_STYLES[displayTag] || TAG_STYLES.school_gen;
-            const padding = row.duration <= 15 ? 'p-0 text-[10px]' : 'px-1.5 py-1.5 text-[11px] leading-snug';
+            const padding = row.duration <= 15 ? 'p-0 text-[10px]' : 'p-2 text-[11px] leading-snug';
             
-            let detailHtml = '';
-            if (blockData.details.length > 0) {
-               detailHtml = `<div class="mt-1 w-full text-[10px] text-slate-300 font-normal border-t border-night-700/50 pt-1 text-left opacity-90 pl-1 space-y-0.5">` + 
-                            blockData.details.map((dt, i) => `<div class="break-words">${i+1}. ${sanitizeForHTML(dt)}</div>`).join('') + `</div>`;
+            let detailHtml = ''; let allChecked = false;
+
+            if (blockData.details.length > 0 && row.duration > 15 && targetDate >= new Date('2026-09-09')) {
+               allChecked = blockData.details.every(dt => dt.checked);
+               detailHtml = `<div class="mt-2 w-full text-[10px] text-slate-300 font-normal border-t border-night-700/50 pt-2 text-left opacity-95 space-y-1.5 relative z-10">` + 
+                  blockData.details.map((dt, i) => `
+                    <label class="flex items-start gap-1.5 cursor-pointer group">
+                      <input type="checkbox" ${dt.checked ? 'checked' : ''} onchange="toggleCheck('${targetDateStr}', ${row.rowId}, '${sanitizeForHTML(item.text)}', ${i})" class="mt-[2px] accent-emerald-500 w-3 h-3 rounded-sm cursor-pointer shadow-sm">
+                      <span class="break-words leading-tight ${dt.checked ? 'line-through text-slate-500 opacity-50' : 'text-slate-300 group-hover:text-white'} transition-all">${sanitizeForHTML(dt.text)}</span>
+                    </label>`).join('') + `</div>`;
             }
 
-            if(item.hide || item.tag === 'dining') {
-              html += `<div class="p-[3px] border-r border-night-800 flex flex-col"><div class="h-full w-full rounded border flex justify-center items-center text-center ${style} ${padding}">${displayTxt}</div></div>`;
+            if(item.hide || item.tag === 'dining' || targetDate < new Date('2026-09-09')) {
+              let textToShow = targetDate < new Date('2026-09-09') ? `<span class="text-slate-600 italic font-normal">已成历史</span>` : displayTxt;
+              html += `<div class="p-1 border-r border-night-800 flex flex-col"><div class="h-full w-full rounded flex justify-center items-center text-center ${style} ${padding} grayscale opacity-50">${textToShow}</div></div>`;
             } else {
-              html += `<div class="p-[3px] border-r border-night-800 flex flex-col">
-                  <div class="h-full w-full rounded border flex flex-col justify-center items-center text-center transition-colors duration-150 ${style} ${padding}">
-                    <span class="font-semibold ${isReplaced?'text-rose-300':''}">${displayTxt} ${isReplaced?'(Re)':''}</span>
+              html += `<div class="p-1 border-r border-night-800 flex flex-col">
+                  <div class="relative h-full w-full rounded flex flex-col transition-all duration-500 ${style} ${padding} task-cell-wrap" data-completed="${allChecked}" data-start="${targetDateStr}T${row.start}:00" data-end="${targetDateStr}T${row.end}:00">
+                    <div class="absolute bottom-0 left-0 h-full bg-gradient-to-r from-blue-500/10 to-blue-400/5 z-0 tech-fill-bar transition-all duration-1000 rounded" style="width:0%"></div>
+                    <span class="font-bold ${isReplaced?'text-rose-300':''} flex items-center relative z-10 tracking-wide">${displayTxt} ${isReplaced?'(Re)':''}</span>
                     ${detailHtml}
                   </div>
                 </div>`;
@@ -438,114 +575,84 @@
         }
       });
       container.innerHTML = html;
+      updateRealTimeProgress(); 
+    }
+
+    /* ==================== 月度表渲染 ==================== */
+    function toggleInlineDetails(dateStr, taskText, rowId) {
+      if (isEditModeActive) return; 
+      const id = `details-${dateStr}-${rowId}-${btoa(encodeURIComponent(taskText)).replace(/=/g, '')}`;
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('hidden');
     }
 
     function generateMonthHTML(year, month) {
       const firstDay = new Date(year, month, 1); const daysInMonth = new Date(year, month + 1, 0).getDate();
       let startingDay = firstDay.getDay() - 1; if (startingDay === -1) startingDay = 6;
       let html = '';
-      for (let i = 0; i < startingDay; i++) html += `<div class="h-[120px] bg-night-950/40 p-2"></div>`;
+      for (let i = 0; i < startingDay; i++) html += `<div class="min-h-[220px] bg-night-950/60 p-2 border-b border-r border-night-800/50"></div>`;
+
+      const todayMidnight = new Date(new Date().toDateString());
 
       for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const dayIdx = getDayIndex(dateStr);
-        const isToday = (new Date().toDateString() === new Date(year, month, day).toDateString());
+        const isToday = (new Date(dateStr).getTime() === todayMidnight.getTime());
+        const isPast = new Date(dateStr) < todayMidnight;
+        const isBeforeStart = new Date(dateStr) < new Date('2026-09-09');
 
-        html += `<div class="h-[120px] p-1.5 bg-night-900/60 transition-colors flex flex-col overflow-y-auto hide-scrollbar">
-            <div class="flex items-center justify-between mb-1.5">
-              <span class="font-mono text-[11px] font-semibold ${isToday ? 'bg-cyan-500 text-night-950 px-1.5 py-[1px] rounded-full font-bold shadow-[0_0_10px_rgba(34,211,238,0.4)]' : 'text-slate-400'}">${String(day).padStart(2, '0')}</span>
-            </div><div class="space-y-[3px]">`;
+        html += `<div class="min-h-[220px] p-2 bg-gradient-to-b from-night-900 to-night-950 transition-colors flex flex-col overflow-y-auto hide-scrollbar border-b border-r border-night-800/80 relative">
+            <div class="flex items-center justify-between mb-3">
+              <span class="font-mono text-[13px] font-bold ${isToday ? 'bg-cyan-500 text-night-950 px-2 py-0.5 rounded-md shadow-[0_0_12px_rgba(34,211,238,0.5)]' : 'text-slate-500'}">${String(day).padStart(2, '0')}</span>
+            </div><div class="space-y-[4px] ${isPast ? 'opacity-30 grayscale' : ''}">`;
         
-        WEEKLY_SCHEDULE_DATA.forEach(row => {
-          if (row.type === 'transit') return;
-          const item = row.days[dayIdx];
-          if (item.hide || item.tag === 'dining') return;
+        if (isBeforeStart) {
+          html += `<div class="text-xs text-slate-600 text-center mt-10 italic">历史节点<br>无任务</div>`;
+        } else {
+          WEEKLY_SCHEDULE_DATA.forEach(row => {
+            if (row.type === 'transit') return; const item = row.days[dayIdx]; 
+            if (item.hide || item.tag === 'dining' || item.tag.startsWith('school_')) return;
 
-          const blockData = getBlockData(dateStr, row.rowId, item.text);
-          const isReplaced = blockData.replacedBy !== null;
-          const displayTxt = isReplaced ? blockData.replacedBy.theme : item.text;
-          const displayTag = isReplaced ? blockData.replacedBy.tag : item.tag;
-          const isSchoolFixed = !isReplaced && displayTag.startsWith('school_');
+            const blockData = getBlockData(dateStr, row.rowId, item.text);
+            const isReplaced = blockData.replacedBy !== null;
+            const displayTxt = isReplaced ? blockData.replacedBy.theme : item.text;
+            const displayTag = isReplaced ? blockData.replacedBy.tag : item.tag;
+            
+            const barStyle = TAG_COLORS_FOR_BARS[displayTag] || "bg-night-800 border-l-[3px] border-l-slate-500 text-slate-300";
+            const safeDisplayTxt = sanitizeForHTML(displayTxt); const safeItemText = sanitizeForHTML(item.text);
+            const detailsId = `details-${dateStr}-${row.rowId}-${btoa(encodeURIComponent(item.text)).replace(/=/g, '')}`;
 
-          const barStyle = TAG_COLORS_FOR_BARS[displayTag] || "bg-night-800/40 text-slate-400 border-night-700/40";
-          const editClass = isSchoolFixed ? 'uneditable' : 'editable';
-          
-          // 对所有注入HTML的变量进行转义，彻底防止崩溃
-          const safeDisplayTxt = sanitizeForHTML(displayTxt);
-          const safeItemText = sanitizeForHTML(item.text);
-          let hoverText = isReplaced ? `[覆写] ${safeDisplayTxt}` : safeDisplayTxt;
-          if(blockData.details.length > 0) hoverText += `<br><br>` + blockData.details.map((d,i)=>`${i+1}. ${sanitizeForHTML(d)}`).join('<br>');
+            let detailsHtml = `<div id="${detailsId}" class="hidden pl-2 text-[10px] text-slate-400 border-l border-night-700 ml-1 mb-2 mt-1 space-y-1.5">`;
+            if (blockData.details.length === 0) detailsHtml += `<div class="italic">无细分</div>`;
+            else detailsHtml += blockData.details.map((d,i)=>`<div class="${d.checked?'text-emerald-500 line-through opacity-50':''}">${d.checked?'✓':'-'} ${sanitizeForHTML(d.text)}</div>`).join('');
+            detailsHtml += `</div>`;
 
-          html += `
-            <div class="task-bar ${barStyle} ${editClass}"
-                 onmouseenter="showTooltip(event, this, '${safeDisplayTxt}', '${hoverText}', isEditModeActive, ${isSchoolFixed})"
-                 onmouseleave="hideTooltip()"
-                 onclick="!isEditModeActive && togglePin(this, '${safeDisplayTxt}', '${hoverText}')">
-              ${safeDisplayTxt}
-              <div class="action-overlay">
-                <span class="action-btn" title="Add Detail" onclick="openAdd('${dateStr}', ${row.rowId}, '${safeItemText}', event)">➕</span>
-                <span class="action-btn" title="Delete Detail" onclick="openDel('${dateStr}', ${row.rowId}, '${safeItemText}', event)">🗑️</span>
-                <span class="action-btn" title="Override Block" onclick="openSwap('${dateStr}', ${row.rowId}, '${safeItemText}', 'time_ph', event)">🔄</span>
-              </div>
-            </div>`;
-        });
+            html += `
+              <div>
+                <div class="task-bar ${barStyle} flex items-center justify-between shadow-sm" onclick="toggleInlineDetails('${dateStr}', '${safeItemText}', ${row.rowId})">
+                  <span class="truncate font-semibold tracking-wide">${safeDisplayTxt}</span>
+                  <div class="action-overlay rounded">
+                    <span class="action-btn" title="Add" onclick="openAdd('${dateStr}', ${row.rowId}, '${safeItemText}', event)">➕</span>
+                    <span class="action-btn" title="Del" onclick="openDel('${dateStr}', ${row.rowId}, '${safeItemText}', event)">🗑️</span>
+                    <span class="action-btn" title="Override" onclick="openSwap('${dateStr}', ${row.rowId}, '${safeItemText}', event)">🔄</span>
+                  </div>
+                </div>
+                ${detailsHtml}
+              </div>`;
+          });
+        }
         html += `</div></div>`;
       }
+      const totalCells = startingDay + daysInMonth; const trailingCells = (7 - (totalCells % 7)) % 7;
+      for (let i = 0; i < trailingCells; i++) html += `<div class="min-h-[220px] bg-night-950/60 p-2 border-b border-r border-night-800/80"></div>`;
       return html;
     }
 
-    /* ==================== 悬浮气泡控制 ==================== */
-    let pinnedTooltip = null; 
-    const tooltipEl = document.getElementById('global-tooltip');
-    function showTooltip(e, element, title, content, isEditMode, isFixed) {
-      if (pinnedTooltip) return; 
-      document.getElementById('tooltip-title').innerText = title;
-      document.getElementById('tooltip-content').innerHTML = content;
-      const hint = document.getElementById('tooltip-hint');
-      
-      if (isEditMode) {
-        if(isFixed) { hint.innerText = "校内固定课程锁定"; hint.className = "text-[9px] text-rose-400 pt-1 italic"; }
-        else { hint.innerText = "使用方块内操作面板"; hint.className = "text-[9px] text-cyan-500 pt-1 italic"; }
-      } else {
-        hint.innerText = "点击锁定此面板"; hint.className = "text-[9px] text-slate-500 pt-1 italic";
-      }
-      
-      positionTooltip(element);
-      tooltipEl.classList.remove('hidden', 'tooltip-hidden');
-      requestAnimationFrame(() => tooltipEl.classList.add('tooltip-visible'));
-    }
-    function positionTooltip(element) {
-      const rect = element.getBoundingClientRect();
-      const topPos = rect.bottom + window.scrollY + 4;
-      let leftPos = rect.left + window.scrollX;
-      if (leftPos + 260 > document.body.clientWidth) leftPos = document.body.clientWidth - 270;
-      tooltipEl.style.top = topPos + 'px'; tooltipEl.style.left = leftPos + 'px';
-    }
-    function hideTooltip() {
-      if (pinnedTooltip) return;
-      tooltipEl.classList.remove('tooltip-visible'); tooltipEl.classList.add('tooltip-hidden');
-    }
-    function togglePin(element, title, content) {
-      if (pinnedTooltip === element) { pinnedTooltip = null; tooltipEl.classList.remove('pinned'); hideTooltip(); } 
-      else {
-        pinnedTooltip = element; document.getElementById('tooltip-title').innerText = title + " (PINNED)";
-        document.getElementById('tooltip-content').innerHTML = content;
-        document.getElementById('tooltip-hint').innerText = "点击屏幕空白处解锁";
-        positionTooltip(element); tooltipEl.classList.remove('hidden', 'tooltip-hidden'); tooltipEl.classList.add('tooltip-visible', 'pinned');
-      }
-    }
-    function handleBodyClick(e) {
-      if (pinnedTooltip && !e.target.closest('.task-bar') && !e.target.closest('#global-tooltip')) {
-        pinnedTooltip = null; tooltipEl.classList.remove('pinned'); hideTooltip();
-      }
-    }
-
-    /* ==================== 轮播与控制台 ==================== */
     let currentFocusYear = 2026; let currentFocusMonth = 8;
     function generateMonthlySlider() {
       const carousel = document.getElementById('calendar-carousel'); let html = '';
       for (let y = 2025; y <= 2027; y++) {
-        for (let m = 0; m < 12; m++) html += `<div id="month-grid-${y}-${m}" class="w-full min-w-full flex-shrink-0 snap-center p-0.5"><div class="grid grid-cols-7 divide-x divide-y divide-night-800 bg-night-900 border-l border-r border-b border-night-800">${generateMonthHTML(y, m)}</div></div>`;
+        for (let m = 0; m < 12; m++) html += `<div id="month-grid-${y}-${m}" class="w-full min-w-full flex-shrink-0 snap-center"><div class="grid grid-cols-7 border-l border-t border-night-800/80 bg-night-900">${generateMonthHTML(y, m)}</div></div>`;
       }
       carousel.innerHTML = html;
       const observer = new IntersectionObserver((entries) => {
@@ -559,30 +666,210 @@
     function slideToMonth(y, m) { const tgt = document.getElementById(`month-grid-${y}-${m}`); if(tgt) tgt.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'start' }); }
     function slidePrev() { let m = currentFocusMonth - 1, y = currentFocusYear; if (m < 0) { m = 11; y--; } slideToMonth(y, m); }
     function slideNext() { let m = currentFocusMonth + 1, y = currentFocusYear; if (m > 11) { m = 0; y++; } slideToMonth(y, m); }
+    function goToToday() { const d = new Date(); slideToMonth(d.getFullYear(), d.getMonth()); }
 
     let isEditModeActive = false;
     function toggleEditMode() {
       const btn = document.getElementById('editModeBtn'); const wrapper = document.getElementById('monthlyWrapper');
       isEditModeActive = !isEditModeActive;
       if (isEditModeActive) {
-        btn.classList.add('bg-cyan-900/50', 'text-cyan-400', 'border-cyan-500'); btn.innerText = "💾 退出编辑模式"; wrapper.classList.add('edit-mode');
-        pinnedTooltip = null; tooltipEl.classList.remove('pinned'); hideTooltip();
+        btn.classList.add('bg-cyan-900/50', 'text-cyan-400', 'border-cyan-500'); btn.innerText = "💾 EXIT EDIT MODE"; wrapper.classList.add('edit-mode');
       } else {
-        btn.classList.remove('bg-cyan-900/50', 'text-cyan-400', 'border-cyan-500'); btn.innerText = "⚙️ 进入编辑模式"; wrapper.classList.remove('edit-mode');
+        btn.classList.remove('bg-cyan-900/50', 'text-cyan-400', 'border-cyan-500'); btn.innerText = "⚙️ EDIT MODE"; wrapper.classList.remove('edit-mode');
       }
     }
 
+    /* ==================== 进度总览与极客折线时间轴 ==================== */
+    const PROJECT_MILESTONES = {
+      'amc12': [
+        { date: '2026-09-15', label: '代数复数专项', y: 15 }, { date: '2026-09-30', label: '组合概率突破', y: 85 },
+        { date: '2026-10-15', label: '数论几何综合', y: 20 }, { date: '2026-10-30', label: '历年全真模考', y: 80 }, { date: '2026-11-10', label: '压轴题冲刺', y: 50 }
+      ],
+      'himcm': [
+        { date: '2026-09-20', label: '线性规划/评价模型', y: 85 }, { date: '2026-10-05', label: '微分方程推演', y: 15 },
+        { date: '2026-10-20', label: '机器学习实操', y: 80 }, { date: '2026-11-01', label: '锁定赛题/分工', y: 20 }, { date: '2026-11-15', label: '论文全英封版', y: 50 }
+      ],
+      'bmo': [
+        { date: '2026-09-25', label: '代数方程变形', y: 15 }, { date: '2026-10-10', label: '几何综合推理', y: 85 },
+        { date: '2026-10-25', label: '数论构造套路', y: 20 }, { date: '2026-11-15', label: '完整书面证明', y: 80 }, { date: '2026-11-30', label: 'BMO1全卷演练', y: 50 }
+      ],
+      'nlp': [
+        { date: '2026-09-20', label: 'Word2Vec/RNN', y: 85 }, { date: '2026-10-05', label: 'Transformer架构', y: 15 },
+        { date: '2026-10-25', label: 'HuggingFace微调', y: 80 }, { date: '2026-11-10', label: 'RAG知识库Demo', y: 20 }, { date: '2026-11-20', label: 'PPT与答辩报告', y: 50 }
+      ],
+      'ielts': [
+        { date: '2026-09-30', label: '剑14/15 听阅精刷', y: 15 }, { date: '2026-10-20', label: '口语 Part2 语料', y: 85 },
+        { date: '2026-11-15', label: '写作 Task 2 逻辑', y: 20 }, { date: '2026-12-05', label: '口语 Part3 高频题', y: 80 }, { date: '2026-12-20', label: '全真机考模拟', y: 50 }
+      ]
+    };
+
+    const PROJECTS = [
+      { id: 'amc12', name: 'AMC12 A卷冲刺', start: '2026-09-09', target: '2026-11-10', kw: 'AMC12', c: 'bg-cyan-500', stroke: '#06b6d4', shadow: 'shadow-[0_0_15px_rgba(6,182,212,0.5)]' },
+      { id: 'himcm', name: 'HiMCM 全球赛', start: '2026-09-09', target: '2026-11-15', kw: 'HiMCM', c: 'bg-purple-500', stroke: '#a855f7', shadow: 'shadow-[0_0_15px_rgba(168,85,247,0.5)]' },
+      { id: 'bmo', name: 'BMO1 备考', start: '2026-09-09', target: '2026-11-30', kw: 'BMO', c: 'bg-indigo-500', stroke: '#6366f1', shadow: 'shadow-[0_0_15px_rgba(99,102,241,0.5)]' },
+      { id: 'nlp', name: 'NLP 项目落地', start: '2026-09-09', target: '2026-11-20', kw: '实习项目', c: 'bg-rose-500', stroke: '#f43f5e', shadow: 'shadow-[0_0_15px_rgba(244,63,94,0.5)]' },
+      { id: 'ielts', name: '雅思 IELTS', start: '2026-09-09', target: '2026-12-20', kw: '雅思', c: 'bg-amber-500', stroke: '#f59e0b', shadow: 'shadow-[0_0_15px_rgba(245,158,11,0.5)]' }
+    ];
+
+    function getTasksStats(kw, startDateStr, endDateStr) {
+      const db = getStore(); let checked = 0; let total = 0;
+      const start = new Date(startDateStr).getTime();
+      const end = new Date(endDateStr).getTime();
+
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const dStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        const dayIdx = getDayIndex(dStr);
+
+        WEEKLY_SCHEDULE_DATA.forEach(row => {
+          if (row.type !== 'transit') {
+            const item = row.days[dayIdx];
+            if (item.text.includes(kw)) {
+              const key = `${row.rowId}_${item.text}`;
+              if (db[dStr] && db[dStr][key]) {
+                const dt = db[dStr][key];
+                if (!(dt.details.length === 0 && dt.userDeletedAll)) {
+                  const details = dt.details.length > 0 ? dt.details : getSmartDetail(dStr, item.text);
+                  total += details.length;
+                  checked += details.filter(x => x.checked).length;
+                }
+              } else {
+                total += getSmartDetail(dStr, item.text).length;
+              }
+            }
+          }
+        });
+      }
+      return { checked, total, ratio: total === 0 ? 0 : checked / total };
+    }
+
+    function renderProgress() {
+      const container = document.getElementById('progressContainer'); const today = new Date().getTime();
+      
+      container.innerHTML = PROJECTS.map(p => {
+        const stats = getTasksStats(p.kw, p.start, p.target);
+        const sTime = new Date(p.start).getTime(); const tTime = new Date(p.target).getTime();
+        let perc = Math.max(0, Math.min(100, ((today - sTime) / (tTime - sTime)) * 100));
+        let remain = Math.max(0, Math.ceil((tTime - today) / 86400000));
+        
+        return `
+          <div class="pro-card p-6 rounded-xl relative cursor-pointer hover:border-night-600 transition-all group hover:-translate-y-1 hover:shadow-2xl" onclick="openTimeline('${p.id}')">
+             <div class="flex justify-between items-center mb-2">
+               <h3 class="font-bold text-slate-100 font-mono tracking-wide group-hover:text-white transition-colors text-lg">${p.name}</h3>
+               <span class="text-[10px] font-mono bg-night-950 px-2 py-1 rounded border border-night-700 text-slate-400">距离: ${remain} 天</span>
+             </div>
+             <p class="text-[10px] text-slate-500 mb-4">打卡进度歼灭率 <span class="text-white font-bold text-xs">${(stats.ratio*100).toFixed(1)}%</span> (点击展开六边形时间轴)</p>
+             <div class="w-full bg-night-950 h-3 rounded-full overflow-hidden mt-3 shadow-inner border border-night-800">
+                 <div class="${p.c} h-full progress-fill ${p.shadow} rounded-r-full" style="--progress-w: ${perc}%;"></div>
+             </div>
+             <div class="flex justify-between mt-2 text-[9px] text-slate-600 font-mono font-bold"><span>${p.start}</span><span>TARGET: ${p.target}</span></div>
+          </div>
+        `;
+      }).join('');
+      setTimeout(() => { document.querySelectorAll('.progress-fill').forEach(el => { el.style.width = el.style.getPropertyValue('--progress-w'); }); }, 50);
+    }
+
+    function openTimeline(projectId) {
+      const p = PROJECTS.find(x => x.id === projectId); if(!p) return;
+      document.getElementById('timelineTitle').innerHTML = `<span class="${p.c.replace('bg-', 'text-')} drop-shadow-[0_0_8px_currentColor] tracking-widest">${p.name} TIMELINE</span>`;
+      
+      const milestones = PROJECT_MILESTONES[projectId];
+      const startDate = new Date('2026-09-01');
+      const endDate = new Date('2026-12-31');
+      const PX_PER_DAY = 45;
+      const totalWidth = ((endDate - startDate) / 86400000) * PX_PER_DAY;
+
+      let html = `<div style="width:${totalWidth}px; height: 100%; position: relative;">`;
+
+      // 1. 半透明月份背景框
+      const monthNames = ['SEP', 'OCT', 'NOV', 'DEC'];
+      const monthDays = [30, 31, 30, 31];
+      let currentX = 0;
+      monthDays.forEach((days, i) => {
+        const w = days * PX_PER_DAY;
+        const bgColor = i % 2 === 0 ? 'bg-slate-800/10' : 'bg-slate-800/30';
+        html += `<div class="absolute top-0 bottom-0 ${bgColor} border-r border-night-700/50" style="left:${currentX}px; width:${w}px;">
+                    <div class="text-night-700/40 font-black text-6xl mt-4 ml-4 tracking-tighter">${monthNames[i]}</div>
+                 </div>`;
+        currentX += w;
+      });
+
+      // 2. 大起伏曲折 SVG 连线
+      let svgPath = '';
+      milestones.forEach((m, idx) => {
+        const cx = ((new Date(m.date) - startDate) / 86400000) * PX_PER_DAY;
+        const cy = m.y; 
+        svgPath += (idx === 0 ? `M ${cx} ${cy}% ` : `L ${cx} ${cy}% `);
+      });
+
+      html += `<svg class="absolute top-0 left-0 w-full h-full pointer-events-none z-10" preserveAspectRatio="none">
+                 <path d="${svgPath}" fill="none" stroke="${p.stroke}" stroke-width="3" stroke-dasharray="6 6" opacity="0.6" class="timeline-path drop-shadow-[0_0_5px_currentColor]" />
+               </svg>`;
+
+      // 3. 六边形节点 (边缘动态充能填充)
+      milestones.forEach((m, idx) => {
+        const cx = ((new Date(m.date) - startDate) / 86400000) * PX_PER_DAY;
+        const prevDate = idx === 0 ? p.start : milestones[idx-1].date;
+        
+        const stageRatio = getTasksStats(p.kw, prevDate, m.date).ratio;
+        const isCompleted = stageRatio >= 0.99;
+        
+        const dashOffset = 84 - 84 * stageRatio;
+        const colorClass = isCompleted ? `${p.c.replace('bg-', 'text-')} drop-shadow-[0_0_10px_currentColor]` : 'text-slate-600';
+        
+        const isTop = m.y < 50;
+        const labelPos = isTop ? 'top-10' : 'bottom-10';
+
+        html += `
+          <div class="absolute z-20 flex flex-col items-center group" style="left: ${cx}px; top: ${m.y}%; transform: translate(-50%, -50%);">
+            
+            <svg width="36" height="36" viewBox="0 0 32 32" class="relative z-10 transition-transform duration-300 group-hover:scale-125 cursor-pointer ${colorClass}">
+              <polygon points="16,2 28.12,9 28.12,23 16,30 3.88,23 3.88,9" fill="#0d131f" stroke="#334155" stroke-width="2"/>
+              <polygon points="16,2 28.12,9 28.12,23 16,30 3.88,23 3.88,9" fill="${isCompleted ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="3"
+                       stroke-dasharray="84" stroke-dashoffset="${dashOffset}"
+                       class="transition-all duration-1000 ease-out" style="fill-opacity: 0.15;"/>
+              ${isCompleted ? '<circle cx="16" cy="16" r="3" fill="currentColor" />' : ''}
+            </svg>
+
+            <div class="absolute ${labelPos} flex flex-col items-center w-max opacity-80 group-hover:opacity-100 transition-opacity">
+               <span class="text-xs ${isCompleted ? 'text-white font-bold drop-shadow-md' : 'text-slate-500'} bg-night-950/90 px-3 py-1.5 rounded border border-night-800 shadow-lg backdrop-blur-sm">${m.label}</span>
+               <span class="text-[10px] text-slate-500 font-mono mt-1 font-bold">${m.date.slice(5)} (${(stageRatio*100).toFixed(0)}%)</span>
+            </div>
+          </div>
+        `;
+      });
+
+      html += `</div>`;
+      document.getElementById('timelineContent').innerHTML = html;
+      document.getElementById('modalOverlay').classList.remove('hidden'); document.getElementById('modalTimeline').classList.remove('hidden');
+    }
+
+    // 鼠标拖拽横向滚动时间轴
+    const scrollArea = document.getElementById('timelineScrollArea');
+    let isDown = false; let startX; let scrollLeft;
+    scrollArea.addEventListener('mousedown', (e) => { isDown = true; scrollArea.classList.add('active:cursor-grabbing'); startX = e.pageX - scrollArea.offsetLeft; scrollLeft = scrollArea.scrollLeft; });
+    scrollArea.addEventListener('mouseleave', () => { isDown = false; scrollArea.classList.remove('active:cursor-grabbing'); });
+    scrollArea.addEventListener('mouseup', () => { isDown = false; scrollArea.classList.remove('active:cursor-grabbing'); });
+    scrollArea.addEventListener('mousemove', (e) => { if(!isDown) return; e.preventDefault(); const x = e.pageX - scrollArea.offsetLeft; const walk = (x - startX) * 2; scrollArea.scrollLeft = scrollLeft - walk; });
+
+    /* ==================== 视图控制 ==================== */
+    let currentActiveView = 'weekly';
     function switchView(view) {
-      if (isEditModeActive) toggleEditMode();
-      const tabW = document.getElementById('tabWeekly'); const tabM = document.getElementById('tabMonthly');
+      currentActiveView = view; if (isEditModeActive) toggleEditMode();
+      const tabW = document.getElementById('tabWeekly'); const tabM = document.getElementById('tabMonthly'); const tabP = document.getElementById('tabProgress');
+      const vW = document.getElementById('viewWeekly'); const vM = document.getElementById('viewMonthly'); const vP = document.getElementById('viewProgress');
+      
+      [tabW, tabM, tabP].forEach(t => { t.className = "px-4 py-1.5 text-xs font-semibold rounded-md transition-all text-slate-400 hover:text-slate-200"; });
+      [vW, vM, vP].forEach(v => v.classList.add('hidden'));
+
       if (view === 'weekly') {
-        document.getElementById('viewWeekly').classList.remove('hidden'); document.getElementById('viewMonthly').classList.add('hidden');
-        tabW.className = "px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all bg-cyan-500/10 text-cyan-400 border border-cyan-500/30"; tabM.className = "px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all text-slate-400 hover:text-slate-200";
+        vW.classList.remove('hidden'); tabW.className = "px-4 py-1.5 text-xs font-semibold rounded-md transition-all bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 shadow-inner";
         renderWeeklyGrid(); 
-      } else {
-        document.getElementById('viewWeekly').classList.add('hidden'); document.getElementById('viewMonthly').classList.remove('hidden');
-        tabM.className = "px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all bg-cyan-500/10 text-cyan-400 border border-cyan-500/30"; tabW.className = "px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all text-slate-400 hover:text-slate-200";
-        if (!window.monthlyRendered) { generateMonthlySlider(); setTimeout(() => slideToMonth(2026, 8), 50); window.monthlyRendered = true; }
+      } else if (view === 'monthly') {
+        vM.classList.remove('hidden'); tabM.className = "px-4 py-1.5 text-xs font-semibold rounded-md transition-all bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 shadow-inner";
+        if (!window.monthlyRendered) { generateMonthlySlider(); setTimeout(() => goToToday(), 50); window.monthlyRendered = true; }
+      } else if (view === 'progress') {
+        vP.classList.remove('hidden'); tabP.className = "px-4 py-1.5 text-xs font-semibold rounded-md transition-all text-emerald-400 bg-emerald-900/20 border border-emerald-500/50 shadow-inner";
+        renderProgress();
       }
     }
   </script>
