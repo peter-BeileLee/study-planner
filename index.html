@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ACADEMIC ROADMAP OS - CLOUD ENABLED</title>
+  <title>ACADEMIC ROADMAP OS - V8 MAX-PRO</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Supabase 云端同步 SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -29,14 +29,12 @@
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* 高级卡片样式 */
     .pro-card {
       background: linear-gradient(135deg, rgba(13, 19, 31, 0.9) 0%, rgba(6, 9, 14, 0.95) 100%);
       border-top: 1px solid rgba(255, 255, 255, 0.05); border-left: 1px solid rgba(255, 255, 255, 0.02);
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); position: relative; overflow: hidden;
     }
     
-    /* 月度表与操作菜单 */
     .task-bar { width: 100%; min-height: 22px; border-radius: 4px; margin-bottom: 6px; font-size: 11px; line-height: 14px; padding: 4px 6px; cursor: pointer; transition: all 0.2s; }
     .task-bar:hover { filter: brightness(1.3); transform: translateX(2px); }
     .action-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(11, 15, 23, 0.95); display: flex; align-items: center; justify-content: space-around; opacity: 0; transform: translateY(-100%); transition: all 0.2s ease; }
@@ -44,19 +42,17 @@
     .action-btn { font-size: 11px; padding: 0 5px; cursor: pointer; transition: color 0.1s; }
     .action-btn:hover { color: #38bdf8; }
 
-    /* 科技感进度水波纹 */
     .tech-fill-bar {
       background: linear-gradient(90deg, rgba(56,189,248,0.05) 0%, rgba(56,189,248,0.25) 100%);
       border-right: 2px solid rgba(56,189,248,0.8);
       box-shadow: inset -5px 0 15px rgba(56,189,248,0.2), 2px 0 8px rgba(56,189,248,0.4);
     }
     
-    /* 彻底完成后的状态 */
-    .task-completed { filter: grayscale(100%) opacity(0.25); pointer-events: none; }
+    /* 打满全勾后的变灰压暗状态 (平滑过渡) */
+    .task-completed { filter: grayscale(100%) opacity(0.3) brightness(0.7); transition: all 0.5s ease; }
     .task-active-glow { box-shadow: inset 0 0 10px rgba(56, 189, 248, 0.1), 0 0 5px rgba(56, 189, 248, 0.2); border-color: rgba(56, 189, 248, 0.4) !important; }
 
-    /* 折线图动画与样式 */
-    .timeline-path { stroke-dasharray: 3000; stroke-dashoffset: 3000; animation: drawLine 1.5s ease-out forwards; }
+    .timeline-path { stroke-dasharray: 4000; stroke-dashoffset: 4000; animation: drawLine 2s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
     @keyframes drawLine { to { stroke-dashoffset: 0; } }
     @keyframes fillProgress { from { width: 0%; } }
     .progress-fill { animation: fillProgress 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -77,8 +73,8 @@
     <div class="w-full max-w-md bg-night-900 border border-night-800 rounded-xl p-8 shadow-2xl">
       <div class="flex items-center space-x-3 mb-6"><div class="w-2.5 h-6 bg-cyan-500 rounded-sm"></div><div><h2 class="text-lg font-bold tracking-wider text-slate-100 font-mono uppercase">AUTHENTICATION</h2><p class="text-xs text-slate-500 font-mono">CLOUD SYNC ENABLED</p></div></div>
       <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
-        <input type="text" id="loginUser" required class="w-full bg-night-950 border border-night-800 rounded-lg px-3.5 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-cyan-500" autocomplete="off">
-        <input type="password" id="loginPass" required class="w-full bg-night-950 border border-night-800 rounded-lg px-3.5 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-cyan-500" autocomplete="new-password">
+        <input type="text" id="loginUser" required class="w-full bg-night-950 border border-night-800 rounded-lg px-3.5 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-cyan-500" autocomplete="off" placeholder="Account">
+        <input type="password" id="loginPass" required class="w-full bg-night-950 border border-night-800 rounded-lg px-3.5 py-2.5 text-sm font-mono text-slate-200 focus:outline-none focus:border-cyan-500" autocomplete="new-password" placeholder="Key">
         <div id="loginError" class="text-xs text-rose-400 font-mono hidden"></div>
         <button type="submit" class="w-full bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 font-mono text-xs font-bold py-2.5 rounded-lg transition-all">ENTER SYSTEM</button>
       </form>
@@ -126,7 +122,7 @@
         <div class="flex items-center space-x-3">
           <div class="w-2.5 h-6 bg-cyan-500 rounded-sm"></div>
           <h1 id="headerTitle" class="text-base sm:text-lg font-bold tracking-wider text-slate-100 uppercase font-mono">ACADEMIC ROADMAP</h1>
-          <span id="syncStatusBadge" class="text-[10px] px-2 py-0.5 rounded bg-night-800 text-emerald-400 border border-emerald-900/50 font-mono">CLOUD SYNCED</span>
+          <span id="syncStatusBadge" class="text-[10px] px-2 py-0.5 rounded bg-night-800 text-amber-400 border border-amber-900/50 font-mono">CONNECTING...</span>
         </div>
         <div class="flex items-center space-x-3">
           <nav id="navBarContainer" class="flex space-x-1 bg-night-950 p-1 rounded-lg border border-night-800 shadow-inner">
@@ -142,7 +138,7 @@
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
       <!-- 视图三：进度总览 -->
       <section id="viewProgress" class="hidden transition-opacity duration-300">
-        <div class="mb-6"><h2 class="text-xl sm:text-2xl font-bold text-slate-100 font-mono">BATTLEFRONT PROGRESS 🛡️</h2><p class="text-xs text-slate-400 mt-1">秋季战役倒计时。点击卡片展开<span class="text-cyan-400">【六边形节点时间轴】</span>查看具体月度规划与边缘充能进度。</p></div>
+        <div class="mb-6"><h2 class="text-xl sm:text-2xl font-bold text-slate-100 font-mono">BATTLEFRONT PROGRESS 🛡️</h2><p class="text-xs text-slate-400 mt-1">秋季战役倒计时。点击卡片展开<span class="text-cyan-400">【曲折节点时间轴】</span>查看六边形边缘充能进度。</p></div>
         <div id="progressContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
       </section>
 
@@ -151,7 +147,7 @@
         <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 class="text-lg sm:text-xl font-bold text-slate-100 font-mono">DYNAMIC TIME-BLOCK MASTER</h2>
-            <p class="text-xs text-slate-400 mt-0.5">全勾选自动压暗 | 进行中方块展示科技感蓝色水位线 | 多端实时云同步</p>
+            <p class="text-xs text-slate-400 mt-0.5">全勾选将瞬间变灰压暗以标记歼灭 | 多端实时云同步</p>
           </div>
         </div>
         <div class="overflow-x-auto rounded-lg border border-night-800 bg-night-900 shadow-2xl">
@@ -171,7 +167,7 @@
         <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 class="text-lg sm:text-xl font-bold text-slate-100 font-mono">MONTHLY STRATEGIC ROADMAP</h2>
-            <p class="text-xs text-slate-400 mt-0.5">点击任务条在下方内联展开详细任务 | 已屏蔽过去未完成的无效任务</p>
+            <p class="text-xs text-slate-400 mt-0.5">点击任务条在下方内联展开详细任务 | 已彻底屏蔽过去未完成的无效任务</p>
           </div>
           <div class="flex items-center space-x-3">
             <button onclick="goToToday()" class="px-4 py-2 text-xs font-bold font-mono rounded-lg border border-cyan-800 bg-cyan-900/50 text-cyan-300 hover:bg-cyan-800/80 transition-all shadow-[0_0_10px_rgba(34,211,238,0.2)]">📍 BACK TO TODAY</button>
@@ -196,25 +192,14 @@
 
   <script>
     /* ==================== SUPABASE 云端数据库配置 ==================== */
-    // 注入你提供的专属数据库地址和匿名公钥
     const SUPABASE_URL = "https://wdndkpoajujjnpthwwjn.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkbmRrcG9hanVqam5wdHR3d2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NTIzMjMsImV4cCI6MjEwNDUyODMyM30.W6r5aHzaSqCC2n_4dP_PCN3BqGUTDrpiWvcUf7dvhXE";
 
-    let supabaseClient = null;
-    if (SUPABASE_URL !== "YOUR_SUPABASE_URL" && !SUPABASE_URL.includes("YOUR_")) {
-      supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    }
-
+    let supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let memoryStoreCache = null;
 
     async function loadCloudData() {
       const badge = document.getElementById('syncStatusBadge');
-      if (!supabaseClient) {
-        if (badge) { badge.innerText = "LOCAL MODE"; badge.className = "text-[10px] px-2 py-0.5 rounded bg-night-800 text-slate-400 border border-night-700 font-mono"; }
-        memoryStoreCache = JSON.parse(localStorage.getItem('academic_cloud_v8') || '{}');
-        return;
-      }
-
       try {
         if (badge) { badge.innerText = "SYNCING..."; badge.className = "text-[10px] px-2 py-0.5 rounded bg-night-800 text-amber-400 border border-amber-900/50 font-mono"; }
         const { data, error } = await supabaseClient.from('planner_storage').select('data').eq('id', 'main_planner').single();
@@ -235,24 +220,19 @@
     async function saveCloudData(newData) {
       memoryStoreCache = newData;
       localStorage.setItem('academic_cloud_v8', JSON.stringify(newData));
-
-      if (supabaseClient) {
-        const badge = document.getElementById('syncStatusBadge');
-        try {
-          if (badge) badge.innerText = "SAVING...";
-          await supabaseClient.from('planner_storage').upsert({ id: 'main_planner', data: newData, updated_at: new Date() });
-          if (badge) badge.innerText = "CLOUD SYNCED";
-        } catch (err) {
-          console.error("Cloud save failed, saved locally:", err);
-          if (badge) badge.innerText = "LOCAL SAVED";
-        }
+      const badge = document.getElementById('syncStatusBadge');
+      try {
+        if (badge) badge.innerText = "SAVING...";
+        await supabaseClient.from('planner_storage').upsert({ id: 'main_planner', data: newData, updated_at: new Date() });
+        if (badge) badge.innerText = "CLOUD SYNCED";
+      } catch (err) {
+        console.error("Cloud save failed, saved locally:", err);
+        if (badge) badge.innerText = "LOCAL SAVED";
       }
     }
 
     function getStore() {
-      if (!memoryStoreCache) {
-        memoryStoreCache = JSON.parse(localStorage.getItem('academic_cloud_v8') || '{}');
-      }
+      if (!memoryStoreCache) memoryStoreCache = JSON.parse(localStorage.getItem('academic_cloud_v8') || '{}');
       return memoryStoreCache;
     }
 
@@ -280,11 +260,15 @@
     }
     function handleLogout() { sessionStorage.removeItem('academic_auth_role'); window.location.reload(); }
 
+    /* 初始化入口：阻塞等待云端数据加载完毕后，再进行渲染 */
     async function initApp() {
-      await loadCloudData();
+      await loadCloudData(); // 等待数据100%加载
       const sr = sessionStorage.getItem('academic_auth_role');
-      if (sr) setSession(sr);
-      updateRealTimeProgress();
+      if (sr) {
+        setSession(sr); 
+      }
+      // 此处不再有其他事件监听抢跑
+      setInterval(updateRealTimeProgress, 60000);
     }
 
     /* ==================== 视觉系统 ==================== */
@@ -337,7 +321,7 @@
       { rowId: 25, start: '22:00', end: '22:30', timeLabel: "休整就寝<br><span class='text-[10px] text-slate-500'>22:00-22:30</span>", duration: 30, days: Array(7).fill({ text: "洗澡 -> 熄灯", tag: "physical", hide: true }) }
     ];
 
-    /* ==================== 智能配速算法 (题库) ==================== */
+    /* ==================== 智能配速算法 ==================== */
     function getSmartDetail(dateStr, taskName) {
       const today = new Date('2026-09-09T00:00:00');
       const target = new Date(dateStr + 'T00:00:00');
@@ -349,15 +333,15 @@
       if (taskName === "AMC12备赛") {
         const y = 2012 + Math.floor(offset / 4); 
         const type = (offset % 4) < 2 ? 'A' : 'B';
-        if (month <= 10) return [{text: `完成 ${y} AMC12 ${type}卷 1-15题 (复数与多项式专项)`, checked: false}, {text: "核对答案，将错题录入代数/组合错题本", checked: false}];
+        if (month <= 10) return [{text: `完成 ${y} AMC12 ${type}卷 1-15题`, checked: false}, {text: "核对答案并录入代数/组合错题本", checked: false}];
         else if (month === 11) return [{text: `冲刺：全真模拟 ${Math.min(y, 2023)} 压轴题集训`, checked: false}, {text: "考前易错知识点地毯式复盘", checked: false}];
         else return [{text: "【考试已结束】切换为大学预修微积分", checked: false}];
       } 
       else if (taskName === "BMO备赛") {
         const y = 2005 + Math.floor(offset / 4); 
         if (month <= 10) return [{text: `完成 ${y} BMO1 Q1-Q3 几何综合推理`, checked: false}, {text: "比对官方解答，纠正英文书面证明逻辑断层", checked: false}];
-        else if (month === 11) return [{text: `高压模考：${Math.min(y, 2024)} BMO1 全卷演练`, checked: false}, {text: "总结几何辅助线与数论构造核心套路", checked: false}];
-        else return [{text: "准备 BMO2 进阶或放松调整", checked: false}];
+        else if (month === 11) return [{text: `高压模考：${Math.min(y, 2024)} BMO1 全卷演练`, checked: false}, {text: "总结几何辅助线与数论构造套路", checked: false}];
+        else return [{text: "准备 BMO2 进阶", checked: false}];
       } 
       else if (taskName === "雅思学习") {
         const cNum = 10 + Math.floor(offset / 10); 
@@ -380,7 +364,7 @@
       }
       else if (taskName === "AL高数学习") {
         if (month <= 11) return [{text: "强行推进考纲进度 (纯数 P3/P4 核心)", checked: false}, {text: "推进力学 M1 / 统计 S1 基础难点", checked: false}];
-        else return [{text: "【期末保卫战】狂刷 AL 历年综合 Past Papers", checked: false}, {text: "TMUA / STEP 基础题型初级试水", checked: false}];
+        else return [{text: "刷 AL 历年综合 Past Papers", checked: false}];
       }
       else if (taskName === "英语书籍阅读") {
         if (month <= 10) return [{text: "强力推进英文原版书阅读 (目标一章)", checked: false}, {text: "做读书批注，提炼高级词汇与地道从句", checked: false}];
@@ -390,17 +374,16 @@
         return [{text: "精读《小蓝本》巩固硬核代数/组合竞赛知识漏洞", checked: false}, {text: "翻阅大学英文数学原著，演草纸推导公式定理", checked: false}];
       }
       else if (taskName.includes("校内各科复习")) {
-        if (month <= 11) return [{text: "闭环当天 物理/化学/CS 作业", checked: false}, {text: "整理当日课堂重点笔记与错题本", checked: false}];
-        else return [{text: "【期末保卫战】时间翻倍，狂刷 Past Papers", checked: false}, {text: "突击记忆化学实验现象与物理定义名词", checked: false}];
+        return [{text: "闭环当天 物理/化学/CS 作业", checked: false}, {text: "整理当日课堂重点笔记与错题本", checked: false}];
       }
       else if (taskName.includes("A日")) return [{text: "引体向上：做到力竭 × 4组", checked: false}, {text: "拉力绳(拉背/面拉)：100个 × 3组", checked: false}, {text: "腹部核心：俄罗斯转体/仰卧举腿 3组", checked: false}];
       else if (taskName.includes("B日")) return [{text: "俯卧撑：20个 × 5组 (宽窄距交替)", checked: false}, {text: "仰卧起坐：50个 起底爆发", checked: false}, {text: "平板支撑：核心稳定力竭 × 2组", checked: false}];
-      else if (taskName.includes("拉伸")) return [{text: "足部护养与全身静态肌肉拉伸 (15m)", checked: false}, {text: "泡沫轴滚压：排解乳酸，放松背/腿筋膜", checked: false}];
+      else if (taskName.includes("拉伸")) return [{text: "全身静态肌肉拉伸 (15m)", checked: false}, {text: "泡沫轴滚压：排解乳酸，放松背/腿筋膜", checked: false}];
       
       return [];
     }
 
-    /* ==================== 统一读写引擎 ==================== */
+    /* ==================== 读写引擎 ==================== */
     function getBlockData(dateStr, rowId, baseText) {
       const db = getStore(); const key = `${rowId}_${baseText}`;
       if(db[dateStr] && db[dateStr][key]) {
@@ -428,6 +411,7 @@
       await saveCloudData(db);
     }
 
+    // 更新任务勾选状态并计算全部完成时的情况
     async function toggleCheck(dateStr, rowId, baseText, index) {
       const db = getStore(); const key = `${rowId}_${baseText}`;
       if(!db[dateStr] || !db[dateStr][key]) return; 
@@ -501,9 +485,13 @@
         const end = new Date(cell.getAttribute('data-end'));
         const fillBar = cell.querySelector('.tech-fill-bar');
 
-        if (isCompleted || now > end) {
+        if (isCompleted) {
+          // 全部打勾后，彻底变灰变暗 (保留交互以防点错撤回)
           cell.classList.add('task-completed');
           cell.classList.remove('task-active-glow');
+          if(fillBar) fillBar.style.width = '100%';
+        } else if (now > end) {
+          cell.classList.remove('task-active-glow', 'task-completed');
           if(fillBar) fillBar.style.width = '100%';
         } else if (now >= start && now <= end) {
           cell.classList.remove('task-completed');
@@ -516,7 +504,6 @@
         }
       });
     }
-    setInterval(updateRealTimeProgress, 60000); 
 
     /* ==================== 周度表渲染 ==================== */
     function renderWeeklyGrid() {
@@ -562,9 +549,10 @@
               let textToShow = targetDate < new Date('2026-09-09') ? `<span class="text-slate-600 italic font-normal">已成历史</span>` : displayTxt;
               html += `<div class="p-1 border-r border-night-800 flex flex-col"><div class="h-full w-full rounded flex justify-center items-center text-center ${style} ${padding} grayscale opacity-50">${textToShow}</div></div>`;
             } else {
+              // 在包裹层标注 data-completed 属性，updateRealTimeProgress() 会读取并附加任务变灰样式
               html += `<div class="p-1 border-r border-night-800 flex flex-col">
                   <div class="relative h-full w-full rounded flex flex-col transition-all duration-500 ${style} ${padding} task-cell-wrap" data-completed="${allChecked}" data-start="${targetDateStr}T${row.start}:00" data-end="${targetDateStr}T${row.end}:00">
-                    <div class="absolute bottom-0 left-0 h-full bg-gradient-to-r from-blue-500/10 to-blue-400/5 z-0 tech-fill-bar transition-all duration-1000 rounded" style="width:0%"></div>
+                    <div class="absolute bottom-0 left-0 h-full z-0 tech-fill-bar transition-all duration-1000 rounded" style="width:0%"></div>
                     <span class="font-bold ${isReplaced?'text-rose-300':''} flex items-center relative z-10 tracking-wide">${displayTxt} ${isReplaced?'(Re)':''}</span>
                     ${detailHtml}
                   </div>
@@ -768,6 +756,7 @@
       setTimeout(() => { document.querySelectorAll('.progress-fill').forEach(el => { el.style.width = el.style.getPropertyValue('--progress-w'); }); }, 50);
     }
 
+    // SVG 不能直接解析 %，这里需要在 DOM 显示后拿到真实高度计算绝对像素。
     function openTimeline(projectId) {
       const p = PROJECTS.find(x => x.id === projectId); if(!p) return;
       document.getElementById('timelineTitle').innerHTML = `<span class="${p.c.replace('bg-', 'text-')} drop-shadow-[0_0_8px_currentColor] tracking-widest">${p.name} TIMELINE</span>`;
@@ -778,72 +767,76 @@
       const PX_PER_DAY = 45;
       const totalWidth = ((endDate - startDate) / 86400000) * PX_PER_DAY;
 
-      let html = `<div style="width:${totalWidth}px; height: 100%; position: relative;">`;
+      document.getElementById('modalOverlay').classList.remove('hidden'); 
+      document.getElementById('modalTimeline').classList.remove('hidden');
 
-      // 1. 半透明月份背景框
-      const monthNames = ['SEP', 'OCT', 'NOV', 'DEC'];
-      const monthDays = [30, 31, 30, 31];
-      let currentX = 0;
-      monthDays.forEach((days, i) => {
-        const w = days * PX_PER_DAY;
-        const bgColor = i % 2 === 0 ? 'bg-slate-800/10' : 'bg-slate-800/30';
-        html += `<div class="absolute top-0 bottom-0 ${bgColor} border-r border-night-700/50" style="left:${currentX}px; width:${w}px;">
-                    <div class="text-night-700/40 font-black text-6xl mt-4 ml-4 tracking-tighter">${monthNames[i]}</div>
-                 </div>`;
-        currentX += w;
-      });
-
-      // 2. 大起伏曲折 SVG 连线
-      let svgPath = '';
-      milestones.forEach((m, idx) => {
-        const cx = ((new Date(m.date) - startDate) / 86400000) * PX_PER_DAY;
-        const cy = m.y; 
-        svgPath += (idx === 0 ? `M ${cx} ${cy}% ` : `L ${cx} ${cy}% `);
-      });
-
-      html += `<svg class="absolute top-0 left-0 w-full h-full pointer-events-none z-10" preserveAspectRatio="none">
-                 <path d="${svgPath}" fill="none" stroke="${p.stroke}" stroke-width="3" stroke-dasharray="6 6" opacity="0.6" class="timeline-path drop-shadow-[0_0_5px_currentColor]" />
-               </svg>`;
-
-      // 3. 六边形节点 (边缘动态充能填充)
-      milestones.forEach((m, idx) => {
-        const cx = ((new Date(m.date) - startDate) / 86400000) * PX_PER_DAY;
-        const prevDate = idx === 0 ? p.start : milestones[idx-1].date;
+      // 强行使用 requestAnimationFrame 确保容器已渲染拿到 clientHeight 
+      requestAnimationFrame(() => {
+        const containerHeight = document.getElementById('timelineScrollArea').clientHeight;
         
-        const stageRatio = getTasksStats(p.kw, prevDate, m.date).ratio;
-        const isCompleted = stageRatio >= 0.99;
-        
-        const dashOffset = 84 - 84 * stageRatio;
-        const colorClass = isCompleted ? `${p.c.replace('bg-', 'text-')} drop-shadow-[0_0_10px_currentColor]` : 'text-slate-600';
-        
-        const isTop = m.y < 50;
-        const labelPos = isTop ? 'top-10' : 'bottom-10';
+        let html = `<div style="width:${totalWidth}px; height: 100%; position: relative;">`;
 
-        html += `
-          <div class="absolute z-20 flex flex-col items-center group" style="left: ${cx}px; top: ${m.y}%; transform: translate(-50%, -50%);">
-            
-            <svg width="36" height="36" viewBox="0 0 32 32" class="relative z-10 transition-transform duration-300 group-hover:scale-125 cursor-pointer ${colorClass}">
-              <polygon points="16,2 28.12,9 28.12,23 16,30 3.88,23 3.88,9" fill="#0d131f" stroke="#334155" stroke-width="2"/>
-              <polygon points="16,2 28.12,9 28.12,23 16,30 3.88,23 3.88,9" fill="${isCompleted ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="3"
-                       stroke-dasharray="84" stroke-dashoffset="${dashOffset}"
-                       class="transition-all duration-1000 ease-out" style="fill-opacity: 0.15;"/>
-              ${isCompleted ? '<circle cx="16" cy="16" r="3" fill="currentColor" />' : ''}
-            </svg>
+        const monthNames = ['SEP', 'OCT', 'NOV', 'DEC'];
+        const monthDays = [30, 31, 30, 31];
+        let currentX = 0;
+        monthDays.forEach((days, i) => {
+          const w = days * PX_PER_DAY;
+          const bgColor = i % 2 === 0 ? 'bg-slate-800/10' : 'bg-slate-800/30';
+          html += `<div class="absolute top-0 bottom-0 ${bgColor} border-r border-night-700/50" style="left:${currentX}px; width:${w}px;">
+                      <div class="text-night-700/40 font-black text-6xl mt-4 ml-4 tracking-tighter">${monthNames[i]}</div>
+                   </div>`;
+          currentX += w;
+        });
 
-            <div class="absolute ${labelPos} flex flex-col items-center w-max opacity-80 group-hover:opacity-100 transition-opacity">
-               <span class="text-xs ${isCompleted ? 'text-white font-bold drop-shadow-md' : 'text-slate-500'} bg-night-950/90 px-3 py-1.5 rounded border border-night-800 shadow-lg backdrop-blur-sm">${m.label}</span>
-               <span class="text-[10px] text-slate-500 font-mono mt-1 font-bold">${m.date.slice(5)} (${(stageRatio*100).toFixed(0)}%)</span>
+        let svgPath = '';
+        milestones.forEach((m, idx) => {
+          const cx = ((new Date(m.date) - startDate) / 86400000) * PX_PER_DAY;
+          // 利用实际容器高度计算绝对 Y 坐标
+          const cy = (m.y / 100) * containerHeight; 
+          svgPath += (idx === 0 ? `M ${cx} ${cy} ` : `L ${cx} ${cy} `);
+        });
+
+        html += `<svg class="absolute top-0 left-0 pointer-events-none z-10" width="${totalWidth}" height="${containerHeight}">
+                   <path d="${svgPath}" fill="none" stroke="${p.stroke}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="6 6" opacity="0.6" class="timeline-path drop-shadow-[0_0_5px_currentColor]" />
+                 </svg>`;
+
+        milestones.forEach((m, idx) => {
+          const cx = ((new Date(m.date) - startDate) / 86400000) * PX_PER_DAY;
+          const prevDate = idx === 0 ? p.start : milestones[idx-1].date;
+          
+          const stageRatio = getTasksStats(p.kw, prevDate, m.date).ratio;
+          const isCompleted = stageRatio >= 0.99;
+          
+          const dashOffset = 84 - 84 * stageRatio;
+          const colorClass = isCompleted ? `${p.c.replace('bg-', 'text-')} drop-shadow-[0_0_10px_currentColor]` : 'text-slate-600';
+          
+          const isTop = m.y < 50;
+          const labelPos = isTop ? 'top-10' : 'bottom-10';
+
+          html += `
+            <div class="absolute z-20 flex flex-col items-center group" style="left: ${cx}px; top: ${m.y}%; transform: translate(-50%, -50%);">
+              
+              <svg width="36" height="36" viewBox="0 0 32 32" class="relative z-10 transition-transform duration-300 group-hover:scale-125 cursor-pointer ${colorClass}">
+                <polygon points="16,2 28.12,9 28.12,23 16,30 3.88,23 3.88,9" fill="#0d131f" stroke="#334155" stroke-width="2"/>
+                <polygon points="16,2 28.12,9 28.12,23 16,30 3.88,23 3.88,9" fill="${isCompleted ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="3"
+                         stroke-dasharray="84" stroke-dashoffset="${dashOffset}"
+                         class="transition-all duration-1000 ease-out" style="fill-opacity: 0.15;"/>
+                ${isCompleted ? '<circle cx="16" cy="16" r="3" fill="currentColor" />' : ''}
+              </svg>
+
+              <div class="absolute ${labelPos} flex flex-col items-center w-max opacity-80 group-hover:opacity-100 transition-opacity">
+                 <span class="text-xs ${isCompleted ? 'text-white font-bold drop-shadow-md' : 'text-slate-500'} bg-night-950/90 px-3 py-1.5 rounded border border-night-800 shadow-lg backdrop-blur-sm">${m.label}</span>
+                 <span class="text-[10px] text-slate-500 font-mono mt-1 font-bold">${m.date.slice(5)} (${(stageRatio*100).toFixed(0)}%)</span>
+              </div>
             </div>
-          </div>
-        `;
-      });
+          `;
+        });
 
-      html += `</div>`;
-      document.getElementById('timelineContent').innerHTML = html;
-      document.getElementById('modalOverlay').classList.remove('hidden'); document.getElementById('modalTimeline').classList.remove('hidden');
+        html += `</div>`;
+        document.getElementById('timelineContent').innerHTML = html;
+      });
     }
 
-    // 鼠标拖拽横向滚动时间轴
     const scrollArea = document.getElementById('timelineScrollArea');
     let isDown = false; let startX; let scrollLeft;
     scrollArea.addEventListener('mousedown', (e) => { isDown = true; scrollArea.classList.add('active:cursor-grabbing'); startX = e.pageX - scrollArea.offsetLeft; scrollLeft = scrollArea.scrollLeft; });
@@ -874,4 +867,4 @@
     }
   </script>
 </body>
-</html>   
+</html>
