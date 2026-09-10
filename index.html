@@ -35,27 +35,23 @@
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); position: relative; overflow: hidden;
     }
     
-    .task-bar { width: 100%; min-height: 22px; border-radius: 4px; margin-bottom: 6px; font-size: 11px; line-height: 14px; padding: 4px 6px; cursor: pointer; transition: all 0.2s; }
+    .task-bar { width: 100%; min-height: 22px; border-radius: 4px; margin-bottom: 6px; font-size: 11px; line-height: 14px; padding: 4px 6px; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
     .task-bar:hover { filter: brightness(1.3); transform: translateX(2px); }
-    .action-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(11, 15, 23, 0.95); display: flex; align-items: center; justify-content: space-around; opacity: 0; transform: translateY(-100%); transition: all 0.2s ease; }
-    .edit-mode .task-bar.editable:hover .action-overlay { opacity: 1; transform: translateY(0); }
-    .action-btn { font-size: 11px; padding: 0 5px; cursor: pointer; transition: color 0.1s; }
-    .action-btn:hover { color: #38bdf8; }
-
-    .tech-fill-bar {
-      background: linear-gradient(90deg, rgba(56,189,248,0.05) 0%, rgba(56,189,248,0.25) 100%);
-      border-right: 2px solid rgba(56,189,248,0.8);
-      box-shadow: inset -5px 0 15px rgba(56,189,248,0.2), 2px 0 8px rgba(56,189,248,0.4);
-    }
     
-    /* 打满全勾后的变灰压暗状态 (平滑过渡) */
-    .task-completed { filter: grayscale(100%) opacity(0.3) brightness(0.7); transition: all 0.5s ease; }
-    .task-active-glow { box-shadow: inset 0 0 10px rgba(56, 189, 248, 0.1), 0 0 5px rgba(56, 189, 248, 0.2); border-color: rgba(56, 189, 248, 0.4) !important; }
+    .tech-fill-bar {
+      background: linear-gradient(90deg, rgba(56,189,248,0.05) 0%, rgba(56,189,248,0.3) 100%);
+      border-right: 2px solid rgba(56,189,248,0.9);
+      box-shadow: inset -5px 0 15px rgba(56,189,248,0.2), 2px 0 10px rgba(56,189,248,0.5);
+    }
 
-    .timeline-path { stroke-dasharray: 4000; stroke-dashoffset: 4000; animation: drawLine 2s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-    @keyframes drawLine { to { stroke-dashoffset: 0; } }
-    @keyframes fillProgress { from { width: 0%; } }
-    .progress-fill { animation: fillProgress 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .status-done { 
+      opacity: 0.3 !important; 
+      filter: grayscale(1) brightness(0.6) !important; 
+      -webkit-filter: grayscale(1) brightness(0.6) !important;
+      pointer-events: none !important;
+      transition: all 0.5s ease;
+    }
+    .task-active-glow { box-shadow: inset 0 0 10px rgba(56, 189, 248, 0.1), 0 0 5px rgba(56, 189, 248, 0.2); border-color: rgba(56, 189, 248, 0.4) !important; }
 
     #celebration { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.5); opacity: 0; z-index: 9999; pointer-events: none; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2); }
     #celebration.active { opacity: 1; transform: translate(-50%, -50%) scale(1); }
@@ -66,7 +62,7 @@
   <div id="celebration" class="flex flex-col items-center justify-center bg-night-900/95 border border-emerald-500/50 p-8 rounded-2xl shadow-[0_0_80px_rgba(16,185,129,0.5)] backdrop-blur-xl">
     <div class="text-7xl mb-3">🎖️</div>
     <div class="text-3xl font-black text-emerald-400 font-mono tracking-widest drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]">ALL CLEAR!</div>
-    <div class="text-sm text-slate-400 mt-2 font-mono">区块任务完美歼灭</div>
+    <div class="text-sm text-slate-400 mt-2 font-mono">节点任务完美歼灭</div>
   </div>
 
   <div id="loginOverlay" class="fixed inset-0 z-[100] bg-night-950/95 backdrop-blur-md flex items-center justify-center p-4">
@@ -82,29 +78,6 @@
   </div>
 
   <div id="modalOverlay" class="fixed inset-0 z-[110] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div id="modalSwap" class="hidden w-full max-w-md bg-night-900 border border-night-700 rounded-xl p-6 shadow-2xl">
-      <h3 class="text-sm font-bold text-cyan-400 font-mono border-b border-night-800 pb-2 mb-4">🔄 OVERRIDE BLOCK</h3>
-      <p class="text-[10px] text-slate-400 mb-3" id="swapTargetInfo"></p>
-      <div class="space-y-3">
-        <div><label class="block text-[10px] text-slate-500 mb-1">NEW THEME</label><input type="text" id="swapTheme" class="w-full bg-night-950 border border-night-800 rounded p-2 text-xs text-slate-200"></div>
-        <div><label class="block text-[10px] text-slate-500 mb-1">COLOR TAG</label>
-          <select id="swapTag" class="w-full bg-night-950 border border-night-800 rounded p-2 text-xs text-slate-200 font-mono">
-            <option value="math_comp">Cyan (高数/竞赛)</option><option value="project">Purple (项目/写作)</option>
-            <option value="lang_read">Amber (语言阅读)</option><option value="review">Orange (校内复习)</option>
-            <option value="physical">Emerald (运动体能)</option>
-          </select>
-        </div>
-        <div class="flex justify-end space-x-2 pt-2"><button onclick="closeModal()" class="px-3 py-1.5 text-xs text-slate-400">CANCEL</button><button onclick="executeSwap()" class="px-3 py-1.5 bg-rose-900/50 text-rose-300 border border-rose-800 rounded text-xs">CONFIRM</button></div>
-      </div>
-    </div>
-    
-    <div id="modalDel" class="hidden w-full max-w-md bg-night-900 border border-night-700 rounded-xl p-6 shadow-2xl">
-      <h3 class="text-sm font-bold text-rose-400 font-mono border-b border-night-800 pb-2 mb-4">🗑️ REMOVE DETAIL</h3>
-      <div id="delListContainer" class="space-y-2 max-h-60 overflow-y-auto hide-scrollbar mb-4"></div>
-      <div class="flex justify-end"><button onclick="closeModal()" class="px-3 py-1.5 bg-night-800 text-slate-300 rounded text-xs">CLOSE</button></div>
-    </div>
-
-    <!-- 动态六边形时间轴 Modal -->
     <div id="modalTimeline" class="hidden w-full max-w-6xl bg-night-950 border border-night-700 rounded-xl shadow-2xl overflow-hidden flex flex-col h-[75vh]">
       <div class="bg-night-900 px-6 py-4 border-b border-night-800 flex justify-between items-center z-20 shadow-md">
         <h3 id="timelineTitle" class="text-xl font-bold font-mono tracking-widest uppercase">TIMELINE</h3>
@@ -136,18 +109,16 @@
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
-      <!-- 视图三：进度总览 -->
       <section id="viewProgress" class="hidden transition-opacity duration-300">
-        <div class="mb-6"><h2 class="text-xl sm:text-2xl font-bold text-slate-100 font-mono">BATTLEFRONT PROGRESS 🛡️</h2><p class="text-xs text-slate-400 mt-1">秋季战役倒计时。点击卡片展开<span class="text-cyan-400">【曲折节点时间轴】</span>查看六边形边缘充能进度。</p></div>
+        <div class="mb-6"><h2 class="text-xl sm:text-2xl font-bold text-slate-100 font-mono">BATTLEFRONT PROGRESS 🛡️</h2><p class="text-xs text-slate-400 mt-1">点击卡片展开<span class="text-emerald-400">全景真实时间轴</span>，查看每个月的专项任务里程碑，打卡后自动点亮。</p></div>
         <div id="progressContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
       </section>
 
-      <!-- 视图一：周度计划 -->
       <section id="viewWeekly" class="transition-opacity duration-300">
         <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 class="text-lg sm:text-xl font-bold text-slate-100 font-mono">DYNAMIC TIME-BLOCK MASTER</h2>
-            <p class="text-xs text-slate-400 mt-0.5">全勾选将瞬间变灰压暗以标记歼灭 | 多端实时云同步</p>
+            <p class="text-xs text-slate-400 mt-0.5">洗漱/午餐/就寝全显形 | 课后复习合并归一 | 定制化硬核力量训练</p>
           </div>
         </div>
         <div class="overflow-x-auto rounded-lg border border-night-800 bg-night-900 shadow-2xl">
@@ -162,16 +133,14 @@
         </div>
       </section>
 
-      <!-- 视图二：月度计划 -->
       <section id="viewMonthly" class="hidden transition-opacity duration-300">
         <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 class="text-lg sm:text-xl font-bold text-slate-100 font-mono">MONTHLY STRATEGIC ROADMAP</h2>
-            <p class="text-xs text-slate-400 mt-0.5">点击任务条在下方内联展开详细任务 | 已彻底屏蔽过去未完成的无效任务</p>
+            <p class="text-xs text-slate-400 mt-0.5">极净总览：同主题单日仅保留一个模块 | 点击任意模块展开内联序号清单</p>
           </div>
           <div class="flex items-center space-x-3">
             <button onclick="goToToday()" class="px-4 py-2 text-xs font-bold font-mono rounded-lg border border-cyan-800 bg-cyan-900/50 text-cyan-300 hover:bg-cyan-800/80 transition-all shadow-[0_0_10px_rgba(34,211,238,0.2)]">📍 BACK TO TODAY</button>
-            <button id="editModeBtn" onclick="toggleEditMode()" class="hidden px-4 py-2 text-xs font-semibold rounded-lg border border-night-700 bg-night-800 text-slate-300 hover:text-cyan-400 transition-all shadow-sm">⚙️ EDIT MODE</button>
             <div class="flex items-center space-x-2 bg-night-900 border border-night-800 px-3 py-1.5 rounded-lg shadow-inner">
               <button onclick="slidePrev()" class="p-1.5 text-slate-400 hover:text-cyan-400 bg-night-800 rounded hover:bg-night-700 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg></button>
               <span id="currentMonthLabel" class="text-sm font-mono font-bold text-cyan-400 px-3 min-w-[140px] text-center tracking-widest">...</span>
@@ -191,7 +160,7 @@
   </div>
 
   <script>
-    /* ==================== SUPABASE 云端数据库配置 ==================== */
+    /* ==================== SUPABASE 云端多端热同步 ==================== */
     const SUPABASE_URL = "https://wdndkpoajujjnpthwwjn.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkbmRrcG9hanVqam5wdHR3d2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NTIzMjMsImV4cCI6MjEwNDUyODMyM30.W6r5aHzaSqCC2n_4dP_PCN3BqGUTDrpiWvcUf7dvhXE";
 
@@ -202,76 +171,70 @@
       const badge = document.getElementById('syncStatusBadge');
       try {
         if (badge) { badge.innerText = "SYNCING..."; badge.className = "text-[10px] px-2 py-0.5 rounded bg-night-800 text-amber-400 border border-amber-900/50 font-mono"; }
-        const { data, error } = await supabaseClient.from('planner_storage').select('data').eq('id', 'main_planner').single();
-        if (data && data.data) {
-          memoryStoreCache = data.data;
-          localStorage.setItem('academic_cloud_v8', JSON.stringify(data.data));
+        const { data, error } = await supabaseClient.from('planner_storage').select('data').eq('id', 'main_planner');
+        if (error) throw error; 
+        if (data && data.length > 0 && data[0].data) {
+          memoryStoreCache = JSON.parse(JSON.stringify(data[0].data));
+          localStorage.setItem('academic_cloud_v8', JSON.stringify(memoryStoreCache));
           if (badge) { badge.innerText = "CLOUD SYNCED"; badge.className = "text-[10px] px-2 py-0.5 rounded bg-night-800 text-emerald-400 border border-emerald-900/50 font-mono"; }
         } else {
           memoryStoreCache = JSON.parse(localStorage.getItem('academic_cloud_v8') || '{}');
           if (badge) { badge.innerText = "CLOUD READY"; badge.className = "text-[10px] px-2 py-0.5 rounded bg-night-800 text-emerald-400 border border-emerald-900/50 font-mono"; }
         }
       } catch (err) {
-        console.warn("Cloud load fallback:", err);
         memoryStoreCache = JSON.parse(localStorage.getItem('academic_cloud_v8') || '{}');
+        if (badge) { badge.innerText = "LOCAL MODE"; badge.className = "text-[10px] px-2 py-0.5 rounded bg-night-800 text-slate-400 border border-night-700 font-mono"; }
       }
     }
 
-    async function saveCloudData(newData) {
-      memoryStoreCache = newData;
-      localStorage.setItem('academic_cloud_v8', JSON.stringify(newData));
+    async function saveCloudData(db) {
+      memoryStoreCache = JSON.parse(JSON.stringify(db)); 
+      localStorage.setItem('academic_cloud_v8', JSON.stringify(memoryStoreCache));
       const badge = document.getElementById('syncStatusBadge');
       try {
         if (badge) badge.innerText = "SAVING...";
-        await supabaseClient.from('planner_storage').upsert({ id: 'main_planner', data: newData, updated_at: new Date() });
-        if (badge) badge.innerText = "CLOUD SYNCED";
+        await supabaseClient.from('planner_storage').upsert({ id: 'main_planner', data: memoryStoreCache, updated_at: new Date() });
+        if (badge) { badge.innerText = "CLOUD SYNCED"; badge.className = "text-[10px] px-2 py-0.5 rounded bg-night-800 text-emerald-400 border border-emerald-900/50 font-mono"; }
       } catch (err) {
-        console.error("Cloud save failed, saved locally:", err);
-        if (badge) badge.innerText = "LOCAL SAVED";
+        if (badge) { badge.innerText = "SYNC ERR"; badge.className = "text-[10px] px-2 py-0.5 rounded bg-rose-900/50 text-rose-400 border border-rose-800 font-mono"; }
       }
     }
 
     function getStore() {
       if (!memoryStoreCache) memoryStoreCache = JSON.parse(localStorage.getItem('academic_cloud_v8') || '{}');
-      return memoryStoreCache;
+      return JSON.parse(JSON.stringify(memoryStoreCache)); 
     }
 
-    /* ==================== 身份验证 ==================== */
-    let currentUserRole = null; 
     function handleLogin(e) {
       e.preventDefault(); const u = document.getElementById('loginUser').value.trim(); const p = document.getElementById('loginPass').value.trim();
       if (u === 'BeileLee' && p === '081130Peter') setSession('all');
       else if (u === 'BeileLee' && p === 'peterli') setSession('monthly_only');
       else { document.getElementById('loginError').innerText="ACCESS DENIED: Credentials mismatch."; document.getElementById('loginError').classList.remove('hidden'); }
     }
+
     function setSession(role) {
-      currentUserRole = role; sessionStorage.setItem('academic_auth_role', role);
+      sessionStorage.setItem('academic_auth_role', role);
       document.getElementById('loginOverlay').classList.add('hidden'); document.getElementById('appContainer').classList.remove('hidden');
-      if (role === 'all') {
-        document.getElementById('headerTitle').innerText="ACADEMIC ROADMAP";
-        document.getElementById('tabWeekly').style.display='inline-block';
-        document.getElementById('editModeBtn').classList.remove('hidden'); document.getElementById('tabProgress').classList.remove('hidden');
-        switchView('weekly'); 
-      } else {
-        document.getElementById('headerTitle').innerText="MONTHLY PLANNER";
-        document.getElementById('tabWeekly').style.display='none'; document.getElementById('tabProgress').style.display='none';
-        switchView('monthly');
-      }
+      if (role === 'all') { switchView('weekly'); } 
+      else { document.getElementById('tabWeekly').style.display='none'; document.getElementById('tabProgress').style.display='none'; switchView('monthly'); }
     }
     function handleLogout() { sessionStorage.removeItem('academic_auth_role'); window.location.reload(); }
 
-    /* 初始化入口：阻塞等待云端数据加载完毕后，再进行渲染 */
     async function initApp() {
-      await loadCloudData(); // 等待数据100%加载
-      const sr = sessionStorage.getItem('academic_auth_role');
-      if (sr) {
-        setSession(sr); 
-      }
-      // 此处不再有其他事件监听抢跑
+      await loadCloudData(); 
+      if (sessionStorage.getItem('academic_auth_role')) setSession(sessionStorage.getItem('academic_auth_role'));
       setInterval(updateRealTimeProgress, 60000);
     }
 
-    /* ==================== 视觉系统 ==================== */
+    document.addEventListener("visibilitychange", async () => {
+      if (document.visibilityState === 'visible' && sessionStorage.getItem('academic_auth_role')) {
+        await loadCloudData();
+        if(currentActiveView === 'weekly') renderWeeklyGrid();
+        if(currentActiveView === 'monthly') generateMonthlySlider();
+        if(currentActiveView === 'progress') renderProgress();
+      }
+    });
+
     const TAG_STYLES = {
       school_stem: "pro-card border-l-[3px] border-l-indigo-500/50 text-indigo-200", 
       school_gen:  "pro-card border-l-[3px] border-l-slate-600/50 text-slate-300",             
@@ -280,7 +243,7 @@
       lang_read:   "pro-card border-l-[3px] border-l-amber-500 text-amber-100", 
       review:      "pro-card border-l-[3px] border-l-orange-500 text-orange-100",
       physical:    "pro-card border-l-[3px] border-l-emerald-500 text-emerald-100", 
-      dining:      "bg-night-900 border border-night-800 text-slate-500", 
+      dining:      "bg-night-900 border border-night-800 text-slate-400 font-bold", 
       transit:     "bg-transparent text-slate-600 border-none"
     };
     const TAG_COLORS_FOR_BARS = {
@@ -288,288 +251,306 @@
       project:   "bg-purple-900/30 border-l-[3px] border-l-purple-500 text-purple-200",
       lang_read: "bg-amber-900/30 border-l-[3px] border-l-amber-500 text-amber-200", 
       review:    "bg-orange-900/30 border-l-[3px] border-l-orange-500 text-orange-200",
-      physical:  "bg-emerald-900/30 border-l-[3px] border-l-emerald-500 text-emerald-200"
+      physical:  "bg-emerald-900/30 border-l-[3px] border-l-emerald-500 text-emerald-200",
+      school_stem: "bg-indigo-900/30 border-l-[3px] border-l-indigo-500 text-indigo-200"
     };
 
-    /* ==================== 固定作息骨架 ==================== */
+    /* 🔥 课表再次精锐化：保留洗漱三餐区块，去重叠，唯一复习 🔥 */
     const WEEKLY_SCHEDULE_DATA = [
-      { rowId: 0, start: '06:00', end: '06:05', timeLabel: "极速洗漱<br><span class='text-[10px] text-slate-500'>06:00-06:05</span>", duration: 5, days: Array(7).fill({ text: "洗漱", tag: "physical", hide: true }) },
-      { rowId: 1, start: '06:05', end: '07:45', timeLabel: "晨间高能块<br><span class='text-[10px] text-slate-500'>06:05-07:45</span>", duration: 100, days: [{ text: "雅思学习", tag: "lang_read" }, { text: "AL高数学习", tag: "school_stem" }, { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "雅思学习", tag: "lang_read" }, { text: "BMO备赛", tag: "math_comp" }, { text: "AMC12备赛", tag: "math_comp" } ]},
-      { rowId: 2, start: '07:45', end: '07:50', timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
-      { rowId: 3, start: '07:50', end: '08:00', timeLabel: "Form Time<br><span class='text-[10px] text-slate-500'>07:50-08:00</span>", duration: 10, days: [{ text: "Form(A611)", tag: "school_gen" }, { text: "Form(CR)", tag: "school_gen" }, { text: "Form(A611)", tag: "school_gen" }, { text: "Form(CR)", tag: "school_gen" }, { text: "Form(A611)", tag: "school_gen" }, { text: "英语书籍阅读", tag: "lang_read" }, { text: "数学书籍阅读", tag: "lang_read" } ]},
-      { rowId: 4, start: '08:00', end: '08:10', timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "转场", tag: "transit", hide: true }) },
-      { rowId: 5, start: '08:10', end: '09:30', timeLabel: "Period 1-2<br><span class='text-[10px] text-slate-500'>08:10-09:30</span>", duration: 80, days: [{ text: "Chemistry-AS(MAS)", tag: "school_stem" }, { text: "Computer Science(ANT)", tag: "school_stem" }, { text: "Physics-AS(CAF)", tag: "school_stem" }, { text: "实习项目推进", tag: "project" }, { text: "Mathematics-AL(YVL)", tag: "school_stem" }, { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" } ]},
-      { rowId: 6, start: '09:30', end: '09:40', timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "转场", tag: "transit", hide: true }) },
-      { rowId: 7, start: '09:40', end: '10:55', timeLabel: "Period 3-4<br><span class='text-[10px] text-slate-500'>09:40-10:55</span>", duration: 75, days: [{ text: "English-A1.Lit(JAS)", tag: "school_gen" }, { text: "雅思学习", tag: "lang_read" }, { text: "Mathematics-AL(XIY)", tag: "school_stem" }, { text: "Chemistry-AS(MAS)", tag: "school_stem" }, { text: "Computer Science(ANT)", tag: "school_stem" }, { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" } ]},
-      { rowId: 8, start: '10:55', end: '11:00', timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
-      { rowId: 9, start: '11:00', end: '11:15', timeLabel: "极速午餐<br><span class='text-[10px] text-slate-500'>11:00-11:15</span>", duration: 15, days: Array(7).fill({ text: "午餐", tag: "dining", hide: true }) },
-      { rowId: 10, start: '11:15', end: '11:20', timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
-      { rowId: 11, start: '11:20', end: '12:40', timeLabel: "Period 5-6<br><span class='text-[10px] text-slate-500'>11:20-12:40</span>", duration: 80, days: [{ text: "英语书籍阅读", tag: "lang_read" }, { text: "AL高数学习", tag: "school_stem" }, { text: "PSHE / 英语阅读", tag: "school_gen" }, { text: "AL高数学习", tag: "school_stem" }, { text: "英语书籍阅读", tag: "lang_read" }, { text: "HiMCM建模", tag: "project" }, { text: "HiMCM建模", tag: "project" } ]},
-      { rowId: 12, start: '12:40', end: '13:30', timeLabel: "Midday<br><span class='text-[10px] text-slate-500'>12:40-13:30</span>", duration: 50, days: [{ text: "英语书籍阅读", tag: "lang_read" }, { text: "实习项目推进", tag: "project" }, { text: "Pastoral/雅思", tag: "lang_read" }, { text: "雅思学习", tag: "lang_read" }, { text: "实习项目推进", tag: "project" }, { text: "雅思学习", tag: "lang_read" }, { text: "雅思学习", tag: "lang_read" } ]},
-      { rowId: 13, start: '13:30', end: '13:40', timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "转场", tag: "transit", hide: true }) },
-      { rowId: 14, start: '13:40', end: '15:00', timeLabel: "Period 7-8<br><span class='text-[10px] text-slate-500'>13:40-15:00</span>", duration: 80, days: [{ text: "Physics-AS(CAF)", tag: "school_stem" }, { text: "Chemistry-AS(MAS)", tag: "school_stem" }, { text: "Computer Science(ANT)", tag: "school_stem" }, { text: "English-A1.Lit(JAS)", tag: "school_gen" }, { text: "AL高数学习", tag: "school_stem" }, { text: "HiMCM建模", tag: "project" }, { text: "AL高数学习", tag: "school_stem" } ]},
-      { rowId: 15, start: '15:00', end: '15:10', timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "转场", tag: "transit", hide: true }) },
-      { rowId: 16, start: '15:10', end: '16:30', timeLabel: "Period 9-10<br><span class='text-[10px] text-slate-500'>15:10-16:30</span>", duration: 80, days: [{ text: "Mathematics-AL(YVL)", tag: "school_stem" }, { text: "AL高数学习", tag: "school_stem" }, { text: "校内复习", tag: "review" }, { text: "Physics-AS(CAF)", tag: "school_stem" }, { text: "AMC12备赛", tag: "math_comp" }, { text: "HiMCM建模", tag: "project" }, { text: "BMO备赛", tag: "math_comp" } ]},
-      { rowId: 17, start: '16:30', end: '16:40', timeLabel: "Transit", duration: 10, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
-      { rowId: 18, start: '16:40', end: '17:35', timeLabel: "课后闭环<br><span class='text-[10px] text-slate-500'>16:40-17:35</span>", duration: 55, days: [{ text: "校内各科复习", tag: "review" }, { text: "校内各科复习", tag: "review" }, { text: "校内各科复习", tag: "review" }, { text: "校内各科复习", tag: "review" }, { text: "校内各科复习", tag: "review" }, { text: "校内各科复习", tag: "review" }, { text: "校内各科复习", tag: "review" } ]},
-      { rowId: 19, start: '17:35', end: '17:40', timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
-      { rowId: 20, start: '17:40', end: '18:35', timeLabel: "伤病期居家运动<br><span class='text-[10px] text-slate-500'>17:40-18:35</span>", duration: 55, days: [{ text: "A日(背/核心)", tag: "physical" }, { text: "B日(胸/核心)", tag: "physical" }, { text: "A日(背/核心)", tag: "physical" }, { text: "B日(胸/核心)", tag: "physical" }, { text: "A日(背/核心)", tag: "physical" }, { text: "B日(胸/核心)", tag: "physical" }, { text: "静态拉伸恢复", tag: "physical" } ]},
-      { rowId: 21, start: '18:35', end: '18:40', timeLabel: "Transit", duration: 5, type: 'transit', days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
-      { rowId: 22, start: '18:40', end: '20:00', timeLabel: "晚间攻坚 I<br><span class='text-[10px] text-slate-500'>18:40-20:00</span>", duration: 80, days: [{ text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "AL高数学习", tag: "school_stem" }, { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "实习项目推进", tag: "project" }, { text: "HiMCM建模", tag: "project" } ]},
-      { rowId: 23, start: '20:00', end: '21:15', timeLabel: "晚间攻坚 II<br><span class='text-[10px] text-slate-500'>20:00-21:15</span>", duration: 75, days: [{ text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "AL高数学习", tag: "school_stem" }, { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" }, { text: "数学书籍阅读", tag: "lang_read" }, { text: "数学书籍阅读", tag: "lang_read" } ]},
-      { rowId: 24, start: '21:15', end: '22:00', timeLabel: "总结与阅读<br><span class='text-[10px] text-slate-500'>21:15-22:00</span>", duration: 45, days: [{ text: "雅思学习", tag: "lang_read" }, { text: "英语书籍阅读", tag: "lang_read" }, { text: "雅思学习", tag: "lang_read" }, { text: "英语书籍阅读", tag: "lang_read" }, { text: "雅思学习", tag: "lang_read" }, { text: "实习项目推进", tag: "project" }, { text: "雅思学习", tag: "lang_read" } ]},
-      { rowId: 25, start: '22:00', end: '22:30', timeLabel: "休整就寝<br><span class='text-[10px] text-slate-500'>22:00-22:30</span>", duration: 30, days: Array(7).fill({ text: "洗澡 -> 熄灯", tag: "physical", hide: true }) }
+      { rowId: 0, start: '06:00', end: '06:05', timeLabel: "Wash<br><span class='text-[10px] text-slate-500'>06:00-06:05</span>", duration: 5, days: Array(7).fill({ text: "极速洗漱", tag: "physical" }) }, // 取消了 hide
+      { rowId: 1, start: '06:05', end: '07:45', timeLabel: "雅思晨训<br><span class='text-[10px] text-slate-500'>06:05-07:45</span>", duration: 100, days: Array(7).fill({ text: "雅思学习", tag: "lang_read" }) },
+      { rowId: 2, start: '07:45', end: '07:50', timeLabel: "Transit", duration: 5, days: Array(7).fill({ text: "转场", tag: "transit", hide: true }) },
+      { rowId: 3, start: '07:50', end: '08:00', timeLabel: "Form Time<br><span class='text-[10px] text-slate-500'>07:50-08:00</span>", duration: 10, days: [{ text: "Form(A611)", tag: "school_gen" }, { text: "Form(CR)", tag: "school_gen" }, { text: "Form(A611)", tag: "school_gen" }, { text: "Form(CR)", tag: "school_gen" }, { text: "Form(A611)", tag: "school_gen" }, { text: "数学书籍阅读", tag: "lang_read" }, { text: "数学书籍阅读", tag: "lang_read" } ]},
+      { rowId: 4, start: '08:00', end: '08:10', timeLabel: "Transit", duration: 10, days: Array(7).fill({ text: "转场", tag: "transit", hide: true }) },
+      { rowId: 5, start: '08:10', end: '09:30', timeLabel: "Period 1-2<br><span class='text-[10px] text-slate-500'>08:10-09:30</span>", duration: 80, days: [{ text: "Chemistry-AS (校内)", tag: "school_stem" }, { text: "CompSci-AS (校内)", tag: "school_stem" }, { text: "Physics-AS (校内)", tag: "school_stem" }, { text: "AL高数 (提前学)", tag: "school_stem" }, { text: "Math-AL (校内)", tag: "school_stem" }, { text: "AMC12备赛", tag: "math_comp" }, { text: "AMC12备赛", tag: "math_comp" } ]},
+      { rowId: 6, start: '09:30', end: '09:40', timeLabel: "Transit", duration: 10, days: Array(7).fill({ text: "转场", tag: "transit", hide: true }) },
+      { rowId: 7, start: '09:40', end: '11:00', timeLabel: "Period 3-4<br><span class='text-[10px] text-slate-500'>09:40-11:00</span>", duration: 80, days: [{ text: "English-Lit (校内)", tag: "school_gen" }, { text: "AL高数 (提前学)", tag: "school_stem" }, { text: "Math-AL (校内)", tag: "school_stem" }, { text: "Chemistry-AS (校内)", tag: "school_stem" }, { text: "CompSci-AS (校内)", tag: "school_stem" }, { text: "AMC12备赛", tag: "math_comp" }, { text: "AMC12备赛", tag: "math_comp" } ]},
+      { rowId: 8, start: '11:00', end: '11:20', timeLabel: "Break", duration: 20, days: Array(7).fill({ text: "休息", tag: "transit", hide: true }) },
+      { rowId: 9, start: '11:20', end: '12:40', timeLabel: "Period 5-6<br><span class='text-[10px] text-slate-500'>11:20-12:40</span>", duration: 80, days: [{ text: "AL高数 (提前学)", tag: "school_stem" }, { text: "AL高数 (提前学)", tag: "school_stem" }, { text: "PSHE", tag: "school_gen" }, { text: "AL高数 (提前学)", tag: "school_stem" }, { text: "AL高数 (提前学)", tag: "school_stem" }, { text: "BMO备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" } ]},
+      { rowId: 10, start: '12:40', end: '13:10', timeLabel: "Lunch<br><span class='text-[10px] text-slate-500'>12:40-13:10</span>", duration: 30, days: Array(7).fill({ text: "午餐能量补充", tag: "dining" }) }, // 取消了 hide
+      { rowId: 11, start: '13:10', end: '13:20', timeLabel: "Transit", duration: 10, days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
+      { rowId: 12, start: '13:20', end: '13:30', timeLabel: "Pastoral<br><span class='text-[10px] text-slate-500'>13:20-13:30</span>", duration: 10, days: [{ text: "Pastoral", tag: "school_gen" }, { text: "Pastoral", tag: "school_gen" }, { text: "Pastoral", tag: "school_gen" }, { text: "Pastoral", tag: "school_gen" }, { text: "Pastoral", tag: "school_gen" }, { text: "HiMCM建模", tag: "project" }, { text: "HiMCM建模", tag: "project" } ]},
+      { rowId: 13, start: '13:30', end: '13:40', timeLabel: "Transit", duration: 10, days: Array(7).fill({ text: "转场", tag: "transit", hide: true }) },
+      { rowId: 14, start: '13:40', end: '15:00', timeLabel: "Period 7-8<br><span class='text-[10px] text-slate-500'>13:40-15:00</span>", duration: 80, days: [{ text: "Physics-AS (校内)", tag: "school_stem" }, { text: "Chemistry-AS (校内)", tag: "school_stem" }, { text: "CompSci-AS (校内)", tag: "school_stem" }, { text: "English-Lit (校内)", tag: "school_gen" }, { text: "BMO备赛", tag: "math_comp" }, { text: "实习项目推进", tag: "project" }, { text: "实习项目推进", tag: "project" } ]},
+      { rowId: 15, start: '15:00', end: '15:10', timeLabel: "Transit", duration: 10, days: Array(7).fill({ text: "转场", tag: "transit", hide: true }) },
+      { rowId: 16, start: '15:10', end: '16:30', timeLabel: "Period 9-10<br><span class='text-[10px] text-slate-500'>15:10-16:30</span>", duration: 80, days: [{ text: "Math-AL (校内)", tag: "school_stem" }, { text: "AL高数 (提前学)", tag: "school_stem" }, { text: "PE体育", tag: "physical" }, { text: "Physics-AS (校内)", tag: "school_stem" }, { text: "BMO备赛", tag: "math_comp" }, { text: "实习项目推进", tag: "project" }, { text: "实习项目推进", tag: "project" } ]},
+      { rowId: 17, start: '16:30', end: '16:40', timeLabel: "Transit", duration: 10, days: Array(7).fill({ text: "通勤", tag: "transit", hide: true }) },
+      { rowId: 18, start: '16:40', end: '17:30', timeLabel: "Period 11<br><span class='text-[10px] text-slate-500'>16:40-17:30</span>", duration: 50, days: [{ text: "实习项目推进", tag: "project" }, { text: "HiMCM建模", tag: "project" }, { text: "实习项目推进", tag: "project" }, { text: "HiMCM建模", tag: "project" }, { text: "实习项目推进", tag: "project" }, { text: "AMC12备赛", tag: "math_comp" }, { text: "BMO备赛", tag: "math_comp" } ]}, // P11 改为项目阵地
+      { rowId: 19, start: '17:30', end: '18:30', timeLabel: "Period 12<br><span class='text-[10px] text-slate-500'>17:30-18:30</span>", duration: 60, days: [{ text: "体能训练(A日)", tag: "physical" }, { text: "体能训练(B日)", tag: "physical" }, { text: "体能训练(A日)", tag: "physical" }, { text: "体能训练(B日)", tag: "physical" }, { text: "体能训练(A日)", tag: "physical" }, { text: "体能训练(B日)", tag: "physical" }, { text: "拉伸恢复", tag: "physical" } ]}, // 补全体能训练
+      { rowId: 20, start: '18:30', end: '19:00', timeLabel: "Dinner<br><span class='text-[10px] text-slate-500'>18:30-19:00</span>", duration: 30, days: Array(7).fill({ text: "晚餐补给", tag: "dining" }) }, // 取消了 hide
+      { rowId: 21, start: '19:00', end: '20:00', timeLabel: "晚间攻坚 I<br><span class='text-[10px] text-slate-500'>19:00-20:00</span>", duration: 60, days: Array(7).fill({ text: "AMC12备赛", tag: "math_comp" }) },
+      { rowId: 22, start: '20:00', end: '21:00', timeLabel: "晚间攻坚 II<br><span class='text-[10px] text-slate-500'>20:00-21:00</span>", duration: 60, days: Array(7).fill({ text: "BMO备赛", tag: "math_comp" }) },
+      { rowId: 23, start: '21:00', end: '21:30', timeLabel: "数学原著<br><span class='text-[10px] text-slate-500'>21:00-21:30</span>", duration: 30, days: Array(7).fill({ text: "数学书籍阅读", tag: "lang_read" }) },
+      { rowId: 24, start: '21:30', end: '22:15', timeLabel: "校内闭环<br><span class='text-[10px] text-slate-500'>21:30-22:15</span>", duration: 45, days: Array(7).fill({ text: "课后复习", tag: "review" }) }, // 全天唯一的复习模块
+      { rowId: 25, start: '22:15', end: '22:30', timeLabel: "Shower<br><span class='text-[10px] text-slate-500'>22:15-22:30</span>", duration: 15, days: Array(7).fill({ text: "洗澡 -> 就寝", tag: "physical" }) } // 取消了 hide
     ];
 
-    /* ==================== 智能配速算法 ==================== */
     function getSmartDetail(dateStr, taskName) {
       const today = new Date('2026-09-09T00:00:00');
       const target = new Date(dateStr + 'T00:00:00');
-      if (target < today) return []; // 屏蔽过去
+      if (target < today) return []; 
       
-      const offset = Math.floor((target - today) / 86400000); 
+      const offset = Math.max(0, Math.floor((target - today) / 86400000)); 
       const month = target.getMonth() + 1;
+      const dayOfWeek = target.getDay();
+      const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
       
+      // AMC & BMO：严格的两天一年算法（A卷与B卷 / 上半与下半）
       if (taskName === "AMC12备赛") {
-        const y = 2012 + Math.floor(offset / 4); 
-        const type = (offset % 4) < 2 ? 'A' : 'B';
-        if (month <= 10) return [{text: `完成 ${y} AMC12 ${type}卷 1-15题`, checked: false}, {text: "核对答案并录入代数/组合错题本", checked: false}];
-        else if (month === 11) return [{text: `冲刺：全真模拟 ${Math.min(y, 2023)} 压轴题集训`, checked: false}, {text: "考前易错知识点地毯式复盘", checked: false}];
-        else return [{text: "【考试已结束】切换为大学预修微积分", checked: false}];
+        if (month > 11) return [{text: "【考试已结束】", checked: false}];
+        const examYear = 2010 + Math.floor(offset / 2); // 每两天推进一步
+        const isDayOne = (offset % 2 === 0);
+        const paper = isDayOne ? 'A卷及附加' : 'B卷及复盘';
+        if (isWeekend) {
+            return [
+                {text: `极限压测：严格计时完成 ${examYear}年 ${paper} 全卷`, checked: false},
+                {text: `手速拉扯：附加半套基础题极速秒杀`, checked: false},
+                {text: "深度拆解：详细写出压轴 5 题的解析", checked: false}
+            ];
+        } else {
+            return [
+                {text: `限时直出：计时完成 ${examYear}年 ${paper} 模考`, checked: false},
+                {text: "复盘归档：详细解析最后 5 题（提炼Trick）", checked: false}
+            ];
+        }
       } 
       else if (taskName === "BMO备赛") {
-        const y = 2005 + Math.floor(offset / 4); 
-        if (month <= 10) return [{text: `完成 ${y} BMO1 Q1-Q3 几何综合推理`, checked: false}, {text: "比对官方解答，纠正英文书面证明逻辑断层", checked: false}];
-        else if (month === 11) return [{text: `高压模考：${Math.min(y, 2024)} BMO1 全卷演练`, checked: false}, {text: "总结几何辅助线与数论构造套路", checked: false}];
-        else return [{text: "准备 BMO2 进阶", checked: false}];
+        if (month > 11) return [{text: "【考试已结束】", checked: false}];
+        const bmoYear = 2005 + Math.floor(offset / 2); // 两天一年
+        const paper = (offset % 2 === 0) ? '卷I 前半' : '卷I 后半';
+        if (isWeekend) {
+            return [
+                {text: `深海憋气：高压连做 3 道 ${bmoYear}年 ${paper} 大题`, checked: false},
+                {text: "规范输出：详细解答与严密全英文证明", checked: false}
+            ];
+        } else {
+            return [
+                {text: `单点爆破：死磕 1 道 ${bmoYear}年 ${paper} 压轴大题`, checked: false},
+                {text: "逻辑严密：写出详细解答与全英文证明", checked: false}
+            ];
+        }
       } 
       else if (taskName === "雅思学习") {
-        const cNum = 10 + Math.floor(offset / 10); 
-        const tNum = 1 + (Math.floor(offset/2) % 4); 
-        const pNum = 1 + (offset % 3);
-        if (month <= 11) return [{text: `精读 剑${Math.min(cNum,18)} Test ${tNum} Passage ${pNum}`, checked: false}, {text: `听力 Test ${tNum} Section 1-2 精听盲写`, checked: false}, {text: "积累 Part 2 口语素材，录音修正逻辑", checked: false}];
-        else return [{text: "【圣诞冲刺】精批写作 Task 2 大作文", checked: false}, {text: "录音并反复修改口语高频题回答", checked: false}];
-      }
-      else if (taskName === "实习项目推进") {
-        const w = 6 + Math.floor(offset / 7); 
-        if(w===6) return [{text: "调用大模型API完成 zero-shot/few-shot 测试", checked: false}, {text: "搭建本地笔记 RAG (检索增强) Demo 雏形", checked: false}];
-        else if(w===7) return [{text: "开发 Streamlit/Gradio 可交互 UI 界面", checked: false}, {text: "完成模型混淆矩阵与错误案例深度分析", checked: false}];
-        else if(w===8) return [{text: "撰写 5-8 页全英文 NLP 项目结题报告", checked: false}, {text: "准备 15 分钟 Final Presentation 幻灯片", checked: false}];
-        else return [{text: "【NLP实习已圆满结业】", checked: false}];
+        if (month > 12) return [];
+        const testNum = 1 + (Math.floor(offset/3) % 4);
+        return [
+            {text: `Reading: 剑${10 + Math.floor(offset/15)} T${testNum} Passage 3`, checked: false},
+            {text: `Listening: 精听盲写 Part 2 / Part 3`, checked: false},
+            {text: "Speaking: 抽取 1 题录音练习并修正", checked: false},
+            {text: "Writing: 独立撰写 1 篇大作文并详细改进", checked: false}
+        ];
       }
       else if (taskName === "HiMCM建模") {
-        if (month <= 10) return [{text: "研究评价模型：AHP、TOPSIS、CRITIC客观赋权", checked: false}, {text: "学习机器学习分类器：逻辑回归、SVM、随机森林", checked: false}, {text: "推演线性规划(单纯形法)与微分方程(SIR/种群)", checked: false}];
-        else if (month === 11) return [{text: "【比赛月】锁定赛题，团队分工算法攻坚", checked: false}, {text: "完成全英文论文初稿排版与数学公式 LaTeX 化", checked: false}];
-        else return [{text: "【建模结束】整理代码库与参赛经验总结", checked: false}];
+        if (month > 11) return [{text: "【建模结束】整理代码库与参赛经验总结", checked: false}];
+        return [
+            {text: "研读讲义：深入学习评价模型与推演", checked: false},
+            {text: "讲义实操：对应算法的代码复现与思考", checked: false}
+        ];
       }
-      else if (taskName === "AL高数学习") {
-        if (month <= 11) return [{text: "强行推进考纲进度 (纯数 P3/P4 核心)", checked: false}, {text: "推进力学 M1 / 统计 S1 基础难点", checked: false}];
-        else return [{text: "刷 AL 历年综合 Past Papers", checked: false}];
-      }
-      else if (taskName === "英语书籍阅读") {
-        if (month <= 10) return [{text: "强力推进英文原版书阅读 (目标一章)", checked: false}, {text: "做读书批注，提炼高级词汇与地道从句", checked: false}];
-        else return [{text: "【已读完】转化为期末文学复习", checked: false}];
+      else if (taskName === "实习项目推进") {
+        return [
+            {text: "大段时间块：专注推进 NLP 核心研发", checked: false},
+            {text: "代码调试与前沿大模型 API 接入测试", checked: false}
+        ];
       }
       else if (taskName === "数学书籍阅读") {
-        return [{text: "精读《小蓝本》巩固硬核代数/组合竞赛知识漏洞", checked: false}, {text: "翻阅大学英文数学原著，演草纸推导公式定理", checked: false}];
+        return [
+            {text: "翻阅数学原著，在演草纸上硬核推导公式定理", checked: false},
+            {text: "摘录精妙的证明逻辑与解题思路", checked: false}
+        ];
       }
-      else if (taskName.includes("校内各科复习")) {
-        return [{text: "闭环当天 物理/化学/CS 作业", checked: false}, {text: "整理当日课堂重点笔记与错题本", checked: false}];
+      else if (taskName === "AL高数 (提前学)") {
+        return [
+            {text: "超前推演 Further Math 进阶大纲定理", checked: false}, 
+            {text: "整理进阶高数错题与狂刷高阶题库", checked: false}
+        ];
       }
-      else if (taskName.includes("A日")) return [{text: "引体向上：做到力竭 × 4组", checked: false}, {text: "拉力绳(拉背/面拉)：100个 × 3组", checked: false}, {text: "腹部核心：俄罗斯转体/仰卧举腿 3组", checked: false}];
-      else if (taskName.includes("B日")) return [{text: "俯卧撑：20个 × 5组 (宽窄距交替)", checked: false}, {text: "仰卧起坐：50个 起底爆发", checked: false}, {text: "平板支撑：核心稳定力竭 × 2组", checked: false}];
-      else if (taskName.includes("拉伸")) return [{text: "全身静态肌肉拉伸 (15m)", checked: false}, {text: "泡沫轴滚压：排解乳酸，放松背/腿筋膜", checked: false}];
+      else if (taskName === "课后复习") {
+        return [
+            {text: "理科大扫荡：闭环当天 物理/化学/CS 作业", checked: false}, 
+            {text: "系统化：整理当日课堂重点笔记与错题本入库", checked: false}
+        ];
+      }
+      // 🔥 定制硬核健身计划：上半身、背、三头、腹部 🔥
+      else if (taskName === "体能训练(A日)") {
+        return [
+            {text: "引体向上 (背部)：宽距拉至力竭 × 4组", checked: false},
+            {text: "哑铃划船 (背部)：顶峰收缩 12次 × 4组", checked: false},
+            {text: "俄罗斯转体 (核心)：负重每侧 15次 × 3组", checked: false},
+            {text: "平板支撑 (核心)：核心收紧至力竭 × 2组", checked: false}
+        ];
+      }
+      else if (taskName === "体能训练(B日)") {
+        return [
+            {text: "俯卧撑 (胸/三头)：宽窄距交替 力竭 × 4组", checked: false},
+            {text: "凳上反屈伸 (肱三头)：慢下快起 15次 × 4组", checked: false},
+            {text: "仰卧卷腹 (上腹)：20次 × 3组 起底爆发", checked: false},
+            {text: "仰卧举腿 (下腹)：15次 × 3组 慢放控制", checked: false}
+        ];
+      }
       
+      // 其他带有 (校内) 的课程、或者体育课、班会、转场等一律返回空，显示纯文本块
       return [];
     }
 
-    /* ==================== 读写引擎 ==================== */
-    function getBlockData(dateStr, rowId, baseText) {
-      const db = getStore(); const key = `${rowId}_${baseText}`;
-      if(db[dateStr] && db[dateStr][key]) {
-        let dt = db[dateStr][key];
-        if (dt.details.length === 0 && !dt.userDeletedAll && dt.replacedBy === null) dt.details = getSmartDetail(dateStr, baseText);
-        return dt;
+    // 核心机制：精准生成唯一的任务镜像
+    function getTaskData(dateStr, exactName) {
+      const db = getStore();
+      if(!db[dateStr]) db[dateStr] = {};
+      if(!db[dateStr][exactName]) {
+        db[dateStr][exactName] = { details: getSmartDetail(dateStr, exactName) };
       }
-      return { details: getSmartDetail(dateStr, baseText), replacedBy: null, userDeletedAll: false };
+      return db[dateStr][exactName];
     }
 
-    async function saveDetail(dateStr, rowId, baseText, detailText) {
-      if(!detailText.trim()) return;
-      const db = getStore(); const key = `${rowId}_${baseText}`;
-      if(!db[dateStr]) db[dateStr] = {}; if(!db[dateStr][key]) db[dateStr][key] = { details: getSmartDetail(dateStr, baseText), replacedBy: null };
-      db[dateStr][key].details.push({text: detailText.trim(), checked: false});
-      db[dateStr][key].userDeletedAll = false; 
-      await saveCloudData(db);
-    }
-
-    async function deleteDetail(dateStr, rowId, baseText, index) {
-      const db = getStore(); const key = `${rowId}_${baseText}`;
-      if(!db[dateStr]) db[dateStr] = {}; if(!db[dateStr][key]) db[dateStr][key] = { details: getSmartDetail(dateStr, baseText), replacedBy: null };
-      db[dateStr][key].details.splice(index, 1);
-      if (db[dateStr][key].details.length === 0) db[dateStr][key].userDeletedAll = true; 
-      await saveCloudData(db);
-    }
-
-    // 更新任务勾选状态并计算全部完成时的情况
-    async function toggleCheck(dateStr, rowId, baseText, index) {
-      const db = getStore(); const key = `${rowId}_${baseText}`;
-      if(!db[dateStr] || !db[dateStr][key]) return; 
-      db[dateStr][key].details[index].checked = !db[dateStr][key].details[index].checked;
-      await saveCloudData(db);
-
-      const allDone = db[dateStr][key].details.length > 0 && db[dateStr][key].details.every(d => d.checked);
-      if(allDone) playSuccessAnimation();
+    async function toggleCheck(dateStr, exactName, index, checkboxEl) {
+      const isChecked = checkboxEl.checked;
+      const db = getStore(); 
+      if(!db[dateStr]) db[dateStr] = {};
+      if(!db[dateStr][exactName]) {
+        db[dateStr][exactName] = { details: getSmartDetail(dateStr, exactName) };
+      }
       
-      renderWeeklyGrid();
-      if(currentActiveView === 'progress') renderProgress();
-      updateRealTimeProgress(); 
-    }
+      db[dateStr][exactName].details[index].checked = isChecked;
+      
+      const syncBase = `${dateStr}_${btoa(encodeURIComponent(exactName)).replace(/=/g, '')}`;
+      
+      // 同步 DOM 里所有同名的复选框（保证异地不串台）
+      document.querySelectorAll(`input[data-sync-key="${syncBase}_${index}"]`).forEach(cb => {
+        cb.checked = isChecked;
+        const txt = cb.nextElementSibling;
+        if (isChecked) {
+          txt.classList.add('line-through', 'text-slate-500', 'opacity-50');
+          txt.classList.remove('text-slate-300', 'group-hover:text-white');
+        } else {
+          txt.classList.remove('line-through', 'text-slate-500', 'opacity-50');
+          txt.classList.add('text-slate-300', 'group-hover:text-white');
+        }
+      });
 
-    async function executeSwapOverride(dateStr, rowId, baseText, newTheme, newTag) {
-      const db = getStore(); const key = `${rowId}_${baseText}`;
-      if(!db[dateStr]) db[dateStr] = {}; if(!db[dateStr][key]) db[dateStr][key] = { details: [], replacedBy: null };
-      db[dateStr][key].replacedBy = { theme: newTheme, tag: newTag };
-      db[dateStr][key].details = []; 
-      await saveCloudData(db);
+      const allDone = db[dateStr][exactName].details.length > 0 && db[dateStr][exactName].details.every(d => d.checked);
+      if(allDone) playSuccessAnimation();
+
+      document.querySelectorAll(`[data-wrapper-key="${syncBase}"]`).forEach(wrapper => {
+        wrapper.setAttribute('data-completed', allDone.toString());
+      });
+
+      updateRealTimeProgress(); 
+      await saveCloudData(db); 
     }
 
     function getDayIndex(dateStr) { let d = new Date(dateStr).getDay() - 1; return d === -1 ? 6 : d; }
     function sanitizeForHTML(str) { return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;').replace(/"/g, '&quot;'); }
 
-    /* ==================== Modal 触发与处理 ==================== */
-    let activeModalContext = null;
-    async function openAdd(dateStr, rowId, baseText, e) {
-      e.stopPropagation(); const txt = prompt(`为 [${baseText}] 添加细分任务：`);
-      if(txt) { await saveDetail(dateStr, rowId, baseText, txt); generateMonthlySlider(); renderWeeklyGrid(); updateRealTimeProgress(); }
-    }
-    function openDel(dateStr, rowId, baseText, e) {
-      e.stopPropagation(); const data = getBlockData(dateStr, rowId, baseText);
-      if(data.details.length === 0) { alert("当前无细分任务。"); return; }
-      const container = document.getElementById('delListContainer');
-      container.innerHTML = data.details.map((d, i) => `
-        <div class="flex justify-between items-center p-2 bg-night-800 rounded mb-1 border border-night-700">
-          <span class="text-[11px] text-slate-300">${i+1}. ${sanitizeForHTML(d.text)}</span>
-          <button onclick="commitDel('${dateStr}', ${rowId}, '${sanitizeForHTML(baseText)}', ${i})" class="text-rose-400 border border-rose-800/50 px-3 py-1 rounded text-[10px] hover:bg-rose-900/30 transition-colors">删除</button>
-        </div>
-      `).join('');
-      document.getElementById('modalOverlay').classList.remove('hidden'); document.getElementById('modalDel').classList.remove('hidden');
-    }
-    async function commitDel(dateStr, rowId, baseText, idx) { await deleteDetail(dateStr, rowId, baseText, idx); closeModal(); generateMonthlySlider(); renderWeeklyGrid(); updateRealTimeProgress(); }
-    function openSwap(dateStr, rowId, baseText, e) {
-      e.stopPropagation(); activeModalContext = { dateStr, rowId, baseText };
-      document.getElementById('swapTargetInfo').innerText = `TARGET: ${dateStr} | ${baseText}`;
-      document.getElementById('swapTheme').value = '';
-      document.getElementById('modalOverlay').classList.remove('hidden'); document.getElementById('modalSwap').classList.remove('hidden');
-    }
-    async function executeSwap() {
-      const theme = document.getElementById('swapTheme').value.trim(); const tag = document.getElementById('swapTag').value;
-      if(!theme) { alert('新主题不能为空！'); return; }
-      await executeSwapOverride(activeModalContext.dateStr, activeModalContext.rowId, activeModalContext.baseText, theme, tag);
-      closeModal(); generateMonthlySlider(); renderWeeklyGrid(); updateRealTimeProgress();
-    }
-    function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); document.getElementById('modalSwap').classList.add('hidden'); document.getElementById('modalDel').classList.add('hidden'); document.getElementById('modalTimeline').classList.add('hidden'); activeModalContext = null; }
+    function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); document.getElementById('modalTimeline').classList.add('hidden'); }
 
-    /* ==================== 视觉动画引擎 ==================== */
     function playSuccessAnimation() {
       const anim = document.getElementById('celebration');
       anim.classList.add('active'); setTimeout(() => anim.classList.remove('active'), 2500);
     }
 
+    function parseSafeDate(ds) {
+      if(!ds) return new Date();
+      const parts = ds.split('T');
+      if(parts.length < 2) return new Date(ds);
+      const [y, m, d] = parts[0].split('-');
+      const [h, min, s] = parts[1].split(':');
+      return new Date(y, m - 1, d, h, min, s || 0);
+    }
+
     function updateRealTimeProgress() {
-      if(currentActiveView !== 'weekly') return;
       const now = new Date();
       document.querySelectorAll('.task-cell-wrap').forEach(cell => {
         const isCompleted = cell.getAttribute('data-completed') === 'true';
-        const start = new Date(cell.getAttribute('data-start'));
-        const end = new Date(cell.getAttribute('data-end'));
+        const startStr = cell.getAttribute('data-start');
+        const endStr = cell.getAttribute('data-end');
+        if(!startStr || !endStr) return;
+        
+        const start = parseSafeDate(startStr);
+        const end = parseSafeDate(endStr);
         const fillBar = cell.querySelector('.tech-fill-bar');
 
-        if (isCompleted) {
-          // 全部打勾后，彻底变灰变暗 (保留交互以防点错撤回)
-          cell.classList.add('task-completed');
-          cell.classList.remove('task-active-glow');
-          if(fillBar) fillBar.style.width = '100%';
-        } else if (now > end) {
-          cell.classList.remove('task-active-glow', 'task-completed');
-          if(fillBar) fillBar.style.width = '100%';
+        cell.classList.remove('status-done', 'task-active-glow');
+
+        // 无打卡项的校内课，时间流逝也会触发变灰压暗
+        if (isCompleted || now > end) {
+          cell.classList.add('status-done');
+          if(fillBar) { fillBar.style.width = '100%'; fillBar.style.opacity = '1'; }
         } else if (now >= start && now <= end) {
-          cell.classList.remove('task-completed');
           cell.classList.add('task-active-glow');
           const percent = ((now - start) / (end - start)) * 100;
-          if(fillBar) fillBar.style.width = `${percent}%`;
+          if(fillBar) { fillBar.style.width = `${percent}%`; fillBar.style.opacity = '1'; }
         } else {
-          cell.classList.remove('task-completed', 'task-active-glow');
-          if(fillBar) fillBar.style.width = '0%';
+          if(fillBar) { fillBar.style.width = '0%'; fillBar.style.opacity = '0'; }
         }
       });
     }
 
-    /* ==================== 周度表渲染 ==================== */
+    /* ==================== 周度表渲染（全面释放洗漱餐饮栏目） ==================== */
     function renderWeeklyGrid() {
       const container = document.getElementById('weeklyGridContainer'); let html = '';
       const d = new Date(); const currentDayNum = d.getDay() === 0 ? 7 : d.getDay(); 
 
       WEEKLY_SCHEDULE_DATA.forEach(row => {
-        if(row.type === 'transit') {
-          html += `<div class="grid grid-cols-8 text-[9px] font-mono border-t border-night-800/50" style="min-height: 14px; opacity: 0.4;"><div class="border-r border-night-800 bg-night-950 flex justify-center items-center text-slate-700"></div>`;
-          row.days.forEach(item => html += `<div class="border-r border-night-800"><div class="h-full w-full bg-night-950 border-t border-b border-night-800/30 border-dashed"></div></div>`);
-          html += `</div>`;
-        } else {
-          const calculatedHeight = Math.max(row.duration * 1.6, row.duration < 15 ? 26 : 40);
-          html += `<div class="grid grid-cols-8 text-xs font-mono items-stretch border-t border-night-800/80" style="min-height: ${calculatedHeight}px;">
-              <div class="p-1.5 border-r border-night-800 bg-gradient-to-b from-night-850 to-night-900 flex flex-col items-center justify-center font-bold text-slate-400 text-center select-none shadow-inner">
-                ${row.timeLabel}<span class="text-[9px] font-normal text-slate-600 mt-1">${row.duration}m</span>
-              </div>`;
+        // 取消了对 row.type === 'transit' 的拦截，所有栏目正常渲染高度
+        const calculatedHeight = Math.max(row.duration * 1.6, row.duration <= 15 ? 26 : 40);
+        html += `<div class="grid grid-cols-8 text-xs font-mono items-stretch border-t border-night-800/80" style="min-height: ${calculatedHeight}px;">
+            <div class="p-1.5 border-r border-night-800 bg-gradient-to-b from-night-850 to-night-900 flex flex-col items-center justify-center font-bold text-slate-400 text-center select-none shadow-inner leading-tight">
+              ${row.timeLabel}<span class="text-[9px] font-normal text-slate-600 mt-0.5">${row.duration}m</span>
+            </div>`;
 
-          row.days.forEach((item, dayIdx) => {
-            const diff = dayIdx + 1 - currentDayNum; const targetDate = new Date(d); targetDate.setDate(d.getDate() + diff);
-            const targetDateStr = `${targetDate.getFullYear()}-${String(targetDate.getMonth()+1).padStart(2,'0')}-${String(targetDate.getDate()).padStart(2,'0')}`;
-            
-            const blockData = getBlockData(targetDateStr, row.rowId, item.text);
-            const isReplaced = blockData.replacedBy !== null;
-            const displayTxt = isReplaced ? blockData.replacedBy.theme : item.text;
-            const displayTag = isReplaced ? blockData.replacedBy.tag : item.tag;
-            const style = TAG_STYLES[displayTag] || TAG_STYLES.school_gen;
-            const padding = row.duration <= 15 ? 'p-0 text-[10px]' : 'p-2 text-[11px] leading-snug';
+        row.days.forEach((item, dayIdx) => {
+          const diff = dayIdx + 1 - currentDayNum; const targetDate = new Date(d); targetDate.setDate(d.getDate() + diff);
+          const targetDateStr = `${targetDate.getFullYear()}-${String(targetDate.getMonth()+1).padStart(2,'0')}-${String(targetDate.getDate()).padStart(2,'0')}`;
+          
+          if(item.hide) {
+            // 被隐藏的转场（10分钟的纯空当）使用极简留白
+            html += `<div class="p-0 border-r border-night-800/40 flex flex-col bg-night-950/30"></div>`;
+          } else {
+            const displayTxt = item.text;
+            const style = TAG_STYLES[item.tag] || TAG_STYLES.school_gen;
+            const padding = row.duration <= 15 ? 'p-1 text-[10px] items-center justify-center' : 'p-2 text-[11px] leading-snug';
+            const baseKey = btoa(encodeURIComponent(displayTxt)).replace(/=/g, '');
             
             let detailHtml = ''; let allChecked = false;
-
-            if (blockData.details.length > 0 && row.duration > 15 && targetDate >= new Date('2026-09-09')) {
-               allChecked = blockData.details.every(dt => dt.checked);
-               detailHtml = `<div class="mt-2 w-full text-[10px] text-slate-300 font-normal border-t border-night-700/50 pt-2 text-left opacity-95 space-y-1.5 relative z-10">` + 
-                  blockData.details.map((dt, i) => `
-                    <label class="flex items-start gap-1.5 cursor-pointer group">
-                      <input type="checkbox" ${dt.checked ? 'checked' : ''} onchange="toggleCheck('${targetDateStr}', ${row.rowId}, '${sanitizeForHTML(item.text)}', ${i})" class="mt-[2px] accent-emerald-500 w-3 h-3 rounded-sm cursor-pointer shadow-sm">
-                      <span class="break-words leading-tight ${dt.checked ? 'line-through text-slate-500 opacity-50' : 'text-slate-300 group-hover:text-white'} transition-all">${sanitizeForHTML(dt.text)}</span>
-                    </label>`).join('') + `</div>`;
+            
+            // 只有超过 15 分钟且在有效期内的主动任务才会去拉取 Checkbox
+            if (row.duration > 15 && targetDate >= new Date('2026-09-09') && item.tag !== 'dining') {
+               const taskData = getTaskData(targetDateStr, displayTxt);
+               if(taskData.details.length > 0) {
+                 allChecked = taskData.details.every(dt => dt.checked);
+                 detailHtml = `<div class="mt-2 w-full text-[10px] text-slate-300 font-normal border-t border-night-700/50 pt-2 text-left opacity-95 space-y-1.5 relative z-10">` + 
+                    taskData.details.map((dt, i) => `
+                      <label class="flex items-start gap-1.5 cursor-pointer group">
+                        <input type="checkbox" ${dt.checked ? 'checked' : ''} data-sync-key="${targetDateStr}_${baseKey}_${i}" onchange="toggleCheck('${targetDateStr}', '${sanitizeForHTML(displayTxt)}', ${i}, this)" onclick="event.stopPropagation()" class="mt-[2px] accent-emerald-500 min-w-[12px] h-3 rounded-sm cursor-pointer shadow-sm">
+                        <span class="break-words leading-tight ${dt.checked ? 'line-through text-slate-500 opacity-50' : 'text-slate-300 group-hover:text-white'} transition-all">${sanitizeForHTML(dt.text)}</span>
+                      </label>`).join('') + `</div>`;
+               }
             }
 
-            if(item.hide || item.tag === 'dining' || targetDate < new Date('2026-09-09')) {
-              let textToShow = targetDate < new Date('2026-09-09') ? `<span class="text-slate-600 italic font-normal">已成历史</span>` : displayTxt;
-              html += `<div class="p-1 border-r border-night-800 flex flex-col"><div class="h-full w-full rounded flex justify-center items-center text-center ${style} ${padding} grayscale opacity-50">${textToShow}</div></div>`;
+            // 对于过期任务显示历史
+            if(targetDate < new Date('2026-09-09')) {
+              html += `<div class="p-1 border-r border-night-800 flex flex-col"><div class="h-full w-full rounded flex justify-center items-center text-center ${style} ${padding} grayscale opacity-50"><span class="text-slate-600 italic font-normal">已成历史</span></div></div>`;
             } else {
-              // 在包裹层标注 data-completed 属性，updateRealTimeProgress() 会读取并附加任务变灰样式
               html += `<div class="p-1 border-r border-night-800 flex flex-col">
-                  <div class="relative h-full w-full rounded flex flex-col transition-all duration-500 ${style} ${padding} task-cell-wrap" data-completed="${allChecked}" data-start="${targetDateStr}T${row.start}:00" data-end="${targetDateStr}T${row.end}:00">
-                    <div class="absolute bottom-0 left-0 h-full z-0 tech-fill-bar transition-all duration-1000 rounded" style="width:0%"></div>
-                    <span class="font-bold ${isReplaced?'text-rose-300':''} flex items-center relative z-10 tracking-wide">${displayTxt} ${isReplaced?'(Re)':''}</span>
+                  <div class="relative h-full w-full rounded flex flex-col transition-all duration-500 ${style} ${padding} task-cell-wrap" data-wrapper-key="${targetDateStr}_${baseKey}" data-completed="${allChecked}" data-start="${targetDateStr}T${row.start}:00" data-end="${targetDateStr}T${row.end}:00">
+                    <div class="absolute bottom-0 left-0 h-full z-0 tech-fill-bar transition-all duration-1000 rounded" style="width:0%; opacity:0;"></div>
+                    <span class="font-bold flex items-center relative z-10 tracking-wide ${row.duration <= 15 ? 'text-center' : ''}">${displayTxt}</span>
                     ${detailHtml}
                   </div>
                 </div>`;
             }
-          });
-          html += `</div>`;
-        }
+          }
+        });
+        html += `</div>`;
       });
       container.innerHTML = html;
       updateRealTimeProgress(); 
     }
 
-    /* ==================== 月度表渲染 ==================== */
-    function toggleInlineDetails(dateStr, taskText, rowId) {
-      if (isEditModeActive) return; 
-      const id = `details-${dateStr}-${rowId}-${btoa(encodeURIComponent(taskText)).replace(/=/g, '')}`;
+    /* ==================== 月度表极致合并渲染 (纯净序号版) ==================== */
+    function toggleInlineDetails(dateStr, baseKey) {
+      const id = `details-${dateStr}-${baseKey}`;
       const el = document.getElementById(id);
       if (el) el.classList.toggle('hidden');
     }
@@ -597,33 +578,40 @@
         if (isBeforeStart) {
           html += `<div class="text-xs text-slate-600 text-center mt-10 italic">历史节点<br>无任务</div>`;
         } else {
+          // 在单日维度合并所有相同的科目，去除重复方块
+          let uniqueTasks = {};
           WEEKLY_SCHEDULE_DATA.forEach(row => {
-            if (row.type === 'transit') return; const item = row.days[dayIdx]; 
-            if (item.hide || item.tag === 'dining' || item.tag.startsWith('school_')) return;
+            const item = row.days[dayIdx]; 
+            if (item.hide || item.tag === 'dining' || item.tag === 'transit') return; 
+            if(!uniqueTasks[item.text]) uniqueTasks[item.text] = { text: item.text, tag: item.tag, start: row.start, end: row.end };
+          });
 
-            const blockData = getBlockData(dateStr, row.rowId, item.text);
-            const isReplaced = blockData.replacedBy !== null;
-            const displayTxt = isReplaced ? blockData.replacedBy.theme : item.text;
-            const displayTag = isReplaced ? blockData.replacedBy.tag : item.tag;
-            
-            const barStyle = TAG_COLORS_FOR_BARS[displayTag] || "bg-night-800 border-l-[3px] border-l-slate-500 text-slate-300";
-            const safeDisplayTxt = sanitizeForHTML(displayTxt); const safeItemText = sanitizeForHTML(item.text);
-            const detailsId = `details-${dateStr}-${row.rowId}-${btoa(encodeURIComponent(item.text)).replace(/=/g, '')}`;
+          Object.values(uniqueTasks).forEach(taskInfo => {
+            const barStyle = TAG_COLORS_FOR_BARS[taskInfo.tag] || "bg-night-800 border-l-[3px] border-l-slate-500 text-slate-300";
+            const safeDisplayTxt = sanitizeForHTML(taskInfo.text); 
+            const baseKey = btoa(encodeURIComponent(taskInfo.text)).replace(/=/g, '');
+            const detailsId = `details-${dateStr}-${baseKey}`;
+            const taskData = getTaskData(dateStr, taskInfo.text);
 
-            let detailsHtml = `<div id="${detailsId}" class="hidden pl-2 text-[10px] text-slate-400 border-l border-night-700 ml-1 mb-2 mt-1 space-y-1.5">`;
-            if (blockData.details.length === 0) detailsHtml += `<div class="italic">无细分</div>`;
-            else detailsHtml += blockData.details.map((d,i)=>`<div class="${d.checked?'text-emerald-500 line-through opacity-50':''}">${d.checked?'✓':'-'} ${sanitizeForHTML(d.text)}</div>`).join('');
+            let allChecked = false;
+            // 纯净文本模式，无复选框
+            let detailsHtml = `<div id="${detailsId}" class="hidden pl-2 text-[10px] text-slate-400 border-l border-night-700 ml-1 mb-2 mt-1 space-y-1">`;
+            if (taskData.details.length === 0) {
+              detailsHtml += `<div class="italic opacity-50">无细分任务，上课即可</div>`;
+            } else {
+              allChecked = taskData.details.every(dt => dt.checked);
+              taskData.details.forEach((d, i) => {
+                  const statusIcon = d.checked ? '<span class="text-emerald-500 mr-1 font-bold">✓</span>' : '<span class="text-slate-600 mr-1">•</span>';
+                  const textStyle = d.checked ? 'line-through text-slate-500 opacity-50' : 'text-slate-300';
+                  detailsHtml += `<div class="flex items-start leading-tight ${textStyle}">${statusIcon}<span>${i+1}. ${sanitizeForHTML(d.text)}</span></div>`;
+              });
+            }
             detailsHtml += `</div>`;
 
             html += `
-              <div>
-                <div class="task-bar ${barStyle} flex items-center justify-between shadow-sm" onclick="toggleInlineDetails('${dateStr}', '${safeItemText}', ${row.rowId})">
-                  <span class="truncate font-semibold tracking-wide">${safeDisplayTxt}</span>
-                  <div class="action-overlay rounded">
-                    <span class="action-btn" title="Add" onclick="openAdd('${dateStr}', ${row.rowId}, '${safeItemText}', event)">➕</span>
-                    <span class="action-btn" title="Del" onclick="openDel('${dateStr}', ${row.rowId}, '${safeItemText}', event)">🗑️</span>
-                    <span class="action-btn" title="Override" onclick="openSwap('${dateStr}', ${row.rowId}, '${safeItemText}', event)">🔄</span>
-                  </div>
+              <div class="task-cell-wrap transition-all duration-500 rounded" data-wrapper-key="${dateStr}_${baseKey}" data-completed="${allChecked}" data-start="${dateStr}T${taskInfo.start}:00" data-end="${dateStr}T${taskInfo.end}:00">
+                <div class="task-bar ${barStyle} flex items-center justify-between shadow-sm" onclick="toggleInlineDetails('${dateStr}', '${baseKey}')">
+                  <span class="truncate font-semibold tracking-wide relative z-0">${safeDisplayTxt}</span>
                 </div>
                 ${detailsHtml}
               </div>`;
@@ -652,51 +640,17 @@
       document.querySelectorAll('[id^="month-grid-"]').forEach(el => observer.observe(el));
     }
     function slideToMonth(y, m) { const tgt = document.getElementById(`month-grid-${y}-${m}`); if(tgt) tgt.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'start' }); }
-    function slidePrev() { let m = currentFocusMonth - 1, y = currentFocusYear; if (m < 0) { m = 11; y--; } slideToMonth(y, m); }
-    function slideNext() { let m = currentFocusMonth + 1, y = currentFocusYear; if (m > 11) { m = 0; y++; } slideToMonth(y, m); }
+    function slidePrev() { let txt = document.getElementById('currentMonthLabel').innerText; let y = parseInt(txt.split(' ')[0]); let mStr = txt.split(' ')[2]; let m = parseInt(mStr)-1; m--; if(m<0){m=11; y--;} slideToMonth(y, m); }
+    function slideNext() { let txt = document.getElementById('currentMonthLabel').innerText; let y = parseInt(txt.split(' ')[0]); let mStr = txt.split(' ')[2]; let m = parseInt(mStr)-1; m++; if(m>11){m=0; y++;} slideToMonth(y, m); }
     function goToToday() { const d = new Date(); slideToMonth(d.getFullYear(), d.getMonth()); }
 
-    let isEditModeActive = false;
-    function toggleEditMode() {
-      const btn = document.getElementById('editModeBtn'); const wrapper = document.getElementById('monthlyWrapper');
-      isEditModeActive = !isEditModeActive;
-      if (isEditModeActive) {
-        btn.classList.add('bg-cyan-900/50', 'text-cyan-400', 'border-cyan-500'); btn.innerText = "💾 EXIT EDIT MODE"; wrapper.classList.add('edit-mode');
-      } else {
-        btn.classList.remove('bg-cyan-900/50', 'text-cyan-400', 'border-cyan-500'); btn.innerText = "⚙️ EDIT MODE"; wrapper.classList.remove('edit-mode');
-      }
-    }
-
-    /* ==================== 进度总览与极客折线时间轴 ==================== */
-    const PROJECT_MILESTONES = {
-      'amc12': [
-        { date: '2026-09-15', label: '代数复数专项', y: 15 }, { date: '2026-09-30', label: '组合概率突破', y: 85 },
-        { date: '2026-10-15', label: '数论几何综合', y: 20 }, { date: '2026-10-30', label: '历年全真模考', y: 80 }, { date: '2026-11-10', label: '压轴题冲刺', y: 50 }
-      ],
-      'himcm': [
-        { date: '2026-09-20', label: '线性规划/评价模型', y: 85 }, { date: '2026-10-05', label: '微分方程推演', y: 15 },
-        { date: '2026-10-20', label: '机器学习实操', y: 80 }, { date: '2026-11-01', label: '锁定赛题/分工', y: 20 }, { date: '2026-11-15', label: '论文全英封版', y: 50 }
-      ],
-      'bmo': [
-        { date: '2026-09-25', label: '代数方程变形', y: 15 }, { date: '2026-10-10', label: '几何综合推理', y: 85 },
-        { date: '2026-10-25', label: '数论构造套路', y: 20 }, { date: '2026-11-15', label: '完整书面证明', y: 80 }, { date: '2026-11-30', label: 'BMO1全卷演练', y: 50 }
-      ],
-      'nlp': [
-        { date: '2026-09-20', label: 'Word2Vec/RNN', y: 85 }, { date: '2026-10-05', label: 'Transformer架构', y: 15 },
-        { date: '2026-10-25', label: 'HuggingFace微调', y: 80 }, { date: '2026-11-10', label: 'RAG知识库Demo', y: 20 }, { date: '2026-11-20', label: 'PPT与答辩报告', y: 50 }
-      ],
-      'ielts': [
-        { date: '2026-09-30', label: '剑14/15 听阅精刷', y: 15 }, { date: '2026-10-20', label: '口语 Part2 语料', y: 85 },
-        { date: '2026-11-15', label: '写作 Task 2 逻辑', y: 20 }, { date: '2026-12-05', label: '口语 Part3 高频题', y: 80 }, { date: '2026-12-20', label: '全真机考模拟', y: 50 }
-      ]
-    };
-
+    /* ==================== 进度总览与全景真实时间折线图 ==================== */
     const PROJECTS = [
-      { id: 'amc12', name: 'AMC12 A卷冲刺', start: '2026-09-09', target: '2026-11-10', kw: 'AMC12', c: 'bg-cyan-500', stroke: '#06b6d4', shadow: 'shadow-[0_0_15px_rgba(6,182,212,0.5)]' },
-      { id: 'himcm', name: 'HiMCM 全球赛', start: '2026-09-09', target: '2026-11-15', kw: 'HiMCM', c: 'bg-purple-500', stroke: '#a855f7', shadow: 'shadow-[0_0_15px_rgba(168,85,247,0.5)]' },
-      { id: 'bmo', name: 'BMO1 备考', start: '2026-09-09', target: '2026-11-30', kw: 'BMO', c: 'bg-indigo-500', stroke: '#6366f1', shadow: 'shadow-[0_0_15px_rgba(99,102,241,0.5)]' },
-      { id: 'nlp', name: 'NLP 项目落地', start: '2026-09-09', target: '2026-11-20', kw: '实习项目', c: 'bg-rose-500', stroke: '#f43f5e', shadow: 'shadow-[0_0_15px_rgba(244,63,94,0.5)]' },
-      { id: 'ielts', name: '雅思 IELTS', start: '2026-09-09', target: '2026-12-20', kw: '雅思', c: 'bg-amber-500', stroke: '#f59e0b', shadow: 'shadow-[0_0_15px_rgba(245,158,11,0.5)]' }
+      { id: 'amc12', name: 'AMC12 攻坚', start: '2026-09-09', target: '2026-11-10', kw: 'AMC12', c: 'bg-cyan-500', stroke: '#06b6d4', shadow: 'shadow-[0_0_15px_rgba(6,182,212,0.5)]' },
+      { id: 'himcm', name: 'HiMCM 建模', start: '2026-09-09', target: '2026-11-15', kw: 'HiMCM', c: 'bg-purple-500', stroke: '#a855f7', shadow: 'shadow-[0_0_15px_rgba(168,85,247,0.5)]' },
+      { id: 'bmo', name: 'BMO1 备赛', start: '2026-09-09', target: '2026-11-30', kw: 'BMO', c: 'bg-indigo-500', stroke: '#6366f1', shadow: 'shadow-[0_0_15px_rgba(99,102,241,0.5)]' },
+      { id: 'nlp', name: 'NLP 核心研发', start: '2026-09-09', target: '2026-11-20', kw: '实习', c: 'bg-rose-500', stroke: '#f43f5e', shadow: 'shadow-[0_0_15px_rgba(244,63,94,0.5)]' },
+      { id: 'ielts', name: '雅思 IELTS', start: '2026-09-09', target: '2026-12-20', kw: '雅思学习', c: 'bg-amber-500', stroke: '#f59e0b', shadow: 'shadow-[0_0_15px_rgba(245,158,11,0.5)]' }
     ];
 
     function getTasksStats(kw, startDateStr, endDateStr) {
@@ -707,45 +661,38 @@
       for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
         const dStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         const dayIdx = getDayIndex(dStr);
-
+        let hasSubject = false; let exactName = "";
+        
         WEEKLY_SCHEDULE_DATA.forEach(row => {
           if (row.type !== 'transit') {
-            const item = row.days[dayIdx];
-            if (item.text.includes(kw)) {
-              const key = `${row.rowId}_${item.text}`;
-              if (db[dStr] && db[dStr][key]) {
-                const dt = db[dStr][key];
-                if (!(dt.details.length === 0 && dt.userDeletedAll)) {
-                  const details = dt.details.length > 0 ? dt.details : getSmartDetail(dStr, item.text);
-                  total += details.length;
-                  checked += details.filter(x => x.checked).length;
-                }
-              } else {
-                total += getSmartDetail(dStr, item.text).length;
-              }
-            }
+            if (row.days[dayIdx] && row.days[dayIdx].text.includes(kw)) { hasSubject = true; exactName = row.days[dayIdx].text; }
           }
         });
+
+        if(hasSubject && exactName) {
+          if (db[dStr] && db[dStr][exactName]) {
+            const details = db[dStr][exactName].details.length > 0 ? db[dStr][exactName].details : getSmartDetail(dStr, exactName);
+            total += details.length; checked += details.filter(x => x.checked).length;
+          } else { total += getSmartDetail(dStr, exactName).length; }
+        }
       }
       return { checked, total, ratio: total === 0 ? 0 : checked / total };
     }
 
     function renderProgress() {
       const container = document.getElementById('progressContainer'); const today = new Date().getTime();
-      
       container.innerHTML = PROJECTS.map(p => {
         const stats = getTasksStats(p.kw, p.start, p.target);
         const sTime = new Date(p.start).getTime(); const tTime = new Date(p.target).getTime();
         let perc = Math.max(0, Math.min(100, ((today - sTime) / (tTime - sTime)) * 100));
         let remain = Math.max(0, Math.ceil((tTime - today) / 86400000));
-        
         return `
           <div class="pro-card p-6 rounded-xl relative cursor-pointer hover:border-night-600 transition-all group hover:-translate-y-1 hover:shadow-2xl" onclick="openTimeline('${p.id}')">
              <div class="flex justify-between items-center mb-2">
                <h3 class="font-bold text-slate-100 font-mono tracking-wide group-hover:text-white transition-colors text-lg">${p.name}</h3>
                <span class="text-[10px] font-mono bg-night-950 px-2 py-1 rounded border border-night-700 text-slate-400">距离: ${remain} 天</span>
              </div>
-             <p class="text-[10px] text-slate-500 mb-4">打卡进度歼灭率 <span class="text-white font-bold text-xs">${(stats.ratio*100).toFixed(1)}%</span> (点击展开六边形时间轴)</p>
+             <p class="text-[10px] text-slate-500 mb-4">打卡进度歼灭率 <span class="text-white font-bold text-xs">${(stats.ratio*100).toFixed(1)}%</span></p>
              <div class="w-full bg-night-950 h-3 rounded-full overflow-hidden mt-3 shadow-inner border border-night-800">
                  <div class="${p.c} h-full progress-fill ${p.shadow} rounded-r-full" style="--progress-w: ${perc}%;"></div>
              </div>
@@ -756,85 +703,107 @@
       setTimeout(() => { document.querySelectorAll('.progress-fill').forEach(el => { el.style.width = el.style.getPropertyValue('--progress-w'); }); }, 50);
     }
 
-    // SVG 不能直接解析 %，这里需要在 DOM 显示后拿到真实高度计算绝对像素。
+    // 🔥 全新的标签逻辑：两天一年，清晰划定 A卷与B卷 🔥
+    function generateNodeLabel(dateStr, kw) {
+      const offset = Math.max(0, Math.floor((new Date(dateStr) - new Date('2026-09-09')) / 86400000));
+      if (kw.includes("AMC12")) return `${2010 + Math.floor(offset/2)}年 ${offset % 2 === 0 ? 'A卷' : 'B卷'}`;
+      if (kw.includes("BMO")) return `${2005 + Math.floor(offset/2)}年 ${offset % 2 === 0 ? '上半' : '下半'}`;
+      if (kw.includes("雅思")) return `剑${10 + Math.floor(offset/15)} T${1 + (Math.floor(offset/3)%4)}`;
+      if (kw.includes("HiMCM")) return ["评价模型", "微分方程", "机器学习", "真题复现", "论文排版"][Math.min(4, Math.floor(offset/14))];
+      if (kw.includes("实习")) return ["Word2Vec", "Transformer", "HF微调", "RAG架构", "答辩PPT"][Math.min(4, Math.floor(offset/14))];
+      return "任务节点";
+    }
+
+    // 全真坐标映射折线图，完美连接不断裂，低透明背景色块
     function openTimeline(projectId) {
       const p = PROJECTS.find(x => x.id === projectId); if(!p) return;
-      document.getElementById('timelineTitle').innerHTML = `<span class="${p.c.replace('bg-', 'text-')} drop-shadow-[0_0_8px_currentColor] tracking-widest">${p.name} TIMELINE</span>`;
+      document.getElementById('timelineTitle').innerHTML = `<span class="${p.c.replace('bg-', 'text-')} drop-shadow-[0_0_8px_currentColor] tracking-widest">${p.name} ROADMAP</span>`;
       
-      const milestones = PROJECT_MILESTONES[projectId];
-      const startDate = new Date('2026-09-01');
-      const endDate = new Date('2026-12-31');
-      const PX_PER_DAY = 45;
-      const totalWidth = ((endDate - startDate) / 86400000) * PX_PER_DAY;
-
       document.getElementById('modalOverlay').classList.remove('hidden'); 
       document.getElementById('modalTimeline').classList.remove('hidden');
 
-      // 强行使用 requestAnimationFrame 确保容器已渲染拿到 clientHeight 
-      requestAnimationFrame(() => {
-        const containerHeight = document.getElementById('timelineScrollArea').clientHeight;
-        
-        let html = `<div style="width:${totalWidth}px; height: 100%; position: relative;">`;
+      const startD = new Date('2026-09-01');
+      const endD = new Date('2026-12-31');
+      const PX_PER_DAY = 150; 
+      const totalDays = Math.floor((endD - startD) / 86400000);
+      const totalWidth = totalDays * PX_PER_DAY;
 
-        const monthNames = ['SEP', 'OCT', 'NOV', 'DEC'];
-        const monthDays = [30, 31, 30, 31];
-        let currentX = 0;
-        monthDays.forEach((days, i) => {
-          const w = days * PX_PER_DAY;
-          const bgColor = i % 2 === 0 ? 'bg-slate-800/10' : 'bg-slate-800/30';
-          html += `<div class="absolute top-0 bottom-0 ${bgColor} border-r border-night-700/50" style="left:${currentX}px; width:${w}px;">
-                      <div class="text-night-700/40 font-black text-6xl mt-4 ml-4 tracking-tighter">${monthNames[i]}</div>
-                   </div>`;
-          currentX += w;
-        });
+      let html = `<div style="width:${totalWidth}px; height: 100%; position: relative;">`;
 
-        let svgPath = '';
-        milestones.forEach((m, idx) => {
-          const cx = ((new Date(m.date) - startDate) / 86400000) * PX_PER_DAY;
-          // 利用实际容器高度计算绝对 Y 坐标
-          const cy = (m.y / 100) * containerHeight; 
+      // 绘制分月低透明度色块背景
+      let curM = new Date(startD);
+      const monthColors = [ 
+          {m: 9, c: 'bg-blue-900', name: 'SEP'}, 
+          {m: 10, c: 'bg-purple-900', name: 'OCT'}, 
+          {m: 11, c: 'bg-rose-900', name: 'NOV'}, 
+          {m: 12, c: 'bg-emerald-900', name: 'DEC'} 
+      ];
+      
+      while(curM <= endD) {
+          const m = curM.getMonth() + 1; const y = curM.getFullYear();
+          const daysInM = new Date(y, m, 0).getDate();
+          const xPos = Math.floor((curM - startD) / 86400000) * PX_PER_DAY;
+          const mWidth = daysInM * PX_PER_DAY;
+          const config = monthColors.find(mc => mc.m === m);
+          if (config) {
+             html += `<div class="absolute top-0 bottom-0 ${config.c} bg-opacity-10 border-r border-night-700/50" style="left:${xPos}px; width:${mWidth}px;">
+                <div class="text-night-700/30 font-black text-8xl mt-10 ml-6 tracking-tighter">${config.name}</div>
+             </div>`;
+          }
+          curM.setMonth(curM.getMonth() + 1);
+      }
+
+      const db = getStore();
+      let nodes = []; let curD = new Date(p.start + 'T00:00:00'); const targetD = new Date(p.target + 'T00:00:00');
+      
+      // 提取所有有任务的日子
+      while(curD <= targetD) {
+          const dStr = `${curD.getFullYear()}-${String(curD.getMonth()+1).padStart(2,'0')}-${String(curD.getDate()).padStart(2,'0')}`;
+          const dayIdx = getDayIndex(dStr);
+          let exactName = "";
+          WEEKLY_SCHEDULE_DATA.forEach(row => {
+             if (row.days[dayIdx] && row.days[dayIdx].text.includes(p.kw)) { exactName = row.days[dayIdx].text; }
+          });
+          if(exactName) {
+             const taskData = getTaskData(dStr, exactName);
+             const isCompleted = taskData.details.length > 0 && taskData.details.every(d => d.checked);
+             const label = generateNodeLabel(dStr, p.kw);
+             nodes.push({ date: dStr, isCompleted, label, offsetDays: Math.floor((curD - startD) / 86400000) });
+          }
+          curD.setDate(curD.getDate() + 1);
+      }
+
+      let svgPath = ''; let nodesHtml = ''; let isTop = true;
+      nodes.forEach((node, idx) => {
+          const cx = node.offsetDays * PX_PER_DAY + (PX_PER_DAY / 2); 
+          const cy = isTop ? 35 : 65; 
+          // 真正的全线连接，不会断开
           svgPath += (idx === 0 ? `M ${cx} ${cy} ` : `L ${cx} ${cy} `);
-        });
-
-        html += `<svg class="absolute top-0 left-0 pointer-events-none z-10" width="${totalWidth}" height="${containerHeight}">
-                   <path d="${svgPath}" fill="none" stroke="${p.stroke}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="6 6" opacity="0.6" class="timeline-path drop-shadow-[0_0_5px_currentColor]" />
-                 </svg>`;
-
-        milestones.forEach((m, idx) => {
-          const cx = ((new Date(m.date) - startDate) / 86400000) * PX_PER_DAY;
-          const prevDate = idx === 0 ? p.start : milestones[idx-1].date;
           
-          const stageRatio = getTasksStats(p.kw, prevDate, m.date).ratio;
-          const isCompleted = stageRatio >= 0.99;
-          
-          const dashOffset = 84 - 84 * stageRatio;
-          const colorClass = isCompleted ? `${p.c.replace('bg-', 'text-')} drop-shadow-[0_0_10px_currentColor]` : 'text-slate-600';
-          
-          const isTop = m.y < 50;
-          const labelPos = isTop ? 'top-10' : 'bottom-10';
+          const colorClass = node.isCompleted ? `${p.c.replace('bg-', 'text-')} drop-shadow-[0_0_12px_currentColor]` : 'text-slate-600';
+          const labelPosStyle = isTop ? 'top: 45px;' : 'bottom: 45px;';
 
-          html += `
-            <div class="absolute z-20 flex flex-col items-center group" style="left: ${cx}px; top: ${m.y}%; transform: translate(-50%, -50%);">
-              
-              <svg width="36" height="36" viewBox="0 0 32 32" class="relative z-10 transition-transform duration-300 group-hover:scale-125 cursor-pointer ${colorClass}">
-                <polygon points="16,2 28.12,9 28.12,23 16,30 3.88,23 3.88,9" fill="#0d131f" stroke="#334155" stroke-width="2"/>
-                <polygon points="16,2 28.12,9 28.12,23 16,30 3.88,23 3.88,9" fill="${isCompleted ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="3"
-                         stroke-dasharray="84" stroke-dashoffset="${dashOffset}"
-                         class="transition-all duration-1000 ease-out" style="fill-opacity: 0.15;"/>
-                ${isCompleted ? '<circle cx="16" cy="16" r="3" fill="currentColor" />' : ''}
-              </svg>
-
-              <div class="absolute ${labelPos} flex flex-col items-center w-max opacity-80 group-hover:opacity-100 transition-opacity">
-                 <span class="text-xs ${isCompleted ? 'text-white font-bold drop-shadow-md' : 'text-slate-500'} bg-night-950/90 px-3 py-1.5 rounded border border-night-800 shadow-lg backdrop-blur-sm">${m.label}</span>
-                 <span class="text-[10px] text-slate-500 font-mono mt-1 font-bold">${m.date.slice(5)} (${(stageRatio*100).toFixed(0)}%)</span>
-              </div>
-            </div>
-          `;
-        });
-
-        html += `</div>`;
-        document.getElementById('timelineContent').innerHTML = html;
+          nodesHtml += `
+            <div class="absolute z-20 flex flex-col items-center group" style="left: ${cx}px; top: ${cy}%; transform: translate(-50%, -50%); width: 48px; height: 48px;">
+               <svg width="48" height="48" viewBox="0 0 32 32" class="absolute top-0 left-0 transition-transform duration-300 group-hover:scale-110 cursor-pointer ${colorClass}">
+                  <polygon points="16,2 28.12,9 28.12,23 16,30 3.88,23 3.88,9" fill="#0d131f" stroke="#1e293b" stroke-width="1.5"/>
+                  <polygon points="16,2 28.12,9 28.12,23 16,30 3.88,23 3.88,9" fill="${node.isCompleted ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2.5" class="transition-all duration-500 ease-out" style="fill-opacity: ${node.isCompleted ? '0.2' : '0'};"/>
+                  <circle cx="16" cy="16" r="${node.isCompleted ? '4' : '1.5'}" fill="${node.isCompleted ? 'currentColor' : '#475569'}" class="transition-all duration-500" />
+               </svg>
+               <div class="absolute flex flex-col items-center w-max opacity-90 group-hover:opacity-100 transition-all duration-300 z-30 pointer-events-none" style="${labelPosStyle}">
+                   <span class="text-[11px] ${node.isCompleted ? 'text-white font-bold' : 'text-slate-400'} bg-night-950/80 px-2.5 py-1 rounded border border-night-700/50 shadow-xl backdrop-blur-md tracking-wider">${node.label}</span>
+                   <span class="text-[9px] text-slate-500 font-mono mt-1 font-semibold">${node.date.slice(5)}</span>
+               </div>
+            </div>`;
+          isTop = !isTop;
       });
+
+      html += `<svg class="absolute top-0 left-0 pointer-events-none z-10" width="${totalWidth}px" height="100%" viewBox="0 0 ${totalWidth} 100" preserveAspectRatio="none">
+                 <path d="${svgPath}" fill="none" stroke="${p.stroke}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="0.6" class="timeline-path drop-shadow-[0_0_5px_currentColor]" vector-effect="non-scaling-stroke" />
+               </svg>`;
+      html += nodesHtml;
+      html += `</div>`;
+      document.getElementById('timelineContent').innerHTML = html;
     }
 
     const scrollArea = document.getElementById('timelineScrollArea');
@@ -844,10 +813,8 @@
     scrollArea.addEventListener('mouseup', () => { isDown = false; scrollArea.classList.remove('active:cursor-grabbing'); });
     scrollArea.addEventListener('mousemove', (e) => { if(!isDown) return; e.preventDefault(); const x = e.pageX - scrollArea.offsetLeft; const walk = (x - startX) * 2; scrollArea.scrollLeft = scrollLeft - walk; });
 
-    /* ==================== 视图控制 ==================== */
-    let currentActiveView = 'weekly';
     function switchView(view) {
-      currentActiveView = view; if (isEditModeActive) toggleEditMode();
+      currentActiveView = view;
       const tabW = document.getElementById('tabWeekly'); const tabM = document.getElementById('tabMonthly'); const tabP = document.getElementById('tabProgress');
       const vW = document.getElementById('viewWeekly'); const vM = document.getElementById('viewMonthly'); const vP = document.getElementById('viewProgress');
       
@@ -859,7 +826,7 @@
         renderWeeklyGrid(); 
       } else if (view === 'monthly') {
         vM.classList.remove('hidden'); tabM.className = "px-4 py-1.5 text-xs font-semibold rounded-md transition-all bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 shadow-inner";
-        if (!window.monthlyRendered) { generateMonthlySlider(); setTimeout(() => goToToday(), 50); window.monthlyRendered = true; }
+        generateMonthlySlider(); setTimeout(() => goToToday(), 50);
       } else if (view === 'progress') {
         vP.classList.remove('hidden'); tabP.className = "px-4 py-1.5 text-xs font-semibold rounded-md transition-all text-emerald-400 bg-emerald-900/20 border border-emerald-500/50 shadow-inner";
         renderProgress();
