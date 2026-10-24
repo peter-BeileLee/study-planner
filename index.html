@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="assets/css/app.css">
 </head>
 <body>
 <!-- 登录账号：BeileLee；完整访问密码：081130Peter；仅月度路线密码：peterli。 -->
@@ -242,8 +242,6 @@
 <option value="himcm">HiMCM 建模</option>
 <option value="nlp">NLP 实习项目</option>
 <option value="al">AL 高数</option>
-<option value="tmua">TMUA</option>
-<option value="step">STEP</option>
 <option value="workout">力量训练</option>
 <option value="run">运动 / 训练</option>
 <option value="swim">游泳训练</option>
@@ -259,7 +257,7 @@
 <input id="fixed" type="checkbox">
 <span>标记固定课表 / 训练（仍可手动调整）</span>
 </label>
-<p class="editor-note">区块修改应用于每周模板。临时任务会在日期范围内覆盖所有重叠安排，醒目标记并单独追踪完成。</p>
+<p class="editor-note">区块修改应用于每周模板。临时任务覆盖日期范围内的可移动学习安排，保留固定课程、用餐与每日半小时兴趣时间，并单独追踪完成。</p>
 <p id="formError" class="form-error" role="alert">
 </p>
 <div class="form-actions">
@@ -288,9 +286,9 @@
   <button class="floating-tool" data-float-view="progress" title="进度追踪">↗<span>进度</span></button>
   <button class="floating-tool edit-tool" id="editNav" title="区块修改">✎<span>区块修改</span></button>
  </div>
-<script src="schedule.js">
+<script src="data/schedule.js">
 </script>
-<script src="app.js">
+<script src="assets/js/app.js">
 </script>
 </body>
 </html>
